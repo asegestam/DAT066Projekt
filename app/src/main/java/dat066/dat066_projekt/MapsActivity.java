@@ -12,6 +12,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.TextView;
+import java.lang.Math;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,6 +35,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     static Location lastLocation = null;
     static double distanceInMetres;
+    double speed;
     LocationManager locationManager;
     LocationListener locationListener;
 
@@ -52,22 +55,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onLocationChanged(Location location) {
                 if(lastLocation == null) {
                     lastLocation = location;
+                    return;
                 }
                 long currentTime = location.getTime();
                 long lastTime = lastLocation.getTime();
                 long timeBetween = (currentTime - lastTime)/1000;
                 double distance = location.distanceTo(lastLocation);
-                if(distanceInMetres > 21100) {
-                    //nån bugg där efter första 10m så hoppar den upp med 21183 m
-                    distanceInMetres += distance - 21183;
-                }
                 distanceInMetres += distance;
-                double speed = distance/timeBetween;
-                //Toast.makeText(MapsActivity.this, "Distance " + distanceInMetres, Toast.LENGTH_SHORT).show();
+                if(timeBetween > 0) {
+                    speed = distance/timeBetween;
+                }
+                Log.d(TAG, "Distance mellan " + distance+ " m");
                 Log.d(TAG, "Distance " + distanceInMetres + " m");
                 Log.d(TAG, "Time " + timeBetween + " s");
                 Log.d(TAG, "Speed " + speed + " m/s");
-                Log.d(TAG, "Hastighet " + (speed*3600)/1000 + " km/h");
+                Log.d(TAG, "Hastighet " + speed*3.6 + " km/h");
+
+                TextView distanceText = findViewById(R.id.distanceText);
+                distanceText.setText("Distance moved " + Math.floor(distanceInMetres) + " m");
+
+                TextView speedText = findViewById(R.id.speedText);
+                speedText.setText("Speed " + speed*3.6 + " km/h");
+
                 lastLocation = location;
             }
 
