@@ -12,8 +12,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import java.lang.Math;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,6 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double speed;
     LocationManager locationManager;
     LocationListener locationListener;
+    ArrayList<Double> avgSpeed = new ArrayList<>();
 
 
     @Override
@@ -50,7 +55,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         distanceInMetres = 0;
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
         locationListener = new LocationListener() {
+            DecimalFormat numberFormat = new DecimalFormat("#.00");
             @Override
             public void onLocationChanged(Location location) {
                 if(lastLocation == null) {
@@ -64,18 +71,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 distanceInMetres += distance;
                 if(timeBetween > 0) {
                     speed = distance/timeBetween;
+                    avgSpeed.add(speed);
                 }
-                Log.d(TAG, "Distance mellan " + distance+ " m");
-                Log.d(TAG, "Distance " + distanceInMetres + " m");
-                Log.d(TAG, "Time " + timeBetween + " s");
-                Log.d(TAG, "Speed " + speed + " m/s");
-                Log.d(TAG, "Hastighet " + speed*3.6 + " km/h");
+                if(!avgSpeed.isEmpty()){
+                    calcAverageSpeed();
+                }
+                //Log.d(TAG, "Distance mellan " + distance+ " m");          //Loggar avståndet mellan uppdateringar
+                Log.d(TAG, "Distance " + distanceInMetres + " m");     //Loggar totala avståndet
+                //Log.d(TAG, "Time " + timeBetween + " s");                 //Loggar tiden mellan uppdateringar
+                Log.d(TAG, "Speed " + speed + " m/s");                //Loggar hastighet i m/s
 
                 TextView distanceText = findViewById(R.id.distanceText);
-                distanceText.setText("Distance moved " + Math.floor(distanceInMetres) + " m");
+                distanceText.setText("Distance moved " + numberFormat.format(distanceInMetres) + " m");
 
                 TextView speedText = findViewById(R.id.speedText);
-                speedText.setText("Speed " + speed*3.6 + " km/h");
+                speedText.setText("Speed " + numberFormat.format(speed*3.6) + " km/h");
 
                 lastLocation = location;
             }
@@ -96,6 +106,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
         getLocationPermission();
+    }
+    /* Räknar ut medelhastigheten */
+    private double calcAverageSpeed() {
+        double sum = 0;
+        for (Double value : avgSpeed) {
+            if(value != null) sum += value;
+        }
+        double averageSpeed = sum/avgSpeed.size();
+        Log.d(TAG, "Medelhastighet " + averageSpeed  + " m/s"); //Loggar medelhastigheten de senaste 5000 metrarna
+        if(avgSpeed.size() > 500) avgSpeed.clear();
+        return averageSpeed;
+    }
+
+    public void resetValues(View view) {
+        try {
+            distanceInMetres = 0;
+            speed = 0;
+            avgSpeed.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -132,7 +163,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-                //Every permission is granted, initialize the map
+                //Every permission is granted, initialize the map, request location updates every 10m
                 initMap();
                 locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 1000, 10, locationListener);
             } else {
