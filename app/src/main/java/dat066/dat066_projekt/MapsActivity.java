@@ -1,7 +1,15 @@
 package dat066.dat066_projekt;
 
 import android.Manifest;
+
 import android.content.pm.PackageManager;
+
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -9,22 +17,36 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+
 import com.google.android.gms.maps.CameraUpdateFactory;
+import android.view.View;
+import android.widget.TextView;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.text.DecimalFormat;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap;
+
+    private Thread thread;
+    private SpeedDistanceCalculator speedDistanceCalculator;
+
     private static final String TAG = "MapsActivity";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Boolean mLocationPermissionsGranted = false;
 
+
+
+    LocationManager locationManager;
+    DecimalFormat numberFormat = new DecimalFormat("#.00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +56,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        speedDistanceCalculator = new SpeedDistanceCalculator();
+
+        thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (!thread.isInterrupted()) {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateTextViews();
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+        thread.start();
         getLocationPermission();
     }
 
+    private void updateTextViews() {
+        TextView distanceText = findViewById(R.id.distanceText);
+        TextView speedText = findViewById(R.id.speedText);
+        distanceText.setText("Distance moved " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres())+ " m");
+        speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
+>>>>>>> testing
+    }
+
+    public void resetValues(View view) {
+        speedDistanceCalculator.resetValues();
+    }
 
     /**
      * Manipulates the map once available.
@@ -54,7 +109,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -72,8 +127,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-                //Every permission is granted, initialize the map
+
+                //Every permission is granted, initialize the map, request location updates every 10m
                 initMap();
+                locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 1000, 10, speedDistanceCalculator);
+
             } else {
                 //Ask for the fine_location permission because it was not already granted
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
