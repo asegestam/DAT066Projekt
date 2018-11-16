@@ -27,9 +27,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Boolean mLocationPermissionsGranted = false;
-    private String gender;
-    private int weight;
-    private int age;
 
 
     @Override
@@ -41,35 +38,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         getLocationPermission();
-    }
-
-    /**
-     *  Gets input from screen and saves it with shared preferences
-     *
-     *  Vi kan nog flytta detta om vi ska ha våra kalorieuträkningar
-     *  i en annan klass
-     */
-    public void Saveinfo(View view){
-        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("name", null/*input*/);
-        editor.putString("gender", null/*input*/);
-        editor.putInt("weight", 0/*input*/);
-        editor.putInt("age", 0/*input*/);
-        editor.apply();
-
-    }
-    /**
-     * Gets the user information from userInfo.xml and stores it in three variables
-     * 
-     *  Vi kan nog flytta detta om vi ska ha våra kalorieuträkningar
-     *  i en annan klass
-     */
-    public void getInfo(){
-        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        gender = sharedPref.getString("gender", "");
-        weight = sharedPref.getInt("weight", 0);
-        age = sharedPref.getInt("age", 0);
 
     }
 
@@ -95,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+
     }
 
     /**Gets the necessary permissions from the user or asks for them*/
