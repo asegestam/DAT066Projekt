@@ -14,36 +14,26 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import java.lang.Math;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-
-import android.widget.Toast;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.DecimalFormat;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap;
+    private Thread thread;
+    private SpeedDistanceCalculator speedDistanceCalculator;
     private static final String TAG = "MapsActivity";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private Boolean mLocationPermissionsGranted = false;
-
-
-    static Location lastLocation = null;
-    static double distanceInMetres;
-    double speed;
     LocationManager locationManager;
-    LocationListener locationListener;
-    ArrayList<Double> avgSpeed = new ArrayList<>();
-
+    DecimalFormat numberFormat = new DecimalFormat("#.00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,80 +43,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        distanceInMetres = 0;
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        speedDistanceCalculator = new SpeedDistanceCalculator();
 
-        locationListener = new LocationListener() {
-            DecimalFormat numberFormat = new DecimalFormat("#.00");
+        thread = new Thread() {
             @Override
-            public void onLocationChanged(Location location) {
-                if(lastLocation == null) {
-                    lastLocation = location;
-                    return;
+            public void run() {
+                try {
+                    while (!thread.isInterrupted()) {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateTextViews();
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
                 }
-                long currentTime = location.getTime();
-                long lastTime = lastLocation.getTime();
-                long timeBetween = (currentTime - lastTime)/1000;
-                double distance = location.distanceTo(lastLocation);
-                distanceInMetres += distance;
-                if(timeBetween > 0) {
-                    speed = distance/timeBetween;
-                    avgSpeed.add(speed);
-                }
-                if(!avgSpeed.isEmpty()){
-                    calcAverageSpeed();
-                }
-                //Log.d(TAG, "Distance mellan " + distance+ " m");          //Loggar avståndet mellan uppdateringar
-                Log.d(TAG, "Distance " + distanceInMetres + " m");     //Loggar totala avståndet
-                //Log.d(TAG, "Time " + timeBetween + " s");                 //Loggar tiden mellan uppdateringar
-                Log.d(TAG, "Speed " + speed + " m/s");                //Loggar hastighet i m/s
-
-                TextView distanceText = findViewById(R.id.distanceText);
-                distanceText.setText("Distance moved " + numberFormat.format(distanceInMetres) + " m");
-
-                TextView speedText = findViewById(R.id.speedText);
-                speedText.setText("Speed " + numberFormat.format(speed*3.6) + " km/h");
-
-                lastLocation = location;
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
             }
         };
+        thread.start();
         getLocationPermission();
     }
-    /* Räknar ut medelhastigheten */
-    private double calcAverageSpeed() {
-        double sum = 0;
-        for (Double value : avgSpeed) {
-            if(value != null) sum += value;
-        }
-        double averageSpeed = sum/avgSpeed.size();
-        Log.d(TAG, "Medelhastighet " + averageSpeed  + " m/s"); //Loggar medelhastigheten de senaste 5000 metrarna
-        if(avgSpeed.size() > 500) avgSpeed.clear();
-        return averageSpeed;
+
+    private void updateTextViews() {
+        TextView distanceText = findViewById(R.id.distanceText);
+        TextView speedText = findViewById(R.id.speedText);
+        distanceText.setText("Distance moved " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres())+ " m");
+        speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
     }
 
     public void resetValues(View view) {
-        try {
-            distanceInMetres = 0;
-            speed = 0;
-            avgSpeed.clear();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        speedDistanceCalculator.resetValues();
     }
 
     /**
@@ -145,7 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -165,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mLocationPermissionsGranted = true;
                 //Every permission is granted, initialize the map, request location updates every 10m
                 initMap();
-                locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 1000, 10, locationListener);
+                locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 1000, 10, speedDistanceCalculator);
             } else {
                 //Ask for the fine_location permission because it was not already granted
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
