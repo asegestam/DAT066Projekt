@@ -13,6 +13,9 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -53,7 +56,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         speedDistanceCalculator = new SpeedDistanceCalculator();
         activityRunning = false;
-
         thread = new Thread() {
             @Override
             public void run() {
