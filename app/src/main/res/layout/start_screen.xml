@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/weight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter your Weight (kg)" />
+
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:hint="Weight"/>
+
+    <TextView
+        android:id="@+id/age"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter your Age (years)" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:hint="Age"/>
+
+
+    <TextView
+        android:id="@+id/gender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter your Gender" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+
+    <RadioButton
+        android:id="@+id/radioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Male" />
+
+    <RadioButton
+        android:id="@+id/radioButton2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Female" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button" />
+
+</LinearLayout>
