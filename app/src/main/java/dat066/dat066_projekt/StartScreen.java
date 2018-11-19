@@ -26,14 +26,20 @@ public class StartScreen extends AppCompatActivity{
     }
 
     public void init(View view) {
-        Log.d(TAG, "Weight: " + getWeight());
-        Log.d(TAG, "Age: " + getAge());
-        Log.d(TAG, "Gender: " + getGender());
-        ProfileSaver pf = new ProfileSaver(this, getWeight(), getAge(), getGender() );
-        pf.saveInfo();
-        pf.getInfo();
-        Intent intent = new Intent(StartScreen.this, MapsActivity.class);
-        startActivity(intent);
+        if((getGender() != null && !getGender().isEmpty()) && getWeight() != 0 && getAge() != 0) {
+            Log.d(TAG, "Weight: " + getWeight());
+            Log.d(TAG, "Age: " + getAge());
+            Log.d(TAG, "Gender: " + getGender());
+            ProfileSaver pf = new ProfileSaver(this, getWeight(), getAge(), getGender() );
+            pf.saveInfo();
+            pf.getInfo();
+            Intent intent = new Intent(StartScreen.this, MapsActivity.class);
+            startActivity(intent);
+        }
+        else {
+            Toast.makeText(this, "Please fill all requested fields above", Toast.LENGTH_SHORT).show();
+            Log.e(TAG,"ERROR ALL FIELDS NOT FILLED");
+        }
     }
 
     public int getWeight(){
