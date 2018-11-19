@@ -5,9 +5,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 
 import android.support.annotation.NonNull;
@@ -17,8 +14,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-
-import com.google.android.gms.maps.CameraUpdateFactory;
 import android.view.View;
 import android.widget.TextView;
 
@@ -86,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         TextView speedText = findViewById(R.id.speedText);
         distanceText.setText("Distance moved " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres())+ " m");
         speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
->>>>>>> testing
+
     }
 
     public void resetValues(View view) {
