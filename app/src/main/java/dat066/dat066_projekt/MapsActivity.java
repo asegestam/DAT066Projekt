@@ -74,18 +74,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         thread.start();
         getLocationPermission();
     }
-
-    private void updateTextViews() {
-        TextView distanceText = findViewById(R.id.distanceText);
-        TextView speedText = findViewById(R.id.speedText);
-        distanceText.setText("Distance moved " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres())+ " m");
-        speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
-
-    }
-
-    public void resetValues(View view) {
-        speedDistanceCalculator.resetValues();
-    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
