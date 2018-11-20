@@ -26,7 +26,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
         getInfo();
         //set contentview to activity_main
         if((gender != null && !gender.isEmpty()) && weight != 0 && age != 0) {
-            Intent intent = new Intent(ProfileSaverScreen.this, MapsActivity.class);
+            Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
         }
         else{
@@ -41,7 +41,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
             Log.d(TAG, "Gender: " + getGender());
             //ProfileSaver pf = new ProfileSaver(this, getWeight(), getAge(), getGender() );
             saveInfo();
-            Intent intent = new Intent(ProfileSaverScreen.this, MapsActivity.class);
+            Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
         }
         else {
