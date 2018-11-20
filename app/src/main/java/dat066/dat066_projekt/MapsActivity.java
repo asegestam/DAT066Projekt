@@ -12,7 +12,15 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.PopupMenu;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,10 +33,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.security.PrivateKey;
 import java.text.DecimalFormat;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,PopupMenu.OnMenuItemClickListener{
 
     private GoogleMap mMap;
 
+    String bike,run;
     private Thread thread;
     private SpeedDistanceCalculator speedDistanceCalculator;
 
@@ -196,7 +205,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         (findViewById(R.id.start_button)).setVisibility(visibility);
         (findViewById(R.id.button4)).setVisibility(visibility);
         (findViewById(R.id.button5)).setVisibility(visibility);
+
     }
+
+
 
     /**
      * Starts the location updates to start calculating speed, distance
@@ -226,6 +238,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(this, "Activity stopped", Toast.LENGTH_SHORT).show();
     }
 
+
     private void setTextViewVisibility(int visibility) {
         TextView distanceText = findViewById(R.id.distanceText);
         TextView speedText = findViewById(R.id.speedText);
@@ -237,5 +250,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             speedText.setVisibility(visibility);
         }
 
+    }
+
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.popup, popup.getMenu());
+        popup.show();
+        popup.setOnMenuItemClickListener(this);
+    }
+
+
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.run:
+                run = item.getTitle().toString();
+                item.setChecked(true);
+                changeActivityText(run);
+
+                break;
+            case R.id.bike:
+                 bike = item.getTitle().toString();
+                item.setChecked(true);
+                changeActivityText(bike);
+                break;
+
+        }
+        return true;
+    }
+
+
+
+    public void changeActivityText(String activity){
+        Button button = (Button)findViewById(R.id.button4);
+        button.setText("Type of Activity (" + activity + ")");
     }
 }

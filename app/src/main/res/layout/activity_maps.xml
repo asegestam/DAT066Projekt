@@ -53,12 +53,14 @@
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:visibility="gone" />
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="80dp">
+
 
         <Button
             android:id="@+id/button4"
@@ -68,6 +70,7 @@
             android:layout_marginBottom="1dp"
             android:layout_weight="1"
             android:backgroundTint="@android:color/white"
+            android:onClick="showPopup"
             android:text="Type of Activity"
             android:textAllCaps="false"
             android:textStyle="bold|italic" />
@@ -84,6 +87,8 @@
             android:textAllCaps="false"
             android:textStyle="bold|italic" />
     </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/distanceText"
@@ -114,4 +119,6 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="invisible" />
+
+
 </RelativeLayout>
