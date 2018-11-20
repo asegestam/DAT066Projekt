@@ -23,7 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-
+import android.support.v4.content.ContextCompat;
 import java.text.DecimalFormat;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -36,6 +36,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     DecimalFormat numberFormat = new DecimalFormat("#.00");
     private View view;
     private boolean activityStopped;
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     @Nullable
     @Override
@@ -48,6 +51,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapFragment = SupportMapFragment.newInstance();
             fragmentTransaction.replace(R.id.map, mapFragment).commit();
         }
+        getLocationPermission();
         mapFragment.getMapAsync(this);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         speedDistanceCalculator = new SpeedDistanceCalculator();
@@ -97,13 +101,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        this.mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        mMap.setPadding(0,0,0,0);
         mMap.setMyLocationEnabled(true);
     }
 
+    /**Gets the necessary permissions from the user or asks for them*/
+    private void getLocationPermission() {
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                //Every permission is granted, initialize the map
+                initMap();
+            } else {
+                //Ask for the fine_location permission because it was not already granted
+                ActivityCompat.requestPermissions(getActivity(), permissions, LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        } else
+            ActivityCompat.requestPermissions(getActivity(), permissions, LOCATION_PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+
+                    for (int grantResult : grantResults) {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED) {
+
+                            Log.d(TAG, "onRequestPermissionsResult: permission failed");
+                            return;
+                        }
+                    }
+                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+                    initMap();
+                }
+            }
+        }
+    }
+
+    /**Initializes the map*/
+    private void initMap() {
+        Log.d(TAG, "initMap: initializing the map");
+        mapFragment.getMapAsync(this);
+    }
+
+    /** Updates the TextViews to the current speed and distance */
     private void updateTextViews() {
         if(!activityStopped) {
             TextView distanceText = view.findViewById(R.id.distanceText);
@@ -164,7 +212,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         resetValues();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
-
+    /** Sets textView visibility */
     private void setTextViewVisibility(int visibility) {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
@@ -176,6 +224,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             speedText.setVisibility(visibility);
         }
     }
+    /** Sets the onClickListeners to all relevant buttons */
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             startActivity();
