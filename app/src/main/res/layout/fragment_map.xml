@@ -1,16 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+android:id="@+id/layout"
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".MapFragment">
+
+
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MapsActivity" />
+    android:layout_alignParentStart="true"
+    android:layout_alignParentTop="true"
+    android:layout_marginStart="0dp"
+    android:layout_marginTop="0dp"
+    tools:context=".MainActivity" />
 
-</FrameLayout>
+
+<Button
+    android:id="@+id/start_button"
+    style="@android:style/Widget.Button"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginStart="0dp"
+    android:layout_marginBottom="5dp"
+    android:backgroundTint="@color/colorPrimary"
+    android:onClick="startActivity"
+    android:text="Start Activity"
+    android:textAllCaps="true"
+    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+    android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+
+<Button
+    android:id="@+id/stop_button"
+    style="@android:style/Widget.Button"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginStart="0dp"
+    android:layout_marginBottom="5dp"
+    android:backgroundTint="@android:color/holo_red_dark"
+    android:onClick="stopActivity"
+    android:text="Stop Activity"
+    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+    android:visibility="gone" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="80dp">
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="1dp"
+        android:layout_weight="1"
+        android:backgroundTint="@android:color/white"
+        android:text="Type of Activity"
+        android:textAllCaps="false"
+        android:textStyle="bold|italic" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_weight="1"
+        android:backgroundTint="@android:color/white"
+        android:text="TBD"
+        android:textAllCaps="false"
+        android:textStyle="bold|italic" />
+</LinearLayout>
+
+<TextView
+    android:id="@+id/distanceText"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginStart="0dp"
+    android:layout_marginBottom="105dp"
+    android:text="Distance"
+    android:textAllCaps="true"
+    android:textColor="@android:color/white"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    android:visibility="invisible" />
+
+<TextView
+    android:id="@+id/speedText"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginStart="0dp"
+    android:layout_marginBottom="85dp"
+    android:text="Pace"
+    android:textAllCaps="true"
+    android:textColor="@android:color/white"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    android:visibility="invisible" />
+</RelativeLayout>
+
