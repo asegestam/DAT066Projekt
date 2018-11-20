@@ -4,9 +4,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
@@ -79,6 +76,7 @@ public class SpeedDistanceCalculator implements LocationListener {
         try {
             distanceInMetres = 0;
             speed = 0;
+            averageSpeed = 0;
             avgSpeed.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,7 +100,7 @@ public class SpeedDistanceCalculator implements LocationListener {
     }
 
     public double getAverageSpeed() {
-        return averageSpeed;
-    }
+        return calcAverageSpeed();
+}
 
 }
