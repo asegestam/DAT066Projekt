@@ -33,7 +33,6 @@ tools:context=".MapFragment">
     android:layout_marginStart="0dp"
     android:layout_marginBottom="5dp"
     android:backgroundTint="@color/colorPrimary"
-    android:onClick="startActivity"
     android:text="Start Activity"
     android:textAllCaps="true"
     android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -49,7 +48,6 @@ tools:context=".MapFragment">
     android:layout_marginStart="0dp"
     android:layout_marginBottom="5dp"
     android:backgroundTint="@android:color/holo_red_dark"
-    android:onClick="stopActivity"
     android:text="Stop Activity"
     android:textAppearance="@style/TextAppearance.AppCompat.Title"
     android:textColor="@color/common_google_signin_btn_text_dark_focused"
@@ -63,7 +61,7 @@ tools:context=".MapFragment">
     android:layout_marginBottom="80dp">
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/activity_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"

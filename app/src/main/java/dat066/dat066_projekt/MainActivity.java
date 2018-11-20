@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,11 +18,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.PopupMenu;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
 
     private static final String TAG = "MainActivity";
+    private String bike,run;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,5 +122,38 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
+    }
+
+    public void showPopup() {
+        PopupMenu popup = new PopupMenu(this, findViewById(R.id.activity_button));
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.popup_menu, popup.getMenu());
+        popup.show();
+        popup.setOnMenuItemClickListener(this);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.run:
+                run = item.getTitle().toString();
+                item.setChecked(true);
+                changeActivityText(run);
+
+                break;
+            case R.id.bike:
+                bike = item.getTitle().toString();
+                item.setChecked(true);
+                changeActivityText(bike);
+                break;
+
+        }
+        return true;
+    }
+
+    public void changeActivityText(String activity){
+        Button button = (Button)findViewById(R.id.activity_button);
+        button.setText("Type of Activity (" + activity + ")");
     }
 }
