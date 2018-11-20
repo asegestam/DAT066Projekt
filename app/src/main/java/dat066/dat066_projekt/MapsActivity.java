@@ -1,28 +1,28 @@
 package dat066.dat066_projekt;
 
 import android.Manifest;
-
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-
 import android.content.Context;
 import android.location.LocationManager;
-
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import java.security.PrivateKey;
 import java.text.DecimalFormat;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
@@ -56,7 +56,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         speedDistanceCalculator = new SpeedDistanceCalculator();
         activityRunning = false;
-
         thread = new Thread() {
             @Override
             public void run() {
@@ -77,6 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
         thread.start();
         getLocationPermission();
+
     }
     /**
      * Manipulates the map once available.
@@ -99,6 +99,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+
     }
 
     /**Gets the necessary permissions from the user or asks for them*/
@@ -159,16 +160,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void updateTextViews() {
         TextView distanceText = findViewById(R.id.distanceText);
         TextView speedText = findViewById(R.id.speedText);
-        distanceText.setText("Distance moved " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres())+ " m");
+        distanceText.setText("Distance " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres())+ " m");
         //speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
-        speedText.setText("Speed " + numberFormat.format(speedDistanceCalculator.getSpeed())+ " m/s");
+        speedText.setText("Pace " + numberFormat.format(speedDistanceCalculator.getSpeed())+ " m/s");
     }
 
     public void resetValues() {
         speedDistanceCalculator.resetValues();
     }
 
-
+    /** Request permission if not given and then requests location updates */
     private void requestLocationUpdates() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -205,6 +206,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         activityRunning = true;
         requestLocationUpdates();
         setButtonVisibility(8);
+        setTextViewVisibility(0);
         (findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
         Toast.makeText(this, "Activity started", Toast.LENGTH_SHORT).show();
     }
@@ -218,8 +220,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         activityRunning = false;
         locationManager.removeUpdates(speedDistanceCalculator);
         setButtonVisibility(0);
+        setTextViewVisibility(8);
         (findViewById(R.id.stop_button)).setVisibility(View.GONE);
         resetValues();
         Toast.makeText(this, "Activity stopped", Toast.LENGTH_SHORT).show();
+    }
+
+    private void setTextViewVisibility(int visibility) {
+        TextView distanceText = findViewById(R.id.distanceText);
+        TextView speedText = findViewById(R.id.speedText);
+        if(distanceText.getVisibility() == visibility && speedText.getVisibility() == visibility) {
+            return;
+        }
+        else {
+            distanceText.setVisibility(visibility);
+            speedText.setVisibility(visibility);
+        }
+
     }
 }

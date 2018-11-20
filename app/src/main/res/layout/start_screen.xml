@@ -1,64 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/button"
+        style="@android:style/Widget.Button"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="185dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Start TrainR"
+        android:textAllCaps="false"
+        android:onClick="init"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/white" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <TextView
-        android:id="@+id/weight"
+        android:id="@+id/welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:fontFamily="sans-serif"
+        android:text="Welcome to TrainR!"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/weightText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enter your Weight (kg)" />
+        android:text="Enter your Weight (kg)"
+        android:layout_marginTop="10dp"/>
 
 
     <EditText
+        android:id="@+id/weight"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:hint="Weight"/>
+        android:hint="Weight"
+        android:inputType="phone" />
 
     <TextView
-        android:id="@+id/age"
+        android:id="@+id/ageText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Enter your Age (years)" />
 
     <EditText
+        android:id="@+id/age"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:hint="Age"/>
+        android:hint="Age"
+        android:inputType="phone" />
 
 
     <TextView
-        android:id="@+id/gender"
+        android:id="@+id/genderText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Enter your Gender" />
 
     <RadioGroup
+        android:id="@+id/sex"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
 
+        <RadioButton
+            android:id="@+id/female"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Female" />
 
-    <RadioButton
-        android:id="@+id/radioButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Male" />
-
-    <RadioButton
-        android:id="@+id/radioButton2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Female" />
+        <RadioButton
+            android:id="@+id/man"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Male" />
 
     </RadioGroup>
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button" />
 
 </LinearLayout>
+
+</RelativeLayout>
