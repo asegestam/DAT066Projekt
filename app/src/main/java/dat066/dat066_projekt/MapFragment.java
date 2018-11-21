@@ -74,6 +74,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Button stopButton = (Button) view.findViewById(R.id.stop_button);
         startButton.setOnClickListener(startButtonClickListener);
         stopButton.setOnClickListener(stopButtonClickListener);
+
         return view;
     }
 
