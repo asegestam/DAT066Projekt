@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/done_button"
         style="@android:style/Widget.Button"
         android:layout_width="match_parent"
         android:layout_height="75dp"
@@ -13,9 +13,8 @@
         android:layout_marginBottom="5dp"
         android:layout_marginTop="185dp"
         android:backgroundTint="@color/colorPrimary"
-        android:text="Start TrainR"
+        android:text="Done"
         android:textAllCaps="false"
-        android:onClick="init"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@android:color/white" />
 
@@ -26,11 +25,11 @@
 
         <TextView
             android:id="@+id/welcome"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="60dp"
+            android:gravity="center"
             android:fontFamily="sans-serif"
-            android:text="Welcome to TrainR!"
+            android:text="Change Inputs"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@android:color/black"
             android:textSize="30sp" />
@@ -39,7 +38,7 @@
             android:id="@+id/weightText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter your Weight (kg)"
+            android:text="@string/enter_weight"
             android:layout_marginTop="10dp"/>
 
 
@@ -55,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Enter your Age (years)" />
+            android:text="@string/enter_age" />
 
         <EditText
             android:id="@+id/age"
@@ -70,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Enter your Gender" />
+            android:text="@string/enter_gender" />
 
         <RadioGroup
             android:id="@+id/sex"
