@@ -2,7 +2,9 @@ package dat066.dat066_projekt;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,18 +33,25 @@ public class ProfileFragment extends Fragment {
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private TextView mDisplayUsername;
     private TextView mDisplayWeight;
+    private ProfileSaverScreen pf;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
+
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Creating a new ProfileFragment");
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
-        EditText weightET = (EditText) (v.findViewById(R.id.weight));
-
+        sharedPref = getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
         usernameOnClickListener(v);
         weightOnClickListener(v);
         birthDayOnClickListener(v);
+        getSharedPreferences(v);
 
+        //Get sharedpreferences data
         return v;
     }
 
@@ -49,6 +59,24 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Profile");
+
+    }
+    private void getSharedPreferences(View v){
+        String gender = sharedPref.getString("gender", "");
+        String weight = sharedPref.getString("weight", "");
+        String age = sharedPref.getString("age", "");
+        String userName = sharedPref.getString("username", "");
+        mDisplayDate.setText(age);
+        mDisplayUsername.setText(userName);
+        mDisplayWeight.setText(weight + " kg");
+        if(gender.equals("Male")){
+            RadioButton b =v.findViewById(R.id.male);
+            b.toggle();
+        }
+        else{
+            RadioButton b =v.findViewById(R.id.female);
+            b.toggle();
+        }
 
     }
 
@@ -74,6 +102,9 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String weight = input.getText().toString();
                         mDisplayWeight.setText(weight + " kg");
+                        editor.putString("weight", weight );
+                        editor.apply();
+
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -110,6 +141,8 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String username = input.getText().toString();
                         mDisplayUsername.setText(username);
+                        editor.putString("username", username);
+                        editor.apply();
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -153,6 +186,8 @@ public class ProfileFragment extends Fragment {
                 Log.d(TAG, "onDateSet: dd/mm/yyyy:" + dayOfMonth + "/" + month + "/" + year);
                 String date = "" + dayOfMonth + "/"  + month + "/" + year;
                 mDisplayDate.setText(date);
+                editor.putString("age", date);
+                editor.apply();
             }
         };
     }

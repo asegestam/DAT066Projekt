@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:id="@+id/startscreen_container">
 
     <Button
         android:id="@+id/button"
@@ -18,81 +20,128 @@
         android:onClick="init"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@android:color/white" />
-
-<LinearLayout
+<ScrollView
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/welcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:fontFamily="sans-serif"
-        android:text="Welcome to TrainR!"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@android:color/black"
-        android:textSize="30sp" />
+    <LinearLayout
 
-    <TextView
-        android:id="@+id/weightText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enter your Weight (kg)"
-        android:layout_marginTop="10dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
 
+        <TextView
+            android:id="@+id/welcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif"
+            android:text="Welcome to TrainR!"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
+            android:paddingBottom="20dp"/>
 
-    <EditText
-        android:id="@+id/weight"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="Weight"
-        android:inputType="phone" />
-
-    <TextView
-        android:id="@+id/ageText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Enter your Age (years)" />
-
-    <EditText
-        android:id="@+id/age"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="Age"
-        android:inputType="phone" />
-
-
-    <TextView
-        android:id="@+id/genderText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Enter your Gender" />
-
-    <RadioGroup
-        android:id="@+id/sex"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <RadioButton
-            android:id="@+id/female"
+        <TextView
+            android:id="@+id/username_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Female" />
+            android:fontFamily="sans-serif"
+            android:text="Full Name"
+            android:textSize="20sp" />
 
-        <RadioButton
-            android:id="@+id/man"
+        <TextView
+            android:id="@+id/initialUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Male" />
+            android:hint="First and last name" />
 
-    </RadioGroup>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="15dp"/>
+
+        <TextView
+            android:id="@+id/weightText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Weight"
+            android:textSize="20sp" />
 
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/initialWeight"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Weight" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:id="@+id/birthdayText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Birthday"
+            android:textSize="20sp"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/initialDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="dd-mm-yyyy"
+            android:inputType="phone"
+            android:textSize="20sp" />
+
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:id="@+id/genderText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Gender"
+            android:textSize="20sp" />
+
+        <RadioGroup
+            android:id="@+id/sex"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <RadioButton
+                android:id="@+id/initialFemale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/InitialMale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+        </RadioGroup>
+
+
+    </LinearLayout>
+
+</ScrollView>
+
 
 </RelativeLayout>
