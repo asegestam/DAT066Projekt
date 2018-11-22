@@ -185,11 +185,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void pauseActivity(){
         (view.findViewById(R.id.imageButtonPause)).setVisibility(View.GONE);
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.VISIBLE);
+        locationManager.removeUpdates(speedDistanceCalculator);
     }
 
     public void resumeActivity(){
         (view.findViewById(R.id.imageButtonPause)).setVisibility(View.VISIBLE);
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
+        requestLocationUpdates();
+        speedDistanceCalculator.drawResumeLine();
     }
 
 
@@ -202,7 +205,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
-        //mMap.addMarker(new MarkerOptions().position(speedDistanceCalculator.getRouteLatLngs().get(0)));
+        if(speedDistanceCalculator.getRouteOptions().getPoints().size() != 0) {
+            mMap.addMarker(new MarkerOptions().position(speedDistanceCalculator.getRouteOptions().getPoints().get(1)));
+        }
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
     }
 
@@ -219,6 +224,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
         (view.findViewById(R.id.stop_button)).setVisibility(View.GONE);
+        if(speedDistanceCalculator.getRouteOptions().getPoints().size() != 0) {
+            List<LatLng> latLngs = speedDistanceCalculator.getRouteOptions().getPoints();
+            mMap.addMarker(new MarkerOptions().position(latLngs.get(latLngs.size() - 1)));
+        }
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
     /** Sets textView visibility */

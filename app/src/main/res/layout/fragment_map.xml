@@ -59,7 +59,7 @@ tools:context=".MapFragment">
             android:layout_marginEnd="2.5mm"
             android:layout_weight="1"
             android:background="@drawable/roundcorner"
-            android:backgroundTint="@android:color/background_light"
+            android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_stop_black_24dp"
             android:visibility="gone" />
 
@@ -70,7 +70,7 @@ tools:context=".MapFragment">
             android:layout_marginStart="2.5mm"
             android:layout_weight="1"
             android:background="@drawable/roundcorner"
-            android:backgroundTint="@android:color/background_light"
+            android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_play_arrow_black_24dp"
             android:visibility="gone" />
 
@@ -82,7 +82,7 @@ tools:context=".MapFragment">
             android:layout_weight="1"
             android:adjustViewBounds="false"
             android:background="@drawable/roundcorner"
-            android:backgroundTint="@android:color/background_light"
+            android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_pause_black_24dp"
             android:visibility="gone" />
 
@@ -121,34 +121,34 @@ tools:context=".MapFragment">
         android:textStyle="bold|italic" />
 </LinearLayout>
 
-<TextView
-    android:id="@+id/distanceText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginStart="0dp"
-    android:layout_marginBottom="105dp"
-    android:text="Distance"
-    android:textAllCaps="true"
-    android:textColor="@android:color/white"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:visibility="invisible" />
+    <TextView
+        android:id="@+id/distanceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="125dp"
+        android:text="Distance"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
-<TextView
-    android:id="@+id/speedText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginStart="0dp"
-    android:layout_marginBottom="85dp"
-    android:text="Pace"
-    android:textAllCaps="true"
-    android:textColor="@android:color/white"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:visibility="invisible" />
+    <TextView
+        android:id="@+id/speedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="100dp"
+        android:text="Pace"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 </RelativeLayout>
 

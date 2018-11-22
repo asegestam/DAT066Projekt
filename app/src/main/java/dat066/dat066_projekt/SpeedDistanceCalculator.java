@@ -18,12 +18,15 @@ import static android.content.ContentValues.TAG;
 
 public class SpeedDistanceCalculator implements LocationListener {
 
-    private static Location lastLocation = null;
+    private Location lastLocation = null;
+    private boolean resumeLineDrawn;
     private static double distanceInMetres;
     private double speed;
     private ArrayList<Double> avgSpeed = new ArrayList<>();
     private double averageSpeed;
     private PolylineOptions routeOptions = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true);
+    private Polyline resumePolyline;
+    private PolylineOptions resumeOptions = new PolylineOptions().width(30).color(Color.RED).geodesic(true);
     GoogleMap map;
     Polyline route;
     MapFragment fragment;
@@ -58,7 +61,9 @@ public class SpeedDistanceCalculator implements LocationListener {
         Log.d(TAG, "Distance " + distanceInMetres + " m");     //Loggar totala avståndet
         //Log.d(TAG, "Time " + timeBetween + " s");                 //Loggar tiden mellan uppdateringar
         Log.d(TAG, "Speed " + speed + " m/s");                //Loggar hastighet i m/s
-        reDrawRoute();
+        if (resumeLineDrawn) {
+            reDrawRoute();
+        }
         fragment.updateTextViews(distanceInMetres, calcAverageSpeed());
         lastLocation = location;
     }
@@ -106,9 +111,20 @@ public class SpeedDistanceCalculator implements LocationListener {
         map.clear();
         route = map.addPolyline(routeOptions);
     }
-
-    public static Location getLastLocation() {
+    public void drawResumeLine(){
+        List<LatLng> latLngs = routeOptions.getPoints();
+        LatLng latLng = new LatLng(getLastLocation().getLatitude(), getLastLocation().getLongitude());
+        setLastLocation(null);
+        resumeOptions.add(latLngs.get(latLngs.size() - 1)).add(latLng);
+        resumePolyline = map.addPolyline(resumeOptions);
+        Log.d(TAG, "resume size " + resumePolyline.getPoints().size());
+    }
+    public Location getLastLocation() {
         return lastLocation;
+    }
+
+    public void setLastLocation(Location lastLocation) {
+        this.lastLocation = lastLocation;
     }
 
     public static double getDistanceInMetres() {
