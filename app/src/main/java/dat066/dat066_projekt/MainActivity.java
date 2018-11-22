@@ -21,12 +21,14 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.PopupMenu;
 
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
 
     private static final String TAG = "MainActivity";
     private String bike,run;
-
+    private boolean activityStopped;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +43,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         /*When the application starts we want the "Home" fragment to be initilized*/
         setFragment(R.id.activity_option);
     }
@@ -155,5 +156,13 @@ public class MainActivity extends AppCompatActivity
     public void changeActivityText(String activity){
         Button button = (Button)findViewById(R.id.activity_button);
         button.setText("Type of Activity (" + activity + ")");
+    }
+
+    public boolean isActivityStopped() {
+        return activityStopped;
+    }
+
+    public void setActivityStopped(boolean activityStopped) {
+        this.activityStopped = activityStopped;
     }
 }

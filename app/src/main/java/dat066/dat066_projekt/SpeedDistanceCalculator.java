@@ -6,10 +6,10 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +23,15 @@ public class SpeedDistanceCalculator implements LocationListener {
     private double speed;
     private ArrayList<Double> avgSpeed = new ArrayList<>();
     private double averageSpeed;
-    private PolylineOptions routeOptions = new PolylineOptions().width(13).color(Color.BLUE).geodesic(true);
+    private PolylineOptions routeOptions = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true);
+    GoogleMap map;
+    Polyline route;
+    MapFragment fragment;
 
-
-
+    public SpeedDistanceCalculator(GoogleMap map, MapFragment fragment) {
+        this.map = map;
+        this.fragment = fragment;
+    }
     @Override
     public void onLocationChanged(Location location) {
         //Log.e(TAG, "onLocationChanged: " + location);
@@ -37,6 +42,8 @@ public class SpeedDistanceCalculator implements LocationListener {
         long currentTime = location.getTime();
         long lastTime = lastLocation.getTime();
         long timeBetween = (currentTime - lastTime)/1000;
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        routeOptions.add(latLng);
         double distance = location.distanceTo(lastLocation);
         distanceInMetres += distance;
         if(timeBetween > 0) {
@@ -46,11 +53,13 @@ public class SpeedDistanceCalculator implements LocationListener {
         if(!avgSpeed.isEmpty()){
             calcAverageSpeed();
         }
-        routeOptions.add(new LatLng(location.getLatitude(),location.getLongitude()));
+        Log.d(TAG, "RouteOptions Size " + routeOptions.getPoints().size());
         //Log.d(TAG, "Distance mellan " + distance+ " m");          //Loggar avståndet mellan uppdateringar
         Log.d(TAG, "Distance " + distanceInMetres + " m");     //Loggar totala avståndet
         //Log.d(TAG, "Time " + timeBetween + " s");                 //Loggar tiden mellan uppdateringar
         Log.d(TAG, "Speed " + speed + " m/s");                //Loggar hastighet i m/s
+        reDrawRoute();
+        fragment.updateTextViews(distanceInMetres, calcAverageSpeed());
         lastLocation = location;
     }
 
@@ -87,9 +96,15 @@ public class SpeedDistanceCalculator implements LocationListener {
             speed = 0;
             averageSpeed = 0;
             avgSpeed.clear();
+            routeOptions.getPoints().clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void reDrawRoute(){
+        map.clear();
+        route = map.addPolyline(routeOptions);
     }
 
     public static Location getLastLocation() {
@@ -110,10 +125,8 @@ public class SpeedDistanceCalculator implements LocationListener {
 
     public double getAverageSpeed() {
         return calcAverageSpeed();
-}
-
+    }
     public PolylineOptions getRouteOptions() {
         return routeOptions;
     }
-
 }

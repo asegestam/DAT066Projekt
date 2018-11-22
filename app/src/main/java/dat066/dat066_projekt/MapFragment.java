@@ -24,10 +24,14 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import android.support.v4.content.ContextCompat;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -39,9 +43,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "MapFragment";
     LocationManager locationManager;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
-    private Polyline route;
     private View view;
-    private boolean activityStopped;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
@@ -60,26 +62,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         getLocationPermission();
         mapFragment.getMapAsync(this);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        speedDistanceCalculator = new SpeedDistanceCalculator();
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    while (!activityStopped) {
-                        Thread.sleep(1000);
-                        if (getActivity() == null) return;
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateTextViews();
-                                route = mMap.addPolyline(speedDistanceCalculator.getRouteOptions());
-                            }
-                        });
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
         Button startButton = (Button) view.findViewById(R.id.start_button);
         Button stopButton = (Button) view.findViewById(R.id.stop_button);
         Button activityButton = (Button) view.findViewById(R.id.activity_button);
@@ -87,7 +69,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         startButton.setOnClickListener(startButtonClickListener);
         stopButton.setOnClickListener(stopButtonClickListener);
         activityButton.setOnClickListener(activityButtonOnClickListener);
-        thread.start();
         return view;
     }
 
@@ -109,6 +90,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mMap = googleMap;
+        speedDistanceCalculator = new SpeedDistanceCalculator(mMap, this);
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -157,16 +139,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "initMap: initializing the map");
         mapFragment.getMapAsync(this);
     }
-
     /** Updates the TextViews to the current speed and distance */
-    private void updateTextViews() {
-        if(!activityStopped) {
-            TextView distanceText = view.findViewById(R.id.distanceText);
-            TextView speedText = view.findViewById(R.id.speedText);
-            distanceText.setText("Distance " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres()) + " m");
-            //speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
-            speedText.setText("Pace " + numberFormat.format(speedDistanceCalculator.getSpeed()) + " m/s");
-        }
+    public void updateTextViews(Double distance, Double speed) {
+        TextView distanceText = view.findViewById(R.id.distanceText);
+        TextView speedText = view.findViewById(R.id.speedText);
+        distanceText.setText("Distance " + numberFormat.format(distance) + " m");
+        //speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
+        speedText.setText("Pace " + numberFormat.format(speed) + " m/s");
     }
 
     public void resetValues() {
@@ -197,11 +176,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Shows and hides the relevant buttons
      */
     public void startActivity() {
-        activityStopped = false;
         requestLocationUpdates();
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
+        //mMap.addMarker(new MarkerOptions().position(speedDistanceCalculator.getRouteLatLngs().get(0)));
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
     }
 
@@ -211,12 +190,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Resets the distance and speed calculated during the activity
      */
     public void stopActivity() {
-        activityStopped = true;
         locationManager.removeUpdates(speedDistanceCalculator);
+        resetValues();
         setButtonVisibility(0);
         setTextViewVisibility(8);
         (view.findViewById(R.id.stop_button)).setVisibility(View.GONE);
-        resetValues();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
     /** Sets textView visibility */
@@ -231,6 +209,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             speedText.setVisibility(visibility);
         }
     }
+
     /** Sets the onClickListeners to all relevant buttons */
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
@@ -243,7 +222,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             stopActivity();
         }
     };
-
     private View.OnClickListener activityButtonOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             ((MainActivity)getActivity()).showPopup();
