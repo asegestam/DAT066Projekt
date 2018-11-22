@@ -19,28 +19,32 @@ import static android.content.ContentValues.TAG;
 public class SpeedDistanceCalculator implements LocationListener {
 
     private Location lastLocation = null;
+    private Location firstLocation = null;
     private boolean resumeLineDrawn;
     private static double distanceInMetres;
     private double speed;
     private ArrayList<Double> avgSpeed = new ArrayList<>();
     private double averageSpeed;
     private PolylineOptions routeOptions = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true);
-    private Polyline resumePolyline;
-    private PolylineOptions resumeOptions = new PolylineOptions().width(30).color(Color.RED).geodesic(true);
+    private PolylineOptions resumeOptions = new PolylineOptions().width(20).color(Color.RED).geodesic(true);
     GoogleMap map;
     Polyline route;
+    Polyline resumePolyline;
     MapFragment fragment;
 
     public SpeedDistanceCalculator(GoogleMap map, MapFragment fragment) {
         this.map = map;
         this.fragment = fragment;
     }
+
+    /** On LocationChange calculate user speed, distance moved, adds LatLng objects to draw a Route */
     @Override
     public void onLocationChanged(Location location) {
-        //Log.e(TAG, "onLocationChanged: " + location);
         if(lastLocation == null) {
             lastLocation = location;
-            return;
+        }
+        if(firstLocation == null) {
+            firstLocation = location;
         }
         long currentTime = location.getTime();
         long lastTime = lastLocation.getTime();
@@ -56,14 +60,7 @@ public class SpeedDistanceCalculator implements LocationListener {
         if(!avgSpeed.isEmpty()){
             calcAverageSpeed();
         }
-        Log.d(TAG, "RouteOptions Size " + routeOptions.getPoints().size());
-        //Log.d(TAG, "Distance mellan " + distance+ " m");          //Loggar avståndet mellan uppdateringar
-        Log.d(TAG, "Distance " + distanceInMetres + " m");     //Loggar totala avståndet
-        //Log.d(TAG, "Time " + timeBetween + " s");                 //Loggar tiden mellan uppdateringar
-        Log.d(TAG, "Speed " + speed + " m/s");                //Loggar hastighet i m/s
-        if (resumeLineDrawn) {
-            reDrawRoute();
-        }
+        reDrawRoute();
         fragment.updateTextViews(distanceInMetres, calcAverageSpeed());
         lastLocation = location;
     }
@@ -83,7 +80,7 @@ public class SpeedDistanceCalculator implements LocationListener {
 
     }
 
-    /* Räknar ut medelhastigheten */
+    /** Calculates average speed */
     private double calcAverageSpeed() {
         double sum = 0;
         for (Double value : avgSpeed) {
@@ -95,6 +92,7 @@ public class SpeedDistanceCalculator implements LocationListener {
         return averageSpeed;
     }
 
+    /** Resets values */
     public void resetValues() {
         try {
             distanceInMetres = 0;
@@ -102,25 +100,34 @@ public class SpeedDistanceCalculator implements LocationListener {
             averageSpeed = 0;
             avgSpeed.clear();
             routeOptions.getPoints().clear();
+            firstLocation = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    /** Draws a Polyline based on user movement */
     private void reDrawRoute(){
-        map.clear();
         route = map.addPolyline(routeOptions);
     }
-    public void drawResumeLine(){
+
+    /**
+     * Draws a PolyLine when resuming activity from the point the user clicked pause to the point the user pressed resume
+     */
+    public void drawResumeLine(Location lastKnownLocation){
         List<LatLng> latLngs = routeOptions.getPoints();
-        LatLng latLng = new LatLng(getLastLocation().getLatitude(), getLastLocation().getLongitude());
-        setLastLocation(null);
+        LatLng latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        setLastLocation(null); //so the distance is not accounted for when resuming
         resumeOptions.add(latLngs.get(latLngs.size() - 1)).add(latLng);
         resumePolyline = map.addPolyline(resumeOptions);
-        Log.d(TAG, "resume size " + resumePolyline.getPoints().size());
+        resumeOptions.getPoints().clear();
+        routeOptions.getPoints().clear();
+        routeOptions.add(latLng);
+        fragment.requestLocationUpdates(); //enable Location updates like normal
     }
-    public Location getLastLocation() {
-        return lastLocation;
+
+    public LatLng getFirstLocation() {
+        LatLng fl = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
+        return fl;
     }
 
     public void setLastLocation(Location lastLocation) {
@@ -142,6 +149,7 @@ public class SpeedDistanceCalculator implements LocationListener {
     public double getAverageSpeed() {
         return calcAverageSpeed();
     }
+
     public PolylineOptions getRouteOptions() {
         return routeOptions;
     }
