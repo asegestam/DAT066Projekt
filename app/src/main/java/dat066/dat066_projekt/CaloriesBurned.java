@@ -15,10 +15,10 @@ public class CaloriesBurned {
         velocity = new SpeedDistanceCalculator();
         profile = new ProfileSaverScreen();
         if(profile.getGender().equals("Male")){
-            bmr = (13.75 * profile.getWeight()) + /*(5 * profile.getHeight())*/ - (6.76 * profile.getAge()) + 66;
+           // bmr = (13.75 * profile.getWeight()) + /*(5 * profile.getHeight())*/ - (6.76 * profile.getAge()) + 66;
         }
         else {
-            bmr = (9.56 * profile.getWeight()) + /*(1.85 * profile.getHeight())*/ - (4.68 * profile.getAge()) + 665;
+           // bmr = (9.56 * profile.getWeight()) + /*(1.85 * profile.getHeight())*/ - (4.68 * profile.getAge()) + 665;
         }
 
     }

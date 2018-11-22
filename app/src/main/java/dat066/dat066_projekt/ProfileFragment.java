@@ -29,7 +29,6 @@ import java.util.Calendar;
 public class ProfileFragment extends Fragment {
 
     private static final String TAG = "ProfileFragment";
-
     private TextView mDisplayDate;
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private TextView mDisplayUsername;
@@ -62,51 +61,7 @@ public class ProfileFragment extends Fragment {
             getActivity().setTitle("Change Profile Inputs");
     }
 
-    public void done() {
-            Log.d(TAG, "Weight: " + getWeight());
-            Log.d(TAG, "Age: " + getAge());
-            Log.d(TAG, "Gender: " + getGender());
-            saveInfo();
-            getInfo();
-            ((MainActivity)getActivity()).setFragment(R.id.activity_option);
-    }
 
-    /**
-     *  Gets input from screen and saves it with shared preferences
-     */
-    public void saveInfo(){
-        SharedPreferences sharedPref = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        if(getGender() != null && !getGender().isEmpty()) editor.putString("gender", getGender());
-        if(getWeight() != 0) editor.putInt("weight", getWeight());
-        if(getAge() != 0) editor.putInt("age", getAge());
-        editor.apply();
-    }
-    /**
-     * Gets the user information from userInfo.xml and stores it in three variables
-     */
-    public void getInfo(){
-        SharedPreferences sharedPref = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
-        gender = sharedPref.getString("gender", "");
-        weight = sharedPref.getInt("weight", 0);
-        age = sharedPref.getInt("age", 0);
-        System.out.println(age + ", " + weight + gender);
-    }
-
-    public int getWeight(){
-        EditText weightET = view.findViewById(R.id.weight);
-        String weightText = weightET.getText().toString();
-        if(weightText.isEmpty()) return 0;
-        weight = Integer.valueOf(weightText);
-        return weight;
-    }
-    public int getAge(){
-        EditText ageET = view.findViewById(R.id.age);
-        String ageText = ageET.getText().toString();
-        if(ageText.isEmpty()) return 0;
-        age = Integer.valueOf(ageText);
-        return age;
-    }
     private void getSharedPreferences(View v){
         String gender = sharedPref.getString("gender", "");
         String weight = sharedPref.getString("weight", "");
