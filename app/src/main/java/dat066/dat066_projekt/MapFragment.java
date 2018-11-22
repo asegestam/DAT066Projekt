@@ -3,6 +3,7 @@ package dat066.dat066_projekt;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,8 +24,12 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Polyline;
+
 import android.support.v4.content.ContextCompat;
 import java.text.DecimalFormat;
+
+import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -34,6 +39,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "MapFragment";
     LocationManager locationManager;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
+    private Polyline route;
     private View view;
     private boolean activityStopped;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -66,6 +72,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             @Override
                             public void run() {
                                 updateTextViews();
+                                route = mMap.addPolyline(speedDistanceCalculator.getRouteOptions());
                             }
                         });
                     }

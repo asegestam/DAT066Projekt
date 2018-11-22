@@ -1,10 +1,17 @@
 package dat066.dat066_projekt;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -16,6 +23,7 @@ public class SpeedDistanceCalculator implements LocationListener {
     private double speed;
     private ArrayList<Double> avgSpeed = new ArrayList<>();
     private double averageSpeed;
+    private PolylineOptions routeOptions = new PolylineOptions().width(13).color(Color.BLUE).geodesic(true);
 
 
 
@@ -38,6 +46,7 @@ public class SpeedDistanceCalculator implements LocationListener {
         if(!avgSpeed.isEmpty()){
             calcAverageSpeed();
         }
+        routeOptions.add(new LatLng(location.getLatitude(),location.getLongitude()));
         //Log.d(TAG, "Distance mellan " + distance+ " m");          //Loggar avståndet mellan uppdateringar
         Log.d(TAG, "Distance " + distanceInMetres + " m");     //Loggar totala avståndet
         //Log.d(TAG, "Time " + timeBetween + " s");                 //Loggar tiden mellan uppdateringar
@@ -102,5 +111,9 @@ public class SpeedDistanceCalculator implements LocationListener {
     public double getAverageSpeed() {
         return calcAverageSpeed();
 }
+
+    public PolylineOptions getRouteOptions() {
+        return routeOptions;
+    }
 
 }
