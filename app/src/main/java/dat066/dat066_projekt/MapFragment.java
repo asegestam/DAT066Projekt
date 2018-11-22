@@ -13,29 +13,32 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-
+import android.support.v4.content.ContextCompat;
 import java.text.DecimalFormat;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     SupportMapFragment mapFragment;
     GoogleMap mMap;
-    private Thread thread;
     private SpeedDistanceCalculator speedDistanceCalculator;
     private static final String TAG = "MapFragment";
     LocationManager locationManager;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
-    private boolean activityRunning;
     private View view;
-
+    private boolean activityStopped;
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     @Nullable
     @Override
@@ -48,21 +51,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapFragment = SupportMapFragment.newInstance();
             fragmentTransaction.replace(R.id.map, mapFragment).commit();
         }
+        getLocationPermission();
         mapFragment.getMapAsync(this);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         speedDistanceCalculator = new SpeedDistanceCalculator();
-        activityRunning = false;
-        thread = new Thread() {
+        Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
-                    while (!thread.isInterrupted()) {
+                    while (!activityStopped) {
                         Thread.sleep(1000);
+                        if (getActivity() == null) return;
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (activityRunning)
-                                    updateTextViews();
+                                updateTextViews();
                             }
                         });
                     }
@@ -72,16 +75,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         };
         Button startButton = (Button) view.findViewById(R.id.start_button);
         Button stopButton = (Button) view.findViewById(R.id.stop_button);
+        Button activityButton = (Button) view.findViewById(R.id.activity_button);
+
         startButton.setOnClickListener(startButtonClickListener);
         stopButton.setOnClickListener(stopButtonClickListener);
+        activityButton.setOnClickListener(activityButtonOnClickListener);
+        thread.start();
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        getActivity().setTitle("Map-Fragment");
+        getActivity().setTitle("");
     }
 
     /**
@@ -95,19 +101,65 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        this.mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        mMap.setPadding(0,0,0,0);
         mMap.setMyLocationEnabled(true);
     }
 
+    /**Gets the necessary permissions from the user or asks for them*/
+    private void getLocationPermission() {
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                //Every permission is granted, initialize the map
+                initMap();
+            } else {
+                //Ask for the fine_location permission because it was not already granted
+                ActivityCompat.requestPermissions(getActivity(), permissions, LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        } else
+            ActivityCompat.requestPermissions(getActivity(), permissions, LOCATION_PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+
+                    for (int grantResult : grantResults) {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED) {
+
+                            Log.d(TAG, "onRequestPermissionsResult: permission failed");
+                            return;
+                        }
+                    }
+                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+                    initMap();
+                }
+            }
+        }
+    }
+
+    /**Initializes the map*/
+    private void initMap() {
+        Log.d(TAG, "initMap: initializing the map");
+        mapFragment.getMapAsync(this);
+    }
+
+    /** Updates the TextViews to the current speed and distance */
     private void updateTextViews() {
-        TextView distanceText = view.findViewById(R.id.distanceText);
-        TextView speedText = view.findViewById(R.id.speedText);
-        distanceText.setText("Distance " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres()) + " m");
-        //speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
-        speedText.setText("Pace " + numberFormat.format(speedDistanceCalculator.getSpeed()) + " m/s");
+        if(!activityStopped) {
+            TextView distanceText = view.findViewById(R.id.distanceText);
+            TextView speedText = view.findViewById(R.id.speedText);
+            distanceText.setText("Distance " + numberFormat.format(speedDistanceCalculator.getDistanceInMetres()) + " m");
+            //speedText.setText("Speed " + numberFormat.format((speedDistanceCalculator.getSpeed())*3.6)+ " km/h");
+            speedText.setText("Pace " + numberFormat.format(speedDistanceCalculator.getSpeed()) + " m/s");
+        }
     }
 
     public void resetValues() {
@@ -129,7 +181,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     private void setButtonVisibility(int visibility){
         (view.findViewById(R.id.start_button)).setVisibility(visibility);
-        (view.findViewById(R.id.button4)).setVisibility(visibility);
+        (view.findViewById(R.id.activity_button)).setVisibility(visibility);
         (view.findViewById(R.id.button5)).setVisibility(visibility);
     }
 
@@ -138,8 +190,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Shows and hides the relevant buttons
      */
     public void startActivity() {
-        thread.start();
-        activityRunning = true;
+        activityStopped = false;
         requestLocationUpdates();
         setButtonVisibility(8);
         setTextViewVisibility(0);
@@ -153,8 +204,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Resets the distance and speed calculated during the activity
      */
     public void stopActivity() {
-        thread.interrupt();
-        activityRunning = false;
+        activityStopped = true;
         locationManager.removeUpdates(speedDistanceCalculator);
         setButtonVisibility(0);
         setTextViewVisibility(8);
@@ -162,7 +212,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         resetValues();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
-
+    /** Sets textView visibility */
     private void setTextViewVisibility(int visibility) {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
@@ -174,7 +224,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             speedText.setVisibility(visibility);
         }
     }
-
+    /** Sets the onClickListeners to all relevant buttons */
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             startActivity();
@@ -184,6 +234,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private View.OnClickListener stopButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             stopActivity();
+        }
+    };
+
+    private View.OnClickListener activityButtonOnClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            ((MainActivity)getActivity()).showPopup();
         }
     };
 }
