@@ -42,6 +42,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
         if((gender != null && !gender.isEmpty()) && (weight != null && !weight.isEmpty()) && (age != null && !age.isEmpty()) && (userName != null && !userName.isEmpty())) {
             Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
+
         }
         else{
             setContentView(R.layout.start_screen);
@@ -199,11 +200,11 @@ public class ProfileSaverScreen extends AppCompatActivity{
 
     public String getWeightFromLayout(){
             TextView weightET = (TextView) (findViewById(R.id.initialWeight));
-            String weightText = weightET.getText().toString();
-            if (weightText.isEmpty())
+            String[] weightText = weightET.getText().toString().split(" ");
+            if (weightText.length == 0)
                 return "";
 
-            return weightText;
+            return weightText[0];
         }
 
     public String getAgeFromLayout(){
