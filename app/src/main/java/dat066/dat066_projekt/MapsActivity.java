@@ -3,6 +3,7 @@ package dat066.dat066_projekt;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -30,6 +31,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     static Location lastLocation = null;
     static double distanceInMetres;
     double speed;
+    int n = 0;
     LocationManager locationManager;
     LocationListener locationListener;
     ArrayList<Double> avgSpeed = new ArrayList<>();
@@ -241,6 +246,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
+                    JSONArray jsonArray = jsonObj.getJSONArray("results");
+                    double elevation = -1;
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonTemp = jsonArray.getJSONObject(i);
+                        elevation = jsonTemp.getDouble("elevation");
+                    }
+                    GraphView graph = (GraphView) findViewById(R.id.graph);
+                    LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
+                         new DataPoint(n+1, elevation)
+                    });
+                    series.setColor(Color.BLACK);
+                    series.setDrawDataPoints(true);
+                    series.setDataPointsRadius(10);
+                    series.setThickness(8);
+
+                    graph.getViewport().setYAxisBoundsManual(true);
+                    graph.getViewport().setMinY(-150);
+                    graph.getViewport().setMaxY(150);
+
+                    graph.getViewport().setXAxisBoundsManual(true);
+                    graph.getViewport().setMinX(0);
+                    graph.getViewport().setMaxX(80);
+
+                    graph.getViewport().setScalable(true);
+                    graph.getViewport().setScalableY(true);
+                    graph.addSeries(series);
 
                     Log.e(TAG, jsonStr);
                     } catch (final JSONException e) {
