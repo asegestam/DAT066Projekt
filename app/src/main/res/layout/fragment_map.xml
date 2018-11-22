@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-android:id="@+id/layout"
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
 xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context=".MapFragment">
+
+
 
 
 
@@ -20,7 +22,10 @@ tools:context=".MapFragment">
     android:layout_alignParentTop="true"
     android:layout_marginStart="0dp"
     android:layout_marginTop="0dp"
-    tools:context=".MainActivity" />
+    tools:context=".MainActivity" >
+
+
+</FrameLayout>
 
 
 <Button
@@ -35,23 +40,56 @@ tools:context=".MapFragment">
     android:backgroundTint="@color/colorPrimary"
     android:text="Start Activity"
     android:textAllCaps="true"
+    android:visibility="visible"
     android:textAppearance="@style/TextAppearance.AppCompat.Title"
     android:textColor="@color/common_google_signin_btn_text_dark_focused" />
 
-<Button
-    android:id="@+id/stop_button"
-    style="@android:style/Widget.Button"
-    android:layout_width="match_parent"
-    android:layout_height="75dp"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginStart="0dp"
-    android:layout_marginBottom="5dp"
-    android:backgroundTint="@android:color/holo_red_dark"
-    android:text="Stop Activity"
-    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-    android:textColor="@color/common_google_signin_btn_text_dark_focused"
-    android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="14mm"
+        android:layout_marginEnd="15mm"
+        android:layout_marginStart="15mm"
+        android:layout_marginBottom="2mm"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true">
+
+        <ImageButton
+            android:id="@+id/stop_button"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginEnd="2.5mm"
+            android:layout_weight="1"
+            android:background="@drawable/roundcorner"
+            android:backgroundTint="@android:color/background_light"
+            android:src="@drawable/ic_stop_black_24dp"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/imageButtonResume"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginStart="2.5mm"
+            android:layout_weight="1"
+            android:background="@drawable/roundcorner"
+            android:backgroundTint="@android:color/background_light"
+            android:src="@drawable/ic_play_arrow_black_24dp"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/imageButtonPause"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginStart="2.5mm"
+            android:layout_weight="1"
+            android:adjustViewBounds="false"
+            android:background="@drawable/roundcorner"
+            android:backgroundTint="@android:color/background_light"
+            android:src="@drawable/ic_pause_black_24dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 
 <LinearLayout
     android:layout_width="match_parent"

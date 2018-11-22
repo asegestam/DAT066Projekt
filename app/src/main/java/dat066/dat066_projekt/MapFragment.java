@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,10 +83,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         };
         Button startButton = (Button) view.findViewById(R.id.start_button);
-        Button stopButton = (Button) view.findViewById(R.id.stop_button);
+        ImageButton stopButton = (ImageButton) view.findViewById(R.id.stop_button);
         Button activityButton = (Button) view.findViewById(R.id.activity_button);
+        ImageButton pauseButton = (ImageButton) view.findViewById(R.id.imageButtonPause);
+        ImageButton resumeButton = (ImageButton) view.findViewById(R.id.imageButtonResume);
 
+        pauseButton.setOnClickListener(pauseButtonClickListener);
         startButton.setOnClickListener(startButtonClickListener);
+        resumeButton.setOnClickListener(resumeButtonClickListener);
         stopButton.setOnClickListener(stopButtonClickListener);
         activityButton.setOnClickListener(activityButtonOnClickListener);
         thread.start();
@@ -190,7 +196,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.start_button)).setVisibility(visibility);
         (view.findViewById(R.id.activity_button)).setVisibility(visibility);
         (view.findViewById(R.id.button5)).setVisibility(visibility);
+        int antiVisibility;
+        if(visibility==8){  antiVisibility = 0;}
+        else {antiVisibility = 8;}
+        (view.findViewById(R.id.imageButtonPause)).setVisibility(antiVisibility);
+        (view.findViewById(R.id.imageButtonResume)).setVisibility(visibility);
     }
+
+    public void pauseActivity(){
+        (view.findViewById(R.id.imageButtonPause)).setVisibility(View.GONE);
+        (view.findViewById(R.id.imageButtonResume)).setVisibility(View.VISIBLE);
+    }
+
+    public void resumeActivity(){
+        (view.findViewById(R.id.imageButtonPause)).setVisibility(View.VISIBLE);
+        (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
+    }
+
 
     /**
      * Starts the location updates to start calculating speed, distance
@@ -205,6 +227,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
     }
 
+
     /**
      * Stops location updates
      * Shows and hides the relevant buttons
@@ -214,6 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         activityStopped = true;
         locationManager.removeUpdates(speedDistanceCalculator);
         setButtonVisibility(0);
+        (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
         (view.findViewById(R.id.stop_button)).setVisibility(View.GONE);
         resetValues();
@@ -237,7 +261,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             startActivity();
         }
     };
-
+    private View.OnClickListener pauseButtonClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            pauseActivity();
+        }
+    };
+    private View.OnClickListener resumeButtonClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            resumeActivity();
+        }
+    };
     private View.OnClickListener stopButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             stopActivity();
