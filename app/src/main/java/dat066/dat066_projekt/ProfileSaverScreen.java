@@ -51,9 +51,6 @@ public class ProfileSaverScreen extends AppCompatActivity{
         usernameOnClickListener(v);
         weightOnClickListener(v);
         birthDayOnClickListener(v);
-
-
-
     }
 
     public void init(View view) {
@@ -191,6 +188,9 @@ public class ProfileSaverScreen extends AppCompatActivity{
      */
     public void getInfo(){
         SharedPreferences sharedPref = mContext.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor Edit = sharedPref.edit();
+        Edit.clear();
+        Edit.apply();
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
         age = sharedPref.getString("age", "");

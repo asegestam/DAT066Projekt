@@ -6,6 +6,8 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
@@ -31,6 +33,7 @@ public class SpeedDistanceCalculator implements LocationListener {
     Polyline route;
     Polyline resumePolyline;
     MapFragment fragment;
+    int i;
 
     public SpeedDistanceCalculator(GoogleMap map, MapFragment fragment) {
         this.map = map;
@@ -46,6 +49,7 @@ public class SpeedDistanceCalculator implements LocationListener {
         if(firstLocation == null) {
             firstLocation = location;
         }
+        i++;
         long currentTime = location.getTime();
         long lastTime = lastLocation.getTime();
         long timeBetween = (currentTime - lastTime)/1000;
@@ -63,6 +67,11 @@ public class SpeedDistanceCalculator implements LocationListener {
         reDrawRoute();
         fragment.updateTextViews(distanceInMetres, calcAverageSpeed());
         lastLocation = location;
+        if(i == 2) {
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+            map.animateCamera(cameraUpdate);
+            i = 0;
+        }
     }
 
     @Override
