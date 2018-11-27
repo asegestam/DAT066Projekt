@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MapFragment.OnPlotDataListener {
 
     private static final String TAG = "MainActivity";
-    private String bike,run;
-
+    private String type;
+    private boolean activityStopped;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,11 +42,12 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         /*When the application starts we want the "Home" fragment to be initilized*/
         setFragment(R.id.activity_option);
+
     }
 
     @Override
@@ -143,15 +144,15 @@ public class MainActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.run:
-                run = item.getTitle().toString();
+                type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(run);
+                changeActivityText(type);
 
                 break;
             case R.id.bike:
-                bike = item.getTitle().toString();
+                type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(bike);
+                changeActivityText(type);
                 break;
 
         }
@@ -207,5 +208,15 @@ public class MainActivity extends AppCompatActivity
             transaction.commit();
         }
     }
-}
+    public String getType() {
+        return type;
+    }
 
+    public boolean isActivityStopped() {
+        return activityStopped;
+    }
+
+    public void setActivityStopped(boolean activityStopped) {
+        this.activityStopped = activityStopped;
+    }
+}

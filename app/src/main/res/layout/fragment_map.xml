@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapFragment"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".MapFragment">
+
+
 
 
 
@@ -36,23 +38,54 @@
     android:backgroundTint="@color/colorPrimary"
     android:text="Start Activity"
     android:textAllCaps="true"
+    android:visibility="visible"
     android:textAppearance="@style/TextAppearance.AppCompat.Title"
     android:textColor="@color/common_google_signin_btn_text_dark_focused" />
 
-<Button
-    android:id="@+id/stop_button"
-    style="@android:style/Widget.Button"
-    android:layout_width="match_parent"
-    android:layout_height="75dp"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginStart="0dp"
-    android:layout_marginBottom="5dp"
-    android:backgroundTint="@android:color/holo_red_dark"
-    android:text="Stop Activity"
-    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-    android:textColor="@color/common_google_signin_btn_text_dark_focused"
-    android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="33mm"
+        android:layout_height="14mm"
+        android:layout_marginBottom="2mm"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true">
+
+        <ImageButton
+            android:id="@+id/stop_button"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginEnd="2.5mm"
+            android:layout_weight="1"
+            android:background="@drawable/roundcorner"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_stop_black_24dp"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/imageButtonResume"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginStart="2.5mm"
+            android:layout_weight="1"
+            android:background="@drawable/roundcorner"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_play_arrow_black_24dp"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/imageButtonPause"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginStart="2.5mm"
+            android:layout_weight="1"
+            android:adjustViewBounds="false"
+            android:background="@drawable/roundcorner"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_pause_black_24dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -93,34 +126,33 @@
         android:textStyle="bold|italic" />
 </LinearLayout>
 
-<TextView
-    android:id="@+id/distanceText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginStart="0dp"
-    android:layout_marginBottom="105dp"
-    android:text="Distance"
-    android:textAllCaps="true"
-    android:textColor="@android:color/white"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:visibility="invisible" />
+    <TextView
+        android:id="@+id/distanceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="125dp"
+        android:text="Distance"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
-<TextView
-    android:id="@+id/speedText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentBottom="true"
-    android:layout_marginStart="0dp"
-    android:layout_marginBottom="85dp"
-    android:text="Pace"
-    android:textAllCaps="true"
-    android:textColor="@android:color/white"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:visibility="invisible" />
+    <TextView
+        android:id="@+id/speedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="100dp"
+        android:text="Pace"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 </RelativeLayout>
-
