@@ -81,6 +81,28 @@
             android:hint="Weight" />
 
         <View
+            android:id="@+id/divider4"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:id="@+id/heightText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Height"
+            android:textSize="20sp" />
+
+
+        <TextView
+            android:id="@+id/initialHeight"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Height" />
+
+        <View
             android:id="@+id/divider2"
             android:layout_width="match_parent"
             android:layout_height="1dp"

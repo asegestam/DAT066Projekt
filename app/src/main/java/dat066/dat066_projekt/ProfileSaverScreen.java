@@ -30,6 +30,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
     String weight = "";
     String gender = "";
     String userName = "";
+    String height = "";
     private Context mContext = this;
     private DatePickerDialog.OnDateSetListener mDateSetListener;
 
@@ -39,8 +40,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         getInfo();
         //set contentview to activity_main
-        if((gender != null && !gender.isEmpty()) && (weight != null && !weight.isEmpty()) && (age != null && !age.isEmpty()) && (userName != null && !userName.isEmpty())) {
-            Log.d(TAG, "onCreate: WIHO");
+        if((gender != null && !gender.isEmpty()) && (weight != null && !weight.isEmpty()) && (height != null && !height.isEmpty()) && (age != null && !age.isEmpty()) && (userName != null && !userName.isEmpty())) {
             Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
             return;
@@ -52,13 +52,14 @@ public class ProfileSaverScreen extends AppCompatActivity{
         usernameOnClickListener(v);
         weightOnClickListener(v);
         birthDayOnClickListener(v);
+        heightOnClickListener(v);
 
 
 
     }
 
     public void init(View view) {
-        if(getGender() != null && getWeight() != null  && getAge() != null && getUserName() != null) {
+        if(getGender() != null && getWeight() != null && getHeight() != null  && getAge() != null && getUserName() != null) {
             saveInfo();
             Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
@@ -77,6 +78,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("gender", getGenderFromLayout());
         editor.putString("weight", getWeightFromLayout());
+        editor.putString("height", getHeightFromLayout());
         editor.putString("age", getAgeFromLayout());
         editor.putString("username", getUsernameFromLayout());
 
@@ -105,6 +107,41 @@ public class ProfileSaverScreen extends AppCompatActivity{
                         dialog.dismiss();
                         String weight = input.getText().toString();
                         mDisplayWeight.setText(weight + " kg");
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+    }
+
+    private void heightOnClickListener(View v){
+        final TextView mDisplayHeight = (TextView) v.findViewById(R.id.initialHeight);
+        mDisplayHeight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle("height");
+
+                View viewInflated = LayoutInflater.from(mContext).inflate(R.layout.height_popup, (ViewGroup) findViewById(R.id.startscreen_container), false);
+                // Set up the input
+                final EditText input = (EditText) viewInflated.findViewById(R.id.inputHeight);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                builder.setView(viewInflated);
+
+                // Set up the buttons
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        String height = input.getText().toString();
+                        mDisplayHeight.setText(height + " cm");
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -211,9 +248,10 @@ public class ProfileSaverScreen extends AppCompatActivity{
         edit.commit();*/
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
+        height = sharedPref.getString("height", "");
         age = sharedPref.getString("age", "");
         userName = sharedPref.getString("username", "");
-        Log.d(TAG, "getInfo: " + age + ", " + weight + gender);
+        Log.d(TAG, "getInfo: " + age + ", " + weight + ", " + weight + gender);
     }
 
     public String getWeightFromLayout(){
@@ -224,6 +262,15 @@ public class ProfileSaverScreen extends AppCompatActivity{
 
             return weightText[0];
         }
+
+    public String getHeightFromLayout(){
+        TextView heightET = (TextView) (findViewById(R.id.initialHeight));
+        String[] heightText = heightET.getText().toString().split(" ");
+        if (heightText.length == 0)
+            return "";
+
+        return heightText[0];
+    }
 
     public String getAgeFromLayout(){
         TextView ageET = (TextView) (findViewById(R.id.initialDate));
@@ -257,6 +304,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
     public String getWeight(){
         return weight;
     }
+    public String getHeight() { return height; }
     public String getAge(){
        return age;
     }

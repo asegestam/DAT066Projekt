@@ -11,6 +11,7 @@
     <string name="title_activity_map_fragment">Map</string>
     <string name="welcome">Welcome to TrainR!</string>
     <string name="enter_weight">Enter your Weight (kg)</string>
+    <string name="enter_height">Enter your Height (cm)</string>
     <string name="enter_age">Enter your age</string>
     <string name="enter_gender">Enter your Gender</string>
 
