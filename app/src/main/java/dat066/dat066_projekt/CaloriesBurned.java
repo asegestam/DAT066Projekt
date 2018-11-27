@@ -29,11 +29,12 @@ public class CaloriesBurned {
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
         age = sharedPref.getString("age", "");
+        height = sharedPref.getString("height", "");
         if(gender.equals("Male")){
-           bmr = (13.75 * Double.parseDouble(weight)) + /*(5 * profile.getHeight())*/ - (6.76 * calculateAge() + 66);
+           bmr = (13.75 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.76 * calculateAge() + 66);
         }
         else {
-           bmr = (9.56 * Double.parseDouble(weight)) + /*(1.85 * profile.getHeight())*/ - (4.68 * Double.parseDouble(age)) + 665;
+           bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
         }
         System.out.println(bmr);
     }
@@ -44,8 +45,6 @@ public class CaloriesBurned {
         LocalDate birthday = LocalDate.parse(age.replaceAll("/", "-"));
         LocalDate today = LocalDate.now();
         Period p = Period.between(birthday, today);
-
-        System.out.println(p.getYears());
         return p.getYears();
     }
 
