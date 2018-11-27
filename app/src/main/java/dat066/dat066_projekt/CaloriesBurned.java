@@ -15,7 +15,6 @@ import static android.support.constraint.Constraints.TAG;
 
 public class CaloriesBurned {
     private double calories;
-    private SpeedDistanceCalculator velocity;
     private String gender;
     private String age;
     private String weight;
@@ -30,7 +29,6 @@ public class CaloriesBurned {
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
         age = sharedPref.getString("age", "");
-        velocity = new SpeedDistanceCalculator();
         if(gender.equals("Male")){
            bmr = (13.75 * Double.parseDouble(weight)) + /*(5 * profile.getHeight())*/ - (6.76 * calculateAge() + 66);
         }
@@ -52,10 +50,10 @@ public class CaloriesBurned {
     }
 
 
-    public double CalculateCalories() {
+    public double CalculateCalories(double speed, int time) {
 
         if(training.equals("Running")){
-            met = 0.816 * velocity.getAverageSpeed() + 1.662;
+            met = 0.816 * speed + 1.662;
             calories = (bmr/24) * met * time;
         }
         else if(training.equals("Cycling")){

@@ -40,9 +40,10 @@ public class ProfileSaverScreen extends AppCompatActivity{
         getInfo();
         //set contentview to activity_main
         if((gender != null && !gender.isEmpty()) && (weight != null && !weight.isEmpty()) && (age != null && !age.isEmpty()) && (userName != null && !userName.isEmpty())) {
+            Log.d(TAG, "onCreate: WIHO");
             Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
-
+            return;
         }
         else{
             setContentView(R.layout.start_screen);
@@ -205,6 +206,9 @@ public class ProfileSaverScreen extends AppCompatActivity{
      */
     public void getInfo(){
         SharedPreferences sharedPref = mContext.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        /*SharedPreferences.Editor edit = sharedPref.edit();
+        edit.clear();
+        edit.commit();*/
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
         age = sharedPref.getString("age", "");
