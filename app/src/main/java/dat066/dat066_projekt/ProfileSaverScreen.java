@@ -42,7 +42,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
         if((gender != null && !gender.isEmpty()) && (weight != null && !weight.isEmpty()) && (age != null && !age.isEmpty()) && (userName != null && !userName.isEmpty())) {
             Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
-
+            return;
         }
         else{
             setContentView(R.layout.start_screen);
@@ -188,9 +188,6 @@ public class ProfileSaverScreen extends AppCompatActivity{
      */
     public void getInfo(){
         SharedPreferences sharedPref = mContext.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor Edit = sharedPref.edit();
-        Edit.clear();
-        Edit.apply();
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
         age = sharedPref.getString("age", "");

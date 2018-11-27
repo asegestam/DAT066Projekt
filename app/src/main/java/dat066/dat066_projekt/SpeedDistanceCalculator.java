@@ -49,7 +49,6 @@ public class SpeedDistanceCalculator implements LocationListener {
         if(firstLocation == null) {
             firstLocation = location;
         }
-        i++;
         long currentTime = location.getTime();
         long lastTime = lastLocation.getTime();
         long timeBetween = (currentTime - lastTime)/1000;
@@ -67,11 +66,9 @@ public class SpeedDistanceCalculator implements LocationListener {
         reDrawRoute();
         fragment.updateTextViews(distanceInMetres, calcAverageSpeed());
         lastLocation = location;
-        if(i == 2) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-            map.animateCamera(cameraUpdate);
-            i = 0;
-        }
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+        map.animateCamera(cameraUpdate);
+
     }
 
     @Override
@@ -146,7 +143,6 @@ public class SpeedDistanceCalculator implements LocationListener {
     public static double getDistanceInMetres() {
         return distanceInMetres;
     }
-
     public double getSpeed() {
         return speed;
     }

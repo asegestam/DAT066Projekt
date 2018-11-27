@@ -51,7 +51,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    boolean isPaused;
+    long startActivityTime;
+    long endActivityTime;
+    long pausedActivityTime;
+
 
     @Nullable
     @Override
@@ -67,7 +70,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         getLocationPermission();
         mapFragment.getMapAsync(this);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        isPaused = false;
 
         Button startButton = (Button) view.findViewById(R.id.start_button);
         ImageButton stopButton = (ImageButton) view.findViewById(R.id.stop_button);
@@ -92,11 +94,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -161,6 +158,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void resetValues() {
+        endActivityTime = 0;
+        startActivityTime = 0;
+        pausedActivityTime = 0;
         speedDistanceCalculator.resetValues();
     }
 
@@ -193,10 +193,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void pauseActivity() {
-        isPaused = true;
         (view.findViewById(R.id.imageButtonPause)).setVisibility(View.GONE);
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.VISIBLE);
         locationManager.removeUpdates(speedDistanceCalculator);
+        pausedActivityTime = System.currentTimeMillis();
     }
 
     public void resumeActivity() {
@@ -206,7 +206,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         speedDistanceCalculator.drawResumeLine(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-        isPaused = false;
+        pausedActivityTime = System.currentTimeMillis() - pausedActivityTime;
     }
 
     /**
@@ -220,6 +220,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
         mMap.clear(); // clears the map of all polylines and markers
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
+        startActivityTime = System.currentTimeMillis();
     }
 
 
@@ -239,9 +240,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mMap.addMarker(new MarkerOptions().title("Activity Ended Here").position(latLngs.get(latLngs.size() - 1)));
             mMap.addMarker(new MarkerOptions().title("Activity Started Here").position(speedDistanceCalculator.getFirstLocation()));
         }
+        calculateActivityTime();
         resetValues();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
+
+    private void calculateActivityTime() {
+        endActivityTime = System.currentTimeMillis() - startActivityTime;
+        if(pausedActivityTime != 0) {
+            endActivityTime -= pausedActivityTime;
+        }
+        Log.d(TAG, "Time Spent: " + endActivityTime/1000);
+    }
+
     /** Sets textView visibility */
     private void setTextViewVisibility(int visibility) {
         TextView distanceText = view.findViewById(R.id.distanceText);
