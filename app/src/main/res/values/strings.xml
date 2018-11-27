@@ -1,4 +1,19 @@
 <resources>
-    <string name="app_name">DAT066-Projekt</string>
+    <string name="app_name">TrainR</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_map_fragment">Map</string>
+    <string name="welcome">Welcome to TrainR!</string>
+    <string name="enter_weight">Enter your Weight (kg)</string>
+    <string name="enter_age">Enter your age</string>
+    <string name="enter_gender">Enter your Gender</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
