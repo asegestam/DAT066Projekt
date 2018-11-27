@@ -33,6 +33,7 @@ public class ProfileFragment extends Fragment {
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private TextView mDisplayUsername;
     private TextView mDisplayWeight;
+    private TextView mDisplayHeight;
     private ProfileSaverScreen pf;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
@@ -48,6 +49,7 @@ public class ProfileFragment extends Fragment {
         editor = sharedPref.edit();
         usernameOnClickListener(v);
         weightOnClickListener(v);
+        heightOnClickListener(v);
         birthDayOnClickListener(v);
         getSharedPreferences(v);
 
@@ -65,11 +67,13 @@ public class ProfileFragment extends Fragment {
     private void getSharedPreferences(View v){
         String gender = sharedPref.getString("gender", "");
         String weight = sharedPref.getString("weight", "");
+        String height = sharedPref.getString("height", "");
         String age = sharedPref.getString("age", "");
         String userName = sharedPref.getString("username", "");
         mDisplayDate.setText(age);
         mDisplayUsername.setText(userName);
         mDisplayWeight.setText(weight + " kg");
+        mDisplayHeight.setText(height + " cm");
         if(gender.equals("Male")){
             RadioButton b =v.findViewById(R.id.male);
             b.toggle();
@@ -104,6 +108,45 @@ public class ProfileFragment extends Fragment {
                         String weight = input.getText().toString();
                         mDisplayWeight.setText(weight + " kg");
                         editor.putString("weight", weight );
+                        editor.apply();
+
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+    }
+
+    private void heightOnClickListener(View v){
+
+        mDisplayHeight = (TextView) v.findViewById(R.id.tvHeight);
+        mDisplayHeight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Height");
+
+                View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.height_popup, (ViewGroup) getView(), false);
+                // Set up the input
+                final EditText input = (EditText) viewInflated.findViewById(R.id.inputHeight);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                builder.setView(viewInflated);
+
+                // Set up the buttons
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        String height = input.getText().toString();
+                        mDisplayHeight.setText(height + " cm");
+                        editor.putString("height", height );
                         editor.apply();
 
                     }
@@ -183,9 +226,22 @@ public class ProfileFragment extends Fragment {
         mDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                // month is returned 0-11
                 month = month + 1;
-                Log.d(TAG, "onDateSet: dd/mm/yyyy:" + dayOfMonth + "/" + month + "/" + year);
-                String date = "" + dayOfMonth + "/"  + month + "/" + year;
+                String date;
+                Log.d(TAG, "onDateSet: yyyy/mm/dd:" + year + "/" + month + "/" + dayOfMonth);
+                if(month < 10 && dayOfMonth > 10){
+                    date = "" + year + "/"  + String.format("%02d", month) + "/" + dayOfMonth;
+                }
+                else if(month > 10 && dayOfMonth < 10){
+                    date = "" + year + "/"  + month + "/" + String.format("%02d", dayOfMonth);
+                }
+                else if(month < 10 && dayOfMonth < 10){
+                    date = "" + year + "/"  + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
+                }
+                else {
+                    date = "" + year + "/"  + month + "/" + dayOfMonth;
+                }
                 mDisplayDate.setText(date);
                 editor.putString("age", date);
                 editor.apply();
