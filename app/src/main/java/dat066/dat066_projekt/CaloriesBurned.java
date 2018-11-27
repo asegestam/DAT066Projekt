@@ -12,7 +12,7 @@ public class CaloriesBurned {
     private long time = System.currentTimeMillis();
 
     public CaloriesBurned(){
-        velocity = new SpeedDistanceCalculator();
+        //velocity = new SpeedDistanceCalculator();
         profile = new ProfileSaverScreen();
         if(profile.getGender().equals("Male")){
            // bmr = (13.75 * profile.getWeight()) + /*(5 * profile.getHeight())*/ - (6.76 * profile.getAge()) + 66;
