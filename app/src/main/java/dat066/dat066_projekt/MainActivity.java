@@ -21,8 +21,11 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.PopupMenu;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MapFragment.OnPlotDataListener {
 
     private static final String TAG = "MainActivity";
     private String bike,run;
@@ -106,6 +109,9 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                  break;
 
+            case R.id.stats_option:
+                fragment = new StatsFragment();
+                break;
             default:
                 break;
         }
@@ -156,4 +162,50 @@ public class MainActivity extends AppCompatActivity
         Button button = (Button)findViewById(R.id.activity_button);
         button.setText("Type of Activity (" + activity + ")");
     }
+
+    @Override
+    public void onAttachFragment(Fragment fragment){
+        if(fragment instanceof MapFragment){
+            MapFragment mapFragment = (MapFragment) fragment;
+            mapFragment.setOnPlotDataListener(this);
+        }
+    }
+
+
+    @Override
+    public void onDataGiven(ArrayList elevation) {
+
+
+        StatsFragment statsFrag = (StatsFragment)
+                getSupportFragmentManager().findFragmentById(R.id.statistics);
+
+
+        if (statsFrag != null) {
+            // If article frag is available, we're in two-pane layout...
+
+            // Call a method in the ArticleFragment to update its content
+            statsFrag.setPlotData(elevation);
+            Log.e(TAG, "sent; "+ elevation + "to StatsFragmemt");
+        } else {
+            // Otherwise, we're in the one-pane layout and must swap frags...
+            Log.e(TAG,"Null Fragment!");
+            // Create fragment and give it an argument for the selected article
+            StatsFragment newFragment = new StatsFragment();
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("elevation", elevation);
+            Log.e(TAG,"Put elevation in bundle: "+elevation);
+            newFragment.setArguments(args);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+            transaction.replace(R.id.content_main, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+        }
+    }
 }
+
