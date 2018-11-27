@@ -206,7 +206,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, speedDistanceCalculator);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 5, speedDistanceCalculator);
 
     }
 
@@ -268,10 +268,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
         mMap.clear(); // clears the map of all polylines and markers
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
-        t.schedule(tTask, 10000,10000);
+        t.schedule(tTask, 1000,5000);
         startActivityTime = System.currentTimeMillis();
     }
-
 
     /**
      * Stops location updates
@@ -352,10 +351,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void plotGraph() {
         if(this.activityStopped) {
-            elevationArray.add(speedDistanceCalculator.getEle());
+            if(speedDistanceCalculator.getEle() > 0)
+                elevationArray.add(speedDistanceCalculator.getEle());
+
             mCallback.onDataGiven(elevationArray);
         }else{
-            if(speedDistanceCalculator.getEle() != 0) {
+            if(speedDistanceCalculator.getEle() != 0.0) {
                 elevationArray.add(speedDistanceCalculator.getEle());
                 Log.e(TAG, "Added: " + speedDistanceCalculator.getEle() + " in MapFragment!");
             }
@@ -372,94 +373,3 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         public void onDataGiven(ArrayList elevation);
     }
 }
-
-    /*private class GetElevation extends AsyncTask<Void, Void, Void>  {
-
-        GraphView mView;
-        Activity mContex;
-        HttpHandler sh;
-        double LATITUDE;
-        double LONGITUDE;
-        public GetElevation(Activity contex, GraphView gView){
-
-            this.mContex = contex;
-            this.mView = gView;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //Toast.makeText(MapsActivity.this,"Json Data is downloading",Toast.LENGTH_LONG).show();
-        }
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            sh = new HttpHandler();
-            GraphView v = mContex.findViewById(R.id.graph);
-            Looper.prepare();
-            if(location != null)
-            {
-                LATITUDE = location.getLatitude();
-                LONGITUDE = location.getLongitude();
-            }
-
-            // Making a request to url and getting response
-            String url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyDVhNkpid7dwf_jsBQ02XQKJNW4vW-DhvA";
-            String jsonStr = sh.makeServiceCall(url);
-            Log.e(TAG, "Response from url: " + jsonStr);
-            if (jsonStr != null) {
-                try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-                    JSONArray jsonArray = jsonObj.getJSONArray("results");
-                    double elevation = -1;
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonTemp = jsonArray.getJSONObject(i);
-                        elevation = jsonTemp.getDouble("elevation");
-                    }
-
-                    LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
-                            new DataPoint(1, elevation)
-                    });
-                    series.setColor(Color.BLACK);
-                    series.setDrawDataPoints(true);
-                    series.setDataPointsRadius(10);
-                    series.setThickness(8);
-                    mView.getViewport().setYAxisBoundsManual(true);
-                    graph.getViewport().setMinY(-150);
-                    graph.getViewport().setMaxY(150);
-                    graph.getViewport().setXAxisBoundsManual(true);
-                    graph.getViewport().setMinX(0);
-                    graph.getViewport().setMaxX(80);
-                    graph.getViewport().setScalable(true);
-                    graph.getViewport().setScalableY(true);
-                    graph.addSeries(series);
-                    Log.e(TAG, jsonStr);
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-        }
-    }
-}*/

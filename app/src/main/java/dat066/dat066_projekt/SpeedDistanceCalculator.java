@@ -195,6 +195,10 @@ public class SpeedDistanceCalculator implements LocationListener {
         this.lastLocation = lastLocation;
     }
 
+    public Location getLastLocation(){
+        return lastLocation;
+    }
+
     public static double getDistanceInMetres() {
         return distanceInMetres;
     }

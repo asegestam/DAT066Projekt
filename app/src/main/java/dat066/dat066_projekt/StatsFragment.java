@@ -60,6 +60,8 @@ public class StatsFragment extends Fragment {
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
         series.setThickness(8);
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setMaxX(60);
         /*graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
         graph.getViewport().setMaxY(15);
