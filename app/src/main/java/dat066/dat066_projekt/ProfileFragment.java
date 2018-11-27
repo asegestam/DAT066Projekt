@@ -107,8 +107,10 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String weight = input.getText().toString();
                         mDisplayWeight.setText(weight + " kg");
-                        editor.putString("weight", weight );
-                        editor.apply();
+                        if(!weight.isEmpty()) {
+                            editor.putString("weight", weight);
+                            editor.apply();
+                        }
 
                     }
                 });
@@ -146,8 +148,10 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String height = input.getText().toString();
                         mDisplayHeight.setText(height + " cm");
-                        editor.putString("height", height );
-                        editor.apply();
+                        if(!height.isEmpty()) {
+                            editor.putString("height", height);
+                            editor.apply();
+                        }
 
                     }
                 });
@@ -185,8 +189,10 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String username = input.getText().toString();
                         mDisplayUsername.setText(username);
-                        editor.putString("username", username);
-                        editor.apply();
+                        if(!username.isEmpty()) {
+                            editor.putString("username", username);
+                            editor.apply();
+                        }
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

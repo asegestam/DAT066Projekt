@@ -59,7 +59,7 @@ public class ProfileSaverScreen extends AppCompatActivity{
     }
 
     public void init(View view) {
-        if(getGender() != null && getWeight() != null && getHeight() != null  && getAge() != null && getUserName() != null) {
+        if((getGenderFromLayout() != null && !getGenderFromLayout().isEmpty()) && (getWeightFromLayout() != null && !getWeightFromLayout().isEmpty()) && (getHeightFromLayout() != null && !getHeightFromLayout().isEmpty()) && (getAgeFromLayout() != null && !getAgeFromLayout().isEmpty()) && (getUsernameFromLayout() != null && !getUsernameFromLayout().isEmpty())) {
             saveInfo();
             Intent intent = new Intent(ProfileSaverScreen.this, MainActivity.class);
             startActivity(intent);
