@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
 
     private static final String TAG = "MainActivity";
-    private String bike,run;
+    private String type;
     private boolean activityStopped;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,15 +140,15 @@ public class MainActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
             case R.id.run:
-                run = item.getTitle().toString();
+                type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(run);
+                changeActivityText(type);
 
                 break;
             case R.id.bike:
-                bike = item.getTitle().toString();
+                type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(bike);
+                changeActivityText(type);
                 break;
 
         }
@@ -158,6 +158,10 @@ public class MainActivity extends AppCompatActivity
     public void changeActivityText(String activity){
         Button button = (Button)findViewById(R.id.activity_button);
         button.setText("Type of Activity (" + activity + ")");
+    }
+
+    public String getType() {
+        return type;
     }
 
     public boolean isActivityStopped() {

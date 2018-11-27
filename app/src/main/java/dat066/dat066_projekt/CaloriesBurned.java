@@ -31,7 +31,7 @@ public class CaloriesBurned {
         age = sharedPref.getString("age", "");
         height = sharedPref.getString("height", "");
         if(gender.equals("Male")){
-           bmr = (13.75 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.76 * calculateAge() + 66);
+           bmr = (10 * Double.parseDouble(weight)) + (6.25 * Double.parseDouble(height)) - (4.92 * calculateAge() + 5);
         }
         else {
            bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
@@ -49,11 +49,13 @@ public class CaloriesBurned {
     }
 
 
-    public double CalculateCalories(double speed, int time) {
+    public double CalculateCalories(double speed, long time) {
 
         if(training.equals("Running")){
-            met = 0.816 * speed + 1.662;
-            calories = (bmr/24) * met * time;
+            met = (0.816 * speed * 3.6) + 1.662;
+            Log.d(TAG, "CalculateCalories: speed calories"  + speed * 3.6);
+            Log.d(TAG, "CalculateCalories: calories met" + met);
+            calories = (bmr/24) * met * time/3600000;
         }
         else if(training.equals("Cycling")){
 
