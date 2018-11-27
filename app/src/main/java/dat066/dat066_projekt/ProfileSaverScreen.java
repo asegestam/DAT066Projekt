@@ -179,10 +179,24 @@ public class ProfileSaverScreen extends AppCompatActivity{
                 mDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                // month is returned 0-11
                 month = month + 1;
-                Log.d(TAG, "onDateSet: dd/mm/yyyy:" + dayOfMonth + "/" + month + "/" + year);
-                String date = "" + dayOfMonth + "/"  + month + "/" + year;
+                String date;
+                if(month < 10 && dayOfMonth > 10){
+                    date = "" + year + "/"  + String.format("%02d", month) + "/" + dayOfMonth;
+                }
+                else if(month > 10 && dayOfMonth < 10){
+                    date = "" + year + "/"  + month + "/" + String.format("%02d", dayOfMonth);
+                }
+                else if(month < 10 && dayOfMonth < 10){
+                    date = "" + year + "/"  + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
+                }
+                else {
+                    date = "" + year + "/"  + month + "/" + dayOfMonth;
+                }
                 mDisplayDate.setText(date);
+                Log.d(TAG, "onDateSet: " + date);
+
             }
         };
     }

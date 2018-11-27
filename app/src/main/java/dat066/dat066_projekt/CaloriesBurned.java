@@ -1,26 +1,54 @@
 package dat066.dat066_projekt;
 
-import android.text.format.Time;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.PeriodicSync;
+import android.content.SharedPreferences;
+import android.support.annotation.CheckResult;
+import android.util.Log;
+
+import java.lang.annotation.Target;
+import java.time.LocalDate;
+import java.time.Period;
+
+import static android.support.constraint.Constraints.TAG;
 
 public class CaloriesBurned {
     private double calories;
     private SpeedDistanceCalculator velocity;
-    private ProfileSaverScreen profile;
+    private String gender;
+    private String age;
+    private String weight;
+    private String height;
     private String training;
     private double met;
     private double bmr;
     private long time = System.currentTimeMillis();
 
-    public CaloriesBurned(){
+    public CaloriesBurned(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        gender = sharedPref.getString("gender", "");
+        weight = sharedPref.getString("weight", "");
+        age = sharedPref.getString("age", "");
         velocity = new SpeedDistanceCalculator();
-        profile = new ProfileSaverScreen();
-        if(profile.getGender().equals("Male")){
-           // bmr = (13.75 * profile.getWeight()) + /*(5 * profile.getHeight())*/ - (6.76 * profile.getAge()) + 66;
+        if(gender.equals("Male")){
+           bmr = (13.75 * Double.parseDouble(weight)) + /*(5 * profile.getHeight())*/ - (6.76 * calculateAge() + 66);
         }
         else {
-           // bmr = (9.56 * profile.getWeight()) + /*(1.85 * profile.getHeight())*/ - (4.68 * profile.getAge()) + 665;
+           bmr = (9.56 * Double.parseDouble(weight)) + /*(1.85 * profile.getHeight())*/ - (4.68 * Double.parseDouble(age)) + 665;
         }
+        System.out.println(bmr);
+    }
 
+    @TargetApi(26)
+    public int calculateAge(){
+
+        LocalDate birthday = LocalDate.parse(age.replaceAll("/", "-"));
+        LocalDate today = LocalDate.now();
+        Period p = Period.between(birthday, today);
+
+        System.out.println(p.getYears());
+        return p.getYears();
     }
 
 
@@ -28,7 +56,7 @@ public class CaloriesBurned {
 
         if(training.equals("Running")){
             met = 0.816 * velocity.getAverageSpeed() + 1.662;
-            //calories = (bmr/24) * met * tid
+            calories = (bmr/24) * met * time;
         }
         else if(training.equals("Cycling")){
 
