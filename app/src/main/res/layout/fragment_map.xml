@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/myCoordinatorLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapFragment"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<RelativeLayout
     android:id="@+id/layout"
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".MapFragment">
-
-
-
-
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_dodgeInsetEdges="bottom">
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map"
     android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -23,11 +25,7 @@ tools:context=".MapFragment">
     android:layout_marginStart="0dp"
     android:layout_marginTop="0dp"
     tools:context=".MainActivity" >
-
-
 </FrameLayout>
-
-
 <Button
     android:id="@+id/start_button"
     style="@android:style/Widget.Button"
@@ -151,4 +149,4 @@ tools:context=".MapFragment">
         android:textStyle="bold"
         android:visibility="invisible" />
 </RelativeLayout>
-
+</android.support.design.widget.CoordinatorLayout>

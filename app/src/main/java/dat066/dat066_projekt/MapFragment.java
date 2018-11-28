@@ -10,6 +10,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -63,6 +64,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     Polyline route;
     Polyline resumePolyline;
     private boolean followerModeEnabled;
+    Snackbar saveSnackbar;
 
     @Nullable
     @Override
@@ -81,6 +83,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         speedDistanceCalculator = new SpeedDistanceCalculator(this);
         locationUpdater = new LocationUpdater(speedDistanceCalculator);
         followerModeEnabled = true;
+        saveSnackbar = Snackbar.make(view.findViewById(R.id.myCoordinatorLayout), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
 
         Button startButton = (Button) view.findViewById(R.id.start_button);
         ImageButton stopButton = (ImageButton) view.findViewById(R.id.stop_button);
@@ -232,6 +235,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.clear(); // clears the map of all polylines and markers
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
         startActivityTime = System.currentTimeMillis();
+        saveSnackbar.dismiss();
     }
 
     /**
@@ -252,6 +256,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         calculateActivityTime();
         resetValues();
+        saveSnackbar.setAction(R.string.save_string, saveListener);
+        saveSnackbar.show();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
 
@@ -352,6 +358,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         public boolean onMyLocationButtonClick() {
             followerModeEnabled = true;
             return true;
+        }
+    };
+
+    private View.OnClickListener saveListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "onClick: save activity");
         }
     };
 
