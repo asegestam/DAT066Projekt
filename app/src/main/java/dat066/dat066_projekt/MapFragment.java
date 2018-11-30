@@ -4,9 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.icu.util.Calendar;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,16 +16,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,12 +33,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import android.support.v4.content.ContextCompat;
-
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -48,7 +46,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     SupportMapFragment mapFragment;
     GoogleMap mMap;
     private SpeedDistanceCalculator speedDistanceCalculator;
-    private static final String TAG = "MapFragment";
     LocationManager locationManager;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
     private View view;
@@ -65,6 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     Polyline resumePolyline;
     private boolean followerModeEnabled;
     Snackbar saveSnackbar;
+    private ArrayList<UserActivity> userActivities = new ArrayList<>();
 
     @Nullable
     @Override
@@ -233,6 +231,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
         mMap.clear(); // clears the map of all polylines and markers
+        resetValues(); //resets all previous activity values to start recording a new one
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
         startActivityTime = System.currentTimeMillis();
         saveSnackbar.dismiss();
@@ -249,16 +248,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
         (view.findViewById(R.id.stop_button)).setVisibility(View.GONE);
+        addMarkers();
+        calculateActivityTime();
+        saveSnackbar.setAction(R.string.save_string, saveListener);
+        saveSnackbar.show();
+        Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
+    }
+
+    /** Adds two markers, one at the start location, one at the end location */
+    private void addMarkers() {
         if(routeOptions.getPoints().size() != 0) {
             List<LatLng> latLngs = routeOptions.getPoints();
             mMap.addMarker(new MarkerOptions().title("Activity Ended Here").position(latLngs.get(latLngs.size() - 1)));
             mMap.addMarker(new MarkerOptions().title("Activity Started Here").position(locationUpdater.getFirstLocation()));
         }
-        calculateActivityTime();
-        resetValues();
-        saveSnackbar.setAction(R.string.save_string, saveListener);
-        saveSnackbar.show();
-        Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
     }
 
     /** Pauses the current active activity */
@@ -321,6 +324,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    private void saveActivity() {
+        Date currentTime = Calendar.getInstance().getTime();
+        UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), routeOptions,
+                endActivityTime/1000, 0.0, currentTime,locationUpdater.getFirstLocation());
+        userActivities.add(userActivity);
+        Toast.makeText(getActivity(), "Activity saved", Toast.LENGTH_SHORT).show();
+        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m/s\n" + "size " + userActivity.getRoute().getPoints().size() + "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime();
+        Log.d(TAG, "userActivity: " + logString + "\n" + "number of saved activities " + userActivities.size());
+    }
+
     /** Sets the onClickListeners to all relevant buttons */
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
@@ -364,7 +377,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private View.OnClickListener saveListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "onClick: save activity");
+            saveActivity();
         }
     };
 

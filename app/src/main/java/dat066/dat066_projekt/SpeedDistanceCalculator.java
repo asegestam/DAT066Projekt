@@ -16,7 +16,7 @@ public class SpeedDistanceCalculator {
     private double averageSpeed;
     private MapFragment map;
 
-    public SpeedDistanceCalculator(MapFragment map) {
+    SpeedDistanceCalculator(MapFragment map) {
         this.map = map;
     }
 
