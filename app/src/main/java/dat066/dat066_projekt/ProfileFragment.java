@@ -39,7 +39,6 @@ public class ProfileFragment extends Fragment {
     SharedPreferences.Editor editor;
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,19 +51,19 @@ public class ProfileFragment extends Fragment {
         heightOnClickListener(v);
         birthDayOnClickListener(v);
         getSharedPreferences(v);
-
+        genderOnClickListener(v);
         //Get sharedpreferences data
         return v;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            getActivity().setTitle("Change Profile Inputs");
+        super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Change Profile Inputs");
     }
 
 
-    private void getSharedPreferences(View v){
+    private void getSharedPreferences(View v) {
         String gender = sharedPref.getString("gender", "");
         String weight = sharedPref.getString("weight", "");
         String height = sharedPref.getString("height", "");
@@ -74,18 +73,17 @@ public class ProfileFragment extends Fragment {
         mDisplayUsername.setText(userName);
         mDisplayWeight.setText(weight + " kg");
         mDisplayHeight.setText(height + " cm");
-        if(gender.equals("Male")){
-            RadioButton b =v.findViewById(R.id.male);
+        if (gender.equals("Male")) {
+            RadioButton b = v.findViewById(R.id.male);
             b.toggle();
-        }
-        else{
-            RadioButton b =v.findViewById(R.id.female);
+        } else {
+            RadioButton b = v.findViewById(R.id.female);
             b.toggle();
         }
 
     }
 
-    private void weightOnClickListener(View v){
+    private void weightOnClickListener(View v) {
 
         mDisplayWeight = (TextView) v.findViewById(R.id.tvWeight);
         mDisplayWeight.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +105,7 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String weight = input.getText().toString();
                         mDisplayWeight.setText(weight + " kg");
-                        if(!weight.isEmpty()) {
+                        if (!weight.isEmpty()) {
                             editor.putString("weight", weight);
                             editor.apply();
                         }
@@ -126,7 +124,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void heightOnClickListener(View v){
+    private void heightOnClickListener(View v) {
 
         mDisplayHeight = (TextView) v.findViewById(R.id.tvHeight);
         mDisplayHeight.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +146,7 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String height = input.getText().toString();
                         mDisplayHeight.setText(height + " cm");
-                        if(!height.isEmpty()) {
+                        if (!height.isEmpty()) {
                             editor.putString("height", height);
                             editor.apply();
                         }
@@ -167,7 +165,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void usernameOnClickListener(View v){
+    private void usernameOnClickListener(View v) {
 
         mDisplayUsername = (TextView) v.findViewById(R.id.tvUsername);
         mDisplayUsername.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +187,7 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String username = input.getText().toString();
                         mDisplayUsername.setText(username);
-                        if(!username.isEmpty()) {
+                        if (!username.isEmpty()) {
                             editor.putString("username", username);
                             editor.apply();
                         }
@@ -207,7 +205,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void birthDayOnClickListener(View v){
+    private void birthDayOnClickListener(View v) {
         mDisplayDate = (TextView) v.findViewById(R.id.tvDate);
         mDisplayDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,22 +234,40 @@ public class ProfileFragment extends Fragment {
                 month = month + 1;
                 String date;
                 Log.d(TAG, "onDateSet: yyyy/mm/dd:" + year + "/" + month + "/" + dayOfMonth);
-                if(month < 10 && dayOfMonth > 10){
-                    date = "" + year + "/"  + String.format("%02d", month) + "/" + dayOfMonth;
-                }
-                else if(month > 10 && dayOfMonth < 10){
-                    date = "" + year + "/"  + month + "/" + String.format("%02d", dayOfMonth);
-                }
-                else if(month < 10 && dayOfMonth < 10){
-                    date = "" + year + "/"  + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
-                }
-                else {
-                    date = "" + year + "/"  + month + "/" + dayOfMonth;
+                if (month < 10 && dayOfMonth > 10) {
+                    date = "" + year + "/" + String.format("%02d", month) + "/" + dayOfMonth;
+                } else if (month > 10 && dayOfMonth < 10) {
+                    date = "" + year + "/" + month + "/" + String.format("%02d", dayOfMonth);
+                } else if (month < 10 && dayOfMonth < 10) {
+                    date = "" + year + "/" + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
+                } else {
+                    date = "" + year + "/" + month + "/" + dayOfMonth;
                 }
                 mDisplayDate.setText(date);
                 editor.putString("age", date);
                 editor.apply();
             }
         };
+    }
+
+    private void genderOnClickListener(View v) {
+        final RadioGroup radioGenderGroup = (RadioGroup) (v.findViewById(R.id.sex));
+        radioGenderGroup.setOnClickListener(new View.OnClickListener() {
+            String gender;
+
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: " + radioGenderGroup.getCheckedRadioButtonId());
+                if (radioGenderGroup.getCheckedRadioButtonId() != -1) {
+                    int selectedId = radioGenderGroup.getCheckedRadioButtonId();
+                    RadioButton radioGenderButton = (RadioButton) v.findViewById(selectedId);
+                    gender = radioGenderButton.getText().toString();
+                    editor.putString("gender", gender);
+                    editor.apply();
+
+                }
+            }
+        });
+
     }
 }
