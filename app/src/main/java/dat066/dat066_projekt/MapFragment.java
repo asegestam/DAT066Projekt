@@ -33,8 +33,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import android.support.v4.content.ContextCompat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -426,7 +424,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public boolean onMyLocationButtonClick() {
             followerModeEnabled = true;
-            return true;
+            return false;
         }
     };
 
