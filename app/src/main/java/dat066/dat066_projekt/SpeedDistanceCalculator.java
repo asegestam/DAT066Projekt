@@ -22,16 +22,13 @@ public class SpeedDistanceCalculator {
     private ArrayList<Double> avgSpeedArray = new ArrayList<>();
     private double averageSpeed;
     private MapFragment map;
-    private volatile double ele;
-    private Location lastLocation;
 
     SpeedDistanceCalculator(MapFragment map) {
         this.map = map;
     }
 
     /** Handles the location change by calculating speed and distance, calling for fragment to re draw route and updating camera */
-    public void handleLocationChange(Location currentLocation, Location location) {
-        lastLocation = location;
+    public void handleLocationChange(Location currentLocation, Location lastLocation) {
         long currentTime = currentLocation.getTime();
         long lastTime = lastLocation.getTime();
         long timeBetween = (currentTime - lastTime)/1000;
@@ -47,53 +44,9 @@ public class SpeedDistanceCalculator {
         map.reDrawRoute();
         map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
         map.updateCamera(latLng);
-    }
-
-    /*Räknar ut höjden*/
-    public void getElevation(){
-
-        final double LONGITUDE = lastLocation.getLongitude();
-        final double LATITUDE = lastLocation.getLatitude();
-        final String url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyDVhNkpid7dwf_jsBQ02XQKJNW4vW-DhvA";
-
-        new Thread() {
-            public void run() {
-                HttpHandler sh = new HttpHandler();
-                double elevation = 0;
-                String jsonStr = sh.makeServiceCall(url);
-                Log.e(TAG, "parsed: LAT: " + LATITUDE + " LONG: " + LONGITUDE);
-                Log.e(TAG, "String: " + jsonStr);
-
-                if (jsonStr != null) {
-                    try {
-
-                        ele = getData(jsonStr,elevation);
-
-                        Log.e(TAG, jsonStr);
-                    } catch (final JSONException e) {
-                        Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    }
-                } else {
-                    Log.e(TAG, "Couldn't get json from server.");
-                }
-            }
-        }.start();
-    }
-
-    public double getData(String jsonStr, double elevation) throws JSONException {
-        JSONObject jsonObj = new JSONObject(jsonStr);
-        JSONArray jsonArray = jsonObj.getJSONArray("results");
-        elevation = -1;
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonTemp = jsonArray.getJSONObject(i);
-            elevation = jsonTemp.getDouble("elevation");
+        if(!currentLocation.equals(lastLocation)){
+            map.plotGraph();
         }
-        return elevation;
-    }
-
-    public double getEle() {
-        getElevation();
-        return ele;
     }
 
     /** Calculates average speed */
@@ -122,11 +75,6 @@ public class SpeedDistanceCalculator {
             e.printStackTrace();
         }
     }
-
-    public Location getLastLocation(){
-        return lastLocation;
-    }
-
     public static double getDistanceInMetres() {
         return distanceInMetres;
     }
