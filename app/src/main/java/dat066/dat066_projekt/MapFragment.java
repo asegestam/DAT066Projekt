@@ -1,6 +1,8 @@
 package dat066.dat066_projekt;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -9,6 +11,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -16,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import java.lang.Runnable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,9 +36,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import android.widget.GridView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ImageButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import android.support.v4.content.ContextCompat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -47,8 +72,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     GoogleMap mMap;
     private SpeedDistanceCalculator speedDistanceCalculator;
     LocationManager locationManager;
+    Location location = null;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
     private View view;
+    GraphView graph;
+    ArrayList<Double> elevationArray;
+    OnPlotDataListener mCallback;
+    private Timer t;
+    private TimerTask tTask;
+    private boolean activityStopped;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
@@ -63,6 +95,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     Snackbar saveSnackbar;
     private ArrayList<UserActivity> userActivities = new ArrayList<>();
 
+    @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -76,6 +109,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         getLocationPermission();
         mapFragment.getMapAsync(this);
+        graph = (GraphView) view.findViewById(R.id.graph);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         speedDistanceCalculator = new SpeedDistanceCalculator(this);
         locationUpdater = new LocationUpdater(speedDistanceCalculator);
@@ -85,6 +119,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Button startButton = (Button) view.findViewById(R.id.start_button);
         ImageButton stopButton = (ImageButton) view.findViewById(R.id.stop_button);
         Button activityButton = (Button) view.findViewById(R.id.activity_button);
+        Button plotButton = (Button) view.findViewById(R.id.plot_button);
         ImageButton pauseButton = (ImageButton) view.findViewById(R.id.imageButtonPause);
         ImageButton resumeButton = (ImageButton) view.findViewById(R.id.imageButtonResume);
         pauseButton.setOnClickListener(pauseButtonClickListener);
@@ -92,6 +127,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         resumeButton.setOnClickListener(resumeButtonClickListener);
         stopButton.setOnClickListener(stopButtonClickListener);
         activityButton.setOnClickListener(activityButtonOnClickListener);
+        plotButton.setOnClickListener(plotButtonOnClickListener);
 
         return view;
     }
@@ -100,6 +136,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("");
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
     }
 
     /**
@@ -112,13 +153,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        elevationArray = new ArrayList<>();
+        location = speedDistanceCalculator.getLastLocation();
         mMap.setPadding(0, 0, 0, 0);
         mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(onMapClickListener);
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);
     }
 
-    /**Gets the necessary permissions from the user or asks for them*/
+    /**
+     * Gets the necessary permissions from the user or asks for them
+     */
     private void getLocationPermission() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -154,7 +199,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    /**Initializes the map*/
+    /**
+     * Initializes the map
+     */
     private void initMap() {
         Log.d(TAG, "initMap: initializing the map");
         mapFragment.getMapAsync(this);
@@ -192,6 +239,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, locationUpdater);
     }
 
+    public Location getLocation() {
+        return speedDistanceCalculator.getLastLocation();
+    }
+
     /** Draws a Polyline based on user movement */
     public void reDrawRoute(){
         route = mMap.addPolyline(routeOptions);
@@ -221,6 +272,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * Shows and hides the relevant buttons, starts chronometer timer
      */
     public void startActivity() {
+        activityStopped = false;
+        t = new Timer();
+        tTask = new TimerTask() {
+            @Override
+            public void run() {
+                plotGraph();
+            }
+        };
+        requestLocationUpdates();
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
@@ -230,6 +290,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         requestLocationUpdates();
         saveSnackbar.dismiss();
         startTimer();
+        t.schedule(tTask, 1000,5000);
     }
 
     /**
@@ -240,6 +301,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     public void stopActivity() {
         locationManager.removeUpdates(locationUpdater);
+        activityStopped = true;
+        t.cancel();
+        t.purge();
+        locationManager.removeUpdates(speedDistanceCalculator);
         setButtonVisibility(0);
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
@@ -249,6 +314,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         saveSnackbar.show();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
         stopTimer();
+        plotGraph();
     }
 
     /** Pauses the current active activity */
@@ -307,8 +373,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Chronometer time = view.findViewById(R.id.timeChronometer);
         if(distanceText.getVisibility() == visibility && speedText.getVisibility() == visibility) {
             return;
-        }
-        else {
+        } else {
             distanceText.setVisibility(visibility);
             speedText.setVisibility(visibility);
             distanceWord.setVisibility(visibility);
@@ -368,9 +433,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     };
     private View.OnClickListener activityButtonOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-            ((MainActivity)getActivity()).showPopup();
+            ((MainActivity) getActivity()).showPopup();
         }
     };
+
     private GoogleMap.OnMapClickListener onMapClickListener = new GoogleMap.OnMapClickListener() {
         @Override
         public void onMapClick(LatLng latLng) {
@@ -393,4 +459,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     };
 
+    private View.OnClickListener plotButtonOnClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            plotGraph();
+        }
+    };
+
+    public void plotGraph() {
+        if(this.activityStopped) {
+            if(speedDistanceCalculator.getEle() > 0)
+                elevationArray.add(speedDistanceCalculator.getEle());
+
+            mCallback.onDataGiven(elevationArray);
+        }else{
+            if(speedDistanceCalculator.getEle() != 0.0) {
+                elevationArray.add(speedDistanceCalculator.getEle());
+                Log.e(TAG, "Added: " + speedDistanceCalculator.getEle() + " in MapFragment!");
+            }
+        }
+    }
+
+    public void setOnPlotDataListener(Activity activity){
+        mCallback = (OnPlotDataListener) activity;
+    }
+
+
+
+    public interface OnPlotDataListener{
+        public void onDataGiven(ArrayList elevation);
+    }
 }
