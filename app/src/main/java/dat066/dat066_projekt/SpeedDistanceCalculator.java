@@ -32,18 +32,18 @@ public class SpeedDistanceCalculator {
             speed = distance/timeBetween;
             avgSpeedArray.add(speed);
         }
-        if(!avgSpeedArray.isEmpty()){
-            calcAverageSpeed();
-        }
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         map.addLatLngToRoute(latLng);
         map.reDrawRoute();
-        map.updateTextViews(distanceInMetres, calcAverageSpeed());
+        map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
         map.updateCamera(latLng);
     }
 
     /** Calculates average speed */
     private double calcAverageSpeed() {
+        if(avgSpeedArray.isEmpty()) {
+            return speed;
+        }
         double sum = 0;
         for (Double value : avgSpeedArray) {
             if(value != null) sum += value;

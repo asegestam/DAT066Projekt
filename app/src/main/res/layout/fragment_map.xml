@@ -17,13 +17,25 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
-            tools:context=".MainActivity"></FrameLayout>
+            tools:context=".MainActivity">
+        </FrameLayout>
+
+        <Chronometer
+            android:id="@+id/timeChronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="46sp"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/start_button"
@@ -41,7 +53,115 @@
             android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:visibility="visible" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="80dp">
 
+            <Button
+                android:id="@+id/activity_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginStart="0dp"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/white"
+                android:text="Type of Activity"
+                android:textAllCaps="false"
+                android:textStyle="bold|italic" />
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:backgroundTint="@android:color/white"
+                android:text="TBD"
+                android:textAllCaps="false"
+                android:textStyle="bold|italic" />
+        </LinearLayout>
+        <View
+            android:id="@+id/rectangle"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:alpha="0.6"
+            android:background="#bfbdbc"
+            android:visibility="invisible"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="170dp">
+
+            <TextView
+                android:id="@+id/distanceWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Distance"
+                android:layout_marginStart="40dp"
+                android:textSize="24sp"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/speedWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Speed"
+                android:layout_marginEnd="60dp"
+                android:textSize="24sp"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="125dp">
+
+            <TextView
+                android:id="@+id/distanceText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="100,50m"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                android:textColor="#000000"
+                android:textSize="36sp"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/speedText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="5 m/s"
+                android:textColor="#000000"
+                android:layout_marginEnd="20dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                android:textSize="36sp"
+                android:visibility="invisible"/>
+        </LinearLayout>
         <LinearLayout
             android:layout_width="33mm"
             android:layout_height="14mm"
@@ -84,68 +204,5 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="80dp">
-
-            <Button
-                android:id="@+id/activity_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:layout_marginStart="0dp"
-                android:layout_weight="1"
-                android:backgroundTint="@android:color/white"
-                android:text="Type of Activity"
-                android:textAllCaps="false"
-                android:textStyle="bold|italic" />
-
-            <Button
-                android:id="@+id/button5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:layout_marginTop="1dp"
-                android:layout_weight="1"
-                android:backgroundTint="@android:color/white"
-                android:text="TBD"
-                android:textAllCaps="false"
-                android:textStyle="bold|italic" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/distanceText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="125dp"
-            android:layout_marginStart="0dp"
-            android:text="Distance"
-            android:textAllCaps="true"
-            android:textColor="@color/colorPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/speedText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="100dp"
-            android:layout_marginStart="0dp"
-            android:text="Pace"
-            android:textAllCaps="true"
-            android:textColor="@color/colorPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:visibility="invisible" />
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>
