@@ -71,18 +71,6 @@
                 android:text="Type of Activity"
                 android:textAllCaps="false"
                 android:textStyle="bold|italic" />
-
-            <Button
-                android:id="@+id/button5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:layout_marginTop="1dp"
-                android:layout_weight="1"
-                android:backgroundTint="@android:color/white"
-                android:text="TBD"
-                android:textAllCaps="false"
-                android:textStyle="bold|italic" />
         </LinearLayout>
         <View
             android:id="@+id/rectangle"

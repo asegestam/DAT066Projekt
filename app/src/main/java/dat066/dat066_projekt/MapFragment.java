@@ -327,7 +327,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void setButtonVisibility(int visibility) {
         (view.findViewById(R.id.start_button)).setVisibility(visibility);
         (view.findViewById(R.id.activity_button)).setVisibility(visibility);
-        (view.findViewById(R.id.button5)).setVisibility(visibility);
         int antiVisibility;
         if (visibility == 8) {
             antiVisibility = 0;
@@ -424,7 +423,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public boolean onMyLocationButtonClick() {
             followerModeEnabled = true;
-            return false;
+            return true;
         }
     };
 
