@@ -288,6 +288,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         addMarkers();
         saveSnackbar.setAction(R.string.save_string, saveListener);
         saveSnackbar.show();
+        CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
+        caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
+        double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
+        Log.d(TAG, "stopActivity: KALORIER" + d);
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
         stopTimer();
         plotGraph();
