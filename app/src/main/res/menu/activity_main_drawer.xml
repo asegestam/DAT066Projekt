@@ -16,6 +16,10 @@
             android:id="@+id/settings_option"
             android:icon="@drawable/ic_settings_option"
             android:title="Settings" />
+        <item
+            android:id="@+id/stats_option"
+            android:icon="@drawable/ic_stats_option"
+            android:title="Statistics"/>
     </group>
 
     <!--<item android:title="Communicate">
