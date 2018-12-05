@@ -31,7 +31,7 @@ public class CaloriesBurned {
         age = sharedPref.getString("age", "");
         height = sharedPref.getString("height", "");
         if(gender.equals("Male")){
-            bmr = (13.7 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.8 * calculateAge() + 66);
+            bmr = (13.7 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.8 * calculateAge()) + 66;
         }
         else {
            bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
