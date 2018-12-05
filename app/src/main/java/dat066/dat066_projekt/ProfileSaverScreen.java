@@ -243,9 +243,10 @@ public class ProfileSaverScreen extends AppCompatActivity{
      */
     public void getInfo(){
         SharedPreferences sharedPref = mContext.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        /*SharedPreferences.Editor edit = sharedPref.edit();
+       /* SharedPreferences.Editor edit = sharedPref.edit();
         edit.clear();
-        edit.commit();*/
+        edit.commit();
+        */
         gender = sharedPref.getString("gender", "");
         weight = sharedPref.getString("weight", "");
         height = sharedPref.getString("height", "");

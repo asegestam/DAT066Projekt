@@ -33,8 +33,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import android.support.v4.content.ContextCompat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -329,7 +327,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void setButtonVisibility(int visibility) {
         (view.findViewById(R.id.start_button)).setVisibility(visibility);
         (view.findViewById(R.id.activity_button)).setVisibility(visibility);
-        (view.findViewById(R.id.button5)).setVisibility(visibility);
         int antiVisibility;
         if (visibility == 8) {
             antiVisibility = 0;

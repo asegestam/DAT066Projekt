@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private String type;
     private boolean activityStopped;
+    StatsFragment newFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity
                  break;
 
             case R.id.stats_option:
-                fragment = new StatsFragment();
+                fragment = newFragment;
                 break;
             case R.id.goal_option:
                 fragment = new GoalsFragment();
@@ -194,13 +195,13 @@ public class MainActivity extends AppCompatActivity
             // Otherwise, we're in the one-pane layout and must swap frags...
             Log.e(TAG,"Null Fragment!");
             // Create fragment and give it an argument for the selected article
-            StatsFragment newFragment = new StatsFragment();
+            newFragment = new StatsFragment();
             Bundle args = new Bundle();
             args.putParcelableArrayList("elevation", elevation);
             Log.e(TAG,"Put elevation in bundle: "+elevation);
             newFragment.setArguments(args);
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+           /* FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
@@ -209,6 +210,7 @@ public class MainActivity extends AppCompatActivity
 
             // Commit the transaction
             transaction.commit();
+            */
         }
     }
     public String getType() {
