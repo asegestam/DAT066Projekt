@@ -38,6 +38,14 @@
             android:visibility="invisible" />
 
         <Button
+            android:id="@+id/xd"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:text="XD"
+            android:layout_marginTop="50dp"
+            android:layout_alignParentTop="true"/>
+
+        <Button
             android:id="@+id/start_button"
             style="@android:style/Widget.Button"
             android:layout_width="match_parent"
@@ -130,7 +138,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="100,50m"
+                android:text=""
                 android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                 android:textColor="#000000"
                 android:textSize="36sp"
@@ -143,7 +151,7 @@
                 android:layout_weight="0"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="5 m/s"
+                android:text=""
                 android:textColor="#000000"
                 android:layout_marginEnd="20dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display2"

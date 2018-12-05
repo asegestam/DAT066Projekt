@@ -34,7 +34,7 @@ public class CaloriesBurned {
             bmr = (13.7 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.8 * calculateAge()) + 66;
         }
         else {
-           bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
+            bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
         }
         System.out.println(bmr);
     }
@@ -50,7 +50,6 @@ public class CaloriesBurned {
 
 
     public double CalculateCalories(double speed, long time) {
-
         if(training.equals("Running")){
             met = (1.411 * Math.pow(speed * 3.6, 0.8435));
             calories = (bmr/24) * met * time/3600000;
@@ -60,6 +59,7 @@ public class CaloriesBurned {
             calories = (bmr/24) * met * time/3600000;
         }
         return calories;
+
     }
 
     public void setTraining(String s){

@@ -32,8 +32,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.jjoe64.graphview.GraphView;
 import android.support.v4.content.ContextCompat;
+
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -67,12 +70,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     long timeStopped = 0;
     LocationUpdater locationUpdater;
     private PolylineOptions routeOptions = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true);
-    private PolylineOptions resumeOptions = new PolylineOptions().width(20).color(Color.RED).geodesic(true);
-    Polyline route;
-    Polyline resumePolyline;
     private boolean followerModeEnabled;
     Snackbar saveSnackbar;
     private ArrayList<UserActivity> userActivities = new ArrayList<>();
+    private ArrayList<PolylineOptions> activityRoutes;
 
     @SuppressLint("MissingPermission")
     @Nullable
@@ -99,11 +100,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Button activityButton = (Button) view.findViewById(R.id.activity_button);
         ImageButton pauseButton = (ImageButton) view.findViewById(R.id.imageButtonPause);
         ImageButton resumeButton = (ImageButton) view.findViewById(R.id.imageButtonResume);
+        Button xdButton = view.findViewById(R.id.xd);
         pauseButton.setOnClickListener(pauseButtonClickListener);
         startButton.setOnClickListener(startButtonClickListener);
         resumeButton.setOnClickListener(resumeButtonClickListener);
         stopButton.setOnClickListener(stopButtonClickListener);
         activityButton.setOnClickListener(activityButtonOnClickListener);
+        xdButton.setOnClickListener(xdButtonOnClickListener);
 
         return view;
     }
@@ -137,6 +140,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(onMapClickListener);
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);
+        activityRoutes = new ArrayList<>();
     }
 
     /**
@@ -185,10 +189,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
     }
 
-    /** Zooms in at the given LatLng with a zoom of 18 */
+    /** Zooms in at the given LatLng with a zoom of 20 */
     public void updateCamera(LatLng latLng) {
         if(followerModeEnabled) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 20);
             mMap.animateCamera(cameraUpdate);
         }
     }
@@ -223,7 +227,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     /** Draws a Polyline based on user movement */
     public void reDrawRoute(){
-        route = mMap.addPolyline(routeOptions);
+        Polyline route = mMap.addPolyline(routeOptions);
     }
 
     /**
@@ -233,9 +237,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         List<LatLng> latLngs = routeOptions.getPoints();
         LatLng latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
         locationUpdater.setLastLocation(null); //so the distance is not accounted for when resuming
-        resumeOptions.add(latLngs.get(latLngs.size() - 1)).add(latLng);
-        resumePolyline = mMap.addPolyline(resumeOptions);
-        resumeOptions.getPoints().clear();
+        PolylineOptions resumeOptions = new PolylineOptions().width(20).color(Color.RED).geodesic(true).
+                add(latLngs.get(latLngs.size() - 1)).add(latLng);
+        Polyline resumePolyline = mMap.addPolyline(resumeOptions);
+        PolylineOptions savedRoute = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(routeOptions.getPoints());
+        saveActivityRoutes(resumeOptions);
+        saveActivityRoutes(savedRoute);
         routeOptions.getPoints().clear();
         routeOptions.add(latLng);
         requestLocationUpdates(); //enable Location updates like normal
@@ -243,6 +250,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void addLatLngToRoute(LatLng latLng) {
         routeOptions.add(latLng);
+        reDrawRoute();
     }
 
     /**
@@ -258,6 +266,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 plotGraph();
             }
         };
+        if(activityRoutes != null )activityRoutes.clear();
         requestLocationUpdates();
         setButtonVisibility(8);
         setTextViewVisibility(0);
@@ -295,7 +304,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "stopActivity: KALORIER" + d);
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
         stopTimer();
-        plotGraph();
     }
 
     /** Pauses the current active activity */
@@ -322,7 +330,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(routeOptions.getPoints().size() != 0) {
             List<LatLng> latLngs = routeOptions.getPoints();
             mMap.addMarker(new MarkerOptions().title("Activity Ended Here").position(latLngs.get(latLngs.size() - 1)));
-            mMap.addMarker(new MarkerOptions().title("Activity Started Here").position(locationUpdater.getFirstLocation()));
+            mMap.addMarker(new MarkerOptions().title("Activity Started Here").
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).position(locationUpdater.getFirstLocation()));
         }
     }
     /**
@@ -365,12 +374,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     /** Saves the speed, distance, route, elapsed time of a activity in a instance of UserActivity */
     private void saveActivity() {
         Date currentTime = Calendar.getInstance().getTime();
-        UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), routeOptions,
-                elapsedActivityTime/1000, 0.0, currentTime,locationUpdater.getFirstLocation());
+        PolylineOptions savedRoute = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(routeOptions.getPoints());
+        saveActivityRoutes(savedRoute);
+        UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), activityRoutes,
+                elapsedActivityTime/1000, 0.0, currentTime,locationUpdater.getFirstLocation(), elevationArray);
         userActivities.add(userActivity);
-        Toast.makeText(getActivity(), "Activity saved", Toast.LENGTH_SHORT).show();
-        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m/s\n" + "size " + userActivity.getRoute().getPoints().size() + "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime();
-        Log.d(TAG, "userActivity: " + logString + "\n" + "number of saved activities " + userActivities.size());
+        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m/s\n" + "size " + userActivity.getRoutes().size() + "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime();
+        Log.d(TAG, "userActivity: " + logString + "\n" + "number of saved activities " + userActivities.size() + "\n number of routes saved" + activityRoutes.size());
+        mMap.clear();
     }
 
     private void startTimer() {
@@ -383,6 +394,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Chronometer time = view.findViewById(R.id.timeChronometer);
         timeStopped = time.getBase() - SystemClock.elapsedRealtime();
         time.stop();
+    }
+
+    private void saveActivityRoutes(PolylineOptions routeOptions) {
+        activityRoutes.add(routeOptions);
+        Log.d(TAG, "saveActivityRoutes: size av saved rutts" + activityRoutes.size());
     }
 
     /** Sets the onClickListeners to all relevant buttons */
@@ -415,6 +431,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             elapsedActivityTime = SystemClock.elapsedRealtime() - time.getBase();
             Log.d(TAG, "chronometerElaspedTime " + elapsedActivityTime/1000);
             stopActivity();
+            if(locationUpdater.getFirstLocation() != null &&  locationUpdater.getLastLocation() != null) {
+                plotGraph();
+            }
         }
     };
     private View.OnClickListener activityButtonOnClickListener = new View.OnClickListener() {
@@ -434,7 +453,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public boolean onMyLocationButtonClick() {
             followerModeEnabled = true;
-            return true;
+            return false;
         }
     };
 
@@ -449,7 +468,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(this.activityStopped) {
             if(locationUpdater.getEle() > 0)
                 elevationArray.add(locationUpdater.getEle());
-
             mCallback.onDataGiven(elevationArray);
         }else{
             if(locationUpdater.getEle() != 0.0) {
@@ -466,4 +484,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public interface OnPlotDataListener{
         public void onDataGiven(ArrayList elevation);
     }
+
+    private View.OnClickListener xdButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            UserActivity userActivity = userActivities.get(userActivities.size() - 1);
+            ArrayList<PolylineOptions> userRoutes = userActivity.getRoutes();
+            Log.d(TAG, "onClick: user rut" + userRoutes.size());
+            for(PolylineOptions p : userRoutes) {
+                Polyline route = mMap.addPolyline(p);
+            }
+        }
+    };
 }

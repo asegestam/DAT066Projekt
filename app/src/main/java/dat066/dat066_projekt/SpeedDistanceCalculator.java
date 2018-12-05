@@ -22,9 +22,11 @@ public class SpeedDistanceCalculator {
     private ArrayList<Double> avgSpeedArray = new ArrayList<>();
     private double averageSpeed;
     private MapFragment map;
+    int i ;
 
     SpeedDistanceCalculator(MapFragment map) {
         this.map = map;
+        i = 0;
     }
 
     /** Handles the location change by calculating speed and distance, calling for fragment to re draw route and updating camera */
@@ -41,12 +43,8 @@ public class SpeedDistanceCalculator {
         }
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         map.addLatLngToRoute(latLng);
-        map.reDrawRoute();
         map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
         map.updateCamera(latLng);
-        if(!currentLocation.equals(lastLocation)){
-            map.plotGraph();
-        }
     }
 
     /** Calculates average speed */
