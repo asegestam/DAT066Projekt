@@ -94,7 +94,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationUpdater = new LocationUpdater(speedDistanceCalculator);
         followerModeEnabled = true;
         saveSnackbar = Snackbar.make(view.findViewById(R.id.myCoordinatorLayout), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
-
         Button startButton = (Button) view.findViewById(R.id.start_button);
         ImageButton stopButton = (ImageButton) view.findViewById(R.id.stop_button);
         Button activityButton = (Button) view.findViewById(R.id.activity_button);
@@ -126,6 +125,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        ((MainActivity) getActivity()).changeActivityText();
         this.mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -387,10 +388,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     /** Sets the onClickListeners to all relevant buttons */
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-            Chronometer time = view.findViewById(R.id.timeChronometer);
-            timeStopped = 0;
-            time.setBase(SystemClock.elapsedRealtime());
-            startActivity();
+            if(((MainActivity) getActivity()).getType() == null)
+            {
+                Toast.makeText(getActivity(), "Please select Type of Activity", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Chronometer time = view.findViewById(R.id.timeChronometer);
+                timeStopped = 0;
+                time.setBase(SystemClock.elapsedRealtime());
+                startActivity();
+            }
         }
     };
     private View.OnClickListener pauseButtonClickListener = new View.OnClickListener() {

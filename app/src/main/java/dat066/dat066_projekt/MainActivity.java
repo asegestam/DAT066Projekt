@@ -147,22 +147,24 @@ public class MainActivity extends AppCompatActivity
             case R.id.run:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(type);
+                changeActivityText();
 
                 break;
             case R.id.bike:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(type);
+                changeActivityText();
                 break;
 
         }
         return true;
     }
 
-    public void changeActivityText(String activity){
-        Button button = (Button)findViewById(R.id.activity_button);
-        button.setText("Type of Activity (" + activity + ")");
+    public void changeActivityText(){
+        if(getType() != null) {
+            Button button = (Button) findViewById(R.id.activity_button);
+            button.setText("Type of Activity (" + getType() + ")");
+        }
     }
 
     @Override

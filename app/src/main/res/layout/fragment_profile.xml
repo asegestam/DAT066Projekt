@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbarAlwaysDrawVerticalTrack="true">
@@ -52,8 +53,9 @@
             android:id="@+id/weightText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text="@string/enter_weight"
-            android:layout_marginTop="10dp"/>
+            android:textSize="20sp" />
 
 
         <TextView
@@ -73,8 +75,9 @@
             android:id="@+id/heightText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text="@string/enter_height"
-            android:layout_marginTop="10dp"/>
+            android:textSize="20sp" />
 
 
         <TextView
