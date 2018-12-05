@@ -20,6 +20,10 @@
             android:id="@+id/stats_option"
             android:icon="@drawable/ic_stats_option"
             android:title="Statistics"/>
+        <item
+            android:id="@+id/goal_option"
+            android:icon="@drawable/ic_goal_option"
+            android:title="Goals"/>
     </group>
 
     <!--<item android:title="Communicate">

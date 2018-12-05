@@ -113,6 +113,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.stats_option:
                 fragment = new StatsFragment();
                 break;
+            case R.id.goal_option:
+                fragment = new GoalsFragment();
+                break;
             default:
                 break;
         }
