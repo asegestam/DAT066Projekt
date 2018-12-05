@@ -1,8 +1,9 @@
 package dat066.dat066_projekt;
 
-import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
+import android.util.Log;
+import com.google.android.gms.maps.model.LatLng;
+import java.util.ArrayList;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -12,209 +13,81 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import java.util.ArrayList;
-import java.util.List;
-
 import static android.content.ContentValues.TAG;
 
+public class SpeedDistanceCalculator {
 
-public class SpeedDistanceCalculator implements LocationListener {
-
-    private Location lastLocation = null;
-    private Location firstLocation = null;
-    private boolean resumeLineDrawn;
     private static double distanceInMetres;
     private double speed;
-    private ArrayList<Double> avgSpeed = new ArrayList<>();
+    private ArrayList<Double> avgSpeedArray = new ArrayList<>();
     private double averageSpeed;
-    private PolylineOptions routeOptions = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true);
-    private PolylineOptions resumeOptions = new PolylineOptions().width(20).color(Color.RED).geodesic(true);
-    GoogleMap map;
-    Polyline route;
-    Polyline resumePolyline;
-    MapFragment fragment;
-    int i;
-    private volatile double ele;
+    private MapFragment map;
 
-
-    public SpeedDistanceCalculator(GoogleMap map, MapFragment fragment) {
+    SpeedDistanceCalculator(MapFragment map) {
         this.map = map;
-        this.fragment = fragment;
     }
 
-    /** On LocationChange calculate user speed, distance moved, adds LatLng objects to draw a Route */
-    @Override
-    public void onLocationChanged(Location location) {
-        if(lastLocation == null) {
-            lastLocation = location;
-        }
-        if(firstLocation == null) {
-            firstLocation = location;
-        }
-        long currentTime = location.getTime();
+    /** Handles the location change by calculating speed and distance, calling for fragment to re draw route and updating camera */
+    public void handleLocationChange(Location currentLocation, Location lastLocation) {
+        long currentTime = currentLocation.getTime();
         long lastTime = lastLocation.getTime();
         long timeBetween = (currentTime - lastTime)/1000;
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        routeOptions.add(latLng);
-        double distance = location.distanceTo(lastLocation);
+        double distance = currentLocation.distanceTo(lastLocation);
         distanceInMetres += distance;
-        if(timeBetween > 0) {
+        Log.d(TAG, "Distans " + distanceInMetres  + " m");
+        if(timeBetween > 0) { // to avoid dividing by 0
             speed = distance/timeBetween;
-            avgSpeed.add(speed);
+            avgSpeedArray.add(speed);
         }
-        if(!avgSpeed.isEmpty()){
-            calcAverageSpeed();
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        map.addLatLngToRoute(latLng);
+        map.reDrawRoute();
+        map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
+        map.updateCamera(latLng);
+        if(!currentLocation.equals(lastLocation)){
+            map.plotGraph();
         }
-        reDrawRoute();
-        fragment.updateTextViews(distanceInMetres, calcAverageSpeed());
-        lastLocation = location;
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-        map.animateCamera(cameraUpdate);
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    /*Räknar ut höjden*/
-    public void getElevation(){
-
-        final double LONGITUDE = lastLocation.getLongitude();
-        final double LATITUDE = lastLocation.getLatitude();
-        final String url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyDVhNkpid7dwf_jsBQ02XQKJNW4vW-DhvA";
-
-        new Thread() {
-            public void run() {
-                HttpHandler sh = new HttpHandler();
-                double elevation = 0;
-                String jsonStr = sh.makeServiceCall(url);
-                Log.e(TAG, "parsed: LAT: " + LATITUDE + " LONG: " + LONGITUDE);
-                Log.e(TAG, "String: " + jsonStr);
-
-                if (jsonStr != null) {
-                    try {
-
-                        ele = getData(jsonStr,elevation);
-
-                        Log.e(TAG, jsonStr);
-                    } catch (final JSONException e) {
-                        Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    }
-                } else {
-                    Log.e(TAG, "Couldn't get json from server.");
-                }
-            }
-        }.start();
-    }
-
-    public double getData(String jsonStr, double elevation) throws JSONException {
-        JSONObject jsonObj = new JSONObject(jsonStr);
-        JSONArray jsonArray = jsonObj.getJSONArray("results");
-        elevation = -1;
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonTemp = jsonArray.getJSONObject(i);
-            elevation = jsonTemp.getDouble("elevation");
-        }
-        return elevation;
-    }
-
-    public double getEle() {
-        getElevation();
-        return ele;
     }
 
     /** Calculates average speed */
     private double calcAverageSpeed() {
+        if(avgSpeedArray.isEmpty()) {
+            return speed;
+        }
         double sum = 0;
-        for (Double value : avgSpeed) {
+        for (Double value : avgSpeedArray) {
             if(value != null) sum += value;
         }
-        averageSpeed = sum/avgSpeed.size();
+        averageSpeed = sum/avgSpeedArray.size();
         Log.d(TAG, "Medelhastighet " + averageSpeed  + " m/s"); //Loggar medelhastigheten de senaste 5000 metrarna
-        if(avgSpeed.size() > 500) avgSpeed.clear();
+        if(avgSpeedArray.size() > 500) avgSpeedArray.clear();
         return averageSpeed;
     }
 
-    /** Resets values */
+    /** Resets values, used when wanting to reset the recorded speed and distance */
     public void resetValues() {
         try {
             distanceInMetres = 0;
             speed = 0;
             averageSpeed = 0;
-            avgSpeed.clear();
-            routeOptions.getPoints().clear();
-            firstLocation = null;
+            avgSpeedArray.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    /** Draws a Polyline based on user movement */
-    private void reDrawRoute(){
-        route = map.addPolyline(routeOptions);
-    }
-
-    /**
-     * Draws a PolyLine when resuming activity from the point the user clicked pause to the point the user pressed resume
-     */
-    public void drawResumeLine(Location lastKnownLocation){
-        List<LatLng> latLngs = routeOptions.getPoints();
-        LatLng latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-        setLastLocation(null); //so the distance is not accounted for when resuming
-        resumeOptions.add(latLngs.get(latLngs.size() - 1)).add(latLng);
-        resumePolyline = map.addPolyline(resumeOptions);
-        resumeOptions.getPoints().clear();
-        routeOptions.getPoints().clear();
-        routeOptions.add(latLng);
-        fragment.requestLocationUpdates(); //enable Location updates like normal
-    }
-
-    public LatLng getFirstLocation() {
-        LatLng fl = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
-        return fl;
-    }
-
-    public void setLastLocation(Location lastLocation) {
-        this.lastLocation = lastLocation;
-    }
-
-    public Location getLastLocation(){
-        return lastLocation;
-    }
-
     public static double getDistanceInMetres() {
         return distanceInMetres;
     }
+
     public double getSpeed() {
         return speed;
     }
 
     public ArrayList<Double> getAvgSpeed() {
-        return avgSpeed;
+        return avgSpeedArray;
     }
 
     public double getAverageSpeed() {
         return calcAverageSpeed();
-    }
-
-    public PolylineOptions getRouteOptions() {
-        return routeOptions;
     }
 }
