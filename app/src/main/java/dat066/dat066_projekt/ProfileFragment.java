@@ -34,7 +34,6 @@ public class ProfileFragment extends Fragment {
     private TextView mDisplayUsername;
     private TextView mDisplayWeight;
     private TextView mDisplayHeight;
-    private ProfileSaverScreen pf;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
 
@@ -252,22 +251,27 @@ public class ProfileFragment extends Fragment {
 
     private void genderOnClickListener(View v) {
         final RadioGroup radioGenderGroup = (RadioGroup) (v.findViewById(R.id.sex));
-        radioGenderGroup.setOnClickListener(new View.OnClickListener() {
-            String gender;
 
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: " + radioGenderGroup.getCheckedRadioButtonId());
-                if (radioGenderGroup.getCheckedRadioButtonId() != -1) {
-                    int selectedId = radioGenderGroup.getCheckedRadioButtonId();
-                    RadioButton radioGenderButton = (RadioButton) v.findViewById(selectedId);
-                    gender = radioGenderButton.getText().toString();
-                    editor.putString("gender", gender);
-                    editor.apply();
+               radioGenderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+            {
+                String gender;
 
+                public void onCheckedChanged(RadioGroup group, int checkedId)
+                {
+                    switch(checkedId)
+                    {
+                        case R.id.male:
+                            gender = "Male";
+                            editor.putString("gender", gender);
+                            editor.apply();
+                            break;
+                        case R.id.female:
+                            gender = "Female";
+                            editor.putString("gender", gender);
+                            editor.apply();
+                            break;
+                    }
                 }
-            }
-        });
-
+            });
     }
 }

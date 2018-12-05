@@ -52,13 +52,12 @@ public class CaloriesBurned {
     public double CalculateCalories(double speed, long time) {
 
         if(training.equals("Running")){
-            met = (0.816 * speed * 3.6) + 1.662;
-            Log.d(TAG, "CalculateCalories: speed calories"  + speed * 3.6);
-            Log.d(TAG, "CalculateCalories: calories met" + met);
+            met = (1.411 * Math.pow(speed * 3.6, 0.8435));
             calories = (bmr/24) * met * time/3600000;
         }
         else if(training.equals("Cycling")){
-
+            met = (0.03982 * Math.pow(speed * 3.6, 1.724));
+            calories = (bmr/24) * met * time/3600000;
         }
         return calories;
     }
