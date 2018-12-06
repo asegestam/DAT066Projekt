@@ -33,12 +33,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Marker;
 import com.jjoe64.graphview.GraphView;
 import android.support.v4.content.ContextCompat;
-
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.google.android.gms.maps.model.LatLng;
@@ -53,27 +53,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     SupportMapFragment mapFragment;
     GoogleMap mMap;
-    private SpeedDistanceCalculator speedDistanceCalculator;
-    LocationManager locationManager;
-    Location location = null;
-    DecimalFormat numberFormat = new DecimalFormat("#.00");
-    private View view;
-    GraphView graph;
-    ArrayList<Double> elevationArray;
-    OnPlotDataListener mCallback;
-    private Timer t;
-    private boolean activityStopped;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private SpeedDistanceCalculator speedDistanceCalculator;
+    private View view;
     long elapsedActivityTime = 0;
     long timeStopped = 0;
+    LocationManager locationManager;
+    Location location = null;
     LocationUpdater locationUpdater;
-    private PolylineOptions routeOptions = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true);
-    private boolean followerModeEnabled;
+    DecimalFormat numberFormat = new DecimalFormat("#.00");
+    GraphView graph;
+    OnPlotDataListener mCallback;
+    Timer t;
+    boolean activityStopped;
+    boolean followerModeEnabled;
     Snackbar saveSnackbar;
-    private ArrayList<UserActivity> userActivities = new ArrayList<>();
-    private ArrayList<PolylineOptions> activityRoutes;
+    ArrayList<Double> elevationArray;
+    ArrayList<LatLng> userMovement;
+    ArrayList<ArrayList<LatLng>> listOfUserMovement;
+    Polyline route;
+    Polyline savedPolyline;
+
 
     @SuppressLint("MissingPermission")
     @Nullable
@@ -89,25 +91,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         getLocationPermission();
         mapFragment.getMapAsync(this);
-        graph = (GraphView) view.findViewById(R.id.graph);
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        speedDistanceCalculator = new SpeedDistanceCalculator(this);
-        locationUpdater = new LocationUpdater(speedDistanceCalculator);
-        followerModeEnabled = true;
-        saveSnackbar = Snackbar.make(view.findViewById(R.id.myCoordinatorLayout), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
-        Button startButton = (Button) view.findViewById(R.id.start_button);
-        ImageButton stopButton = (ImageButton) view.findViewById(R.id.stop_button);
-        Button activityButton = (Button) view.findViewById(R.id.activity_button);
-        ImageButton pauseButton = (ImageButton) view.findViewById(R.id.imageButtonPause);
-        ImageButton resumeButton = (ImageButton) view.findViewById(R.id.imageButtonResume);
-        Button xdButton = view.findViewById(R.id.xd);
-        pauseButton.setOnClickListener(pauseButtonClickListener);
-        startButton.setOnClickListener(startButtonClickListener);
-        resumeButton.setOnClickListener(resumeButtonClickListener);
-        stopButton.setOnClickListener(stopButtonClickListener);
-        activityButton.setOnClickListener(activityButtonOnClickListener);
-        xdButton.setOnClickListener(xdButtonOnClickListener);
-
+        initGlobalVariables();
+        initButtons();
         return view;
     }
 
@@ -122,13 +107,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
     }
 
+    private void initGlobalVariables() {
+        graph = (GraphView) view.findViewById(R.id.graph);
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        speedDistanceCalculator = new SpeedDistanceCalculator(this);
+        locationUpdater = new LocationUpdater(speedDistanceCalculator);
+        followerModeEnabled = true;
+        saveSnackbar = Snackbar.make(view.findViewById(R.id.myCoordinatorLayout), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
+        userMovement = new ArrayList<>();
+        listOfUserMovement = new ArrayList<>();
+        route = null;
+        savedPolyline = null;
+    }
+
+    private void initButtons() {
+        Button startButton = view.findViewById(R.id.start_button);
+        ImageButton stopButton =  view.findViewById(R.id.stop_button);
+        Button activityButton = view.findViewById(R.id.activity_button);
+        ImageButton pauseButton =  view.findViewById(R.id.imageButtonPause);
+        ImageButton resumeButton = view.findViewById(R.id.imageButtonResume);
+        pauseButton.setOnClickListener(pauseButtonClickListener);
+        startButton.setOnClickListener(startButtonClickListener);
+        resumeButton.setOnClickListener(resumeButtonClickListener);
+        stopButton.setOnClickListener(stopButtonClickListener);
+        activityButton.setOnClickListener(activityButtonOnClickListener);
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         ((MainActivity) getActivity()).changeActivityText();
         this.mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -140,12 +150,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(onMapClickListener);
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);
-        activityRoutes = new ArrayList<>();
     }
 
-    /**
-     * Gets the necessary permissions from the user or asks for them
-     */
     private void getLocationPermission() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -181,23 +187,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    /**
-     * Initializes the map
-     */
+    private void requestLocationUpdates() {
+        //Every permission is granted, initialize the map, request location updates every 5m
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, locationUpdater);
+    }
+
     private void initMap() {
         Log.d(TAG, "initMap: initializing the map");
         mapFragment.getMapAsync(this);
     }
 
-    /** Zooms in at the given LatLng with a zoom of 20 */
     public void updateCamera(LatLng latLng) {
         if(followerModeEnabled) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 20);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 20f);
             mMap.animateCamera(cameraUpdate);
         }
     }
 
-    /** Updates the TextViews to the current speed and distance */
     public void updateTextViews(Double distance, Double speed, long time) {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
@@ -207,56 +216,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void resetValues() {
         elapsedActivityTime = 0;
-        routeOptions.getPoints().clear();
+        userMovement.clear();
         speedDistanceCalculator.resetValues();
+        route = null;
+        listOfUserMovement.clear();
         locationUpdater.setFirstLocation(null);
+        locationUpdater.setLastLocation(null);
     }
 
-    /** Request permission if not given and then requests location updates */
-    private void requestLocationUpdates() {
-        //Every permission is granted, initialize the map, request location updates every 5m
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, locationUpdater);
-    }
-
-    public Location getLocation() {
-        return locationUpdater.getLastLocation();
-    }
-
-    /** Draws a Polyline based on user movement */
     public void reDrawRoute(){
-        Polyline route = mMap.addPolyline(routeOptions);
+        if(route != null) {
+            route.setPoints(userMovement);
+        }
+        else {
+            route = mMap.addPolyline(new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(userMovement));
+        }
     }
-
-    /**
-     * Draws a PolyLine when resuming activity from the point the user clicked pause to the point the user pressed resume
-     */
-    private void drawResumeLine(Location lastKnownLocation){
-        List<LatLng> latLngs = routeOptions.getPoints();
-        LatLng latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-        locationUpdater.setLastLocation(null); //so the distance is not accounted for when resuming
-        PolylineOptions resumeOptions = new PolylineOptions().width(20).color(Color.RED).geodesic(true).
-                add(latLngs.get(latLngs.size() - 1)).add(latLng);
-        Polyline resumePolyline = mMap.addPolyline(resumeOptions);
-        PolylineOptions savedRoute = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(routeOptions.getPoints());
-        saveActivityRoutes(resumeOptions);
-        saveActivityRoutes(savedRoute);
-        routeOptions.getPoints().clear();
-        routeOptions.add(latLng);
-        requestLocationUpdates(); //enable Location updates like normal
-    }
-
     public void addLatLngToRoute(LatLng latLng) {
-        routeOptions.add(latLng);
+        userMovement.add(latLng);
+        Log.d(TAG, "addLatLngToRoute: ACTUAL USERMOVMENT SIZE " + userMovement.size());
         reDrawRoute();
     }
-
-    /**
-     * Starts the location updates to start calculating speed, distance
-     * Shows and hides the relevant buttons, starts chronometer timer
-     */
     public void startActivity() {
         activityStopped = false;
         t = new Timer();
@@ -266,26 +246,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 plotGraph();
             }
         };
-        if(activityRoutes != null )activityRoutes.clear();
-        requestLocationUpdates();
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
         mMap.clear(); // clears the map of all polylines and markers
         resetValues(); //resets all previous activity values to start recording a new one
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
-        requestLocationUpdates();
         saveSnackbar.dismiss();
         startTimer();
+        requestLocationUpdates();
         t.schedule(tTask, 1000,5000);
     }
 
-    /**
-     * Stops location updates
-     * Shows and hides the relevant buttons
-     * Resets the distance and speed calculated during the activity
-     * Stops chronometer timer
-     */
     public void stopActivity() {
         locationManager.removeUpdates(locationUpdater);
         activityStopped = true;
@@ -295,15 +267,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
         (view.findViewById(R.id.stop_button)).setVisibility(View.GONE);
-        addMarkers();
-        saveSnackbar.setAction(R.string.save_string, saveListener);
-        saveSnackbar.show();
-        CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
-        caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
-        double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
-        Log.d(TAG, "stopActivity: KALORIER" + d);
+        //saveSnackbar.setAction(R.string.save_string, saveListener);
+       // saveSnackbar.show();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
         stopTimer();
+        saveActivity();
+        addMarkers();
     }
 
     /** Pauses the current active activity */
@@ -321,18 +290,53 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        drawResumeLine(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        addResumeMarkers(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
         startTimer();
+    }
+
+    private void saveActivity() {
+        Date currentTime = Calendar.getInstance().getTime();
+        CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
+        caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
+        double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
+        Log.d(TAG, "stopActivity: KALORIER" + d);
+        saveUserMovement(userMovement);
+        UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), listOfUserMovement,
+                elapsedActivityTime/1000, d, currentTime,locationUpdater.getFirstLocation(), elevationArray);
+        ((MainActivity)getActivity()).saveUserActivity(userActivity);
+    }
+
+
+    private void saveUserMovement(ArrayList<LatLng> list) {
+        listOfUserMovement.add(list);
+        Log.d(TAG, "saveActivityRoutes: size av saved rutts " + listOfUserMovement.size());
     }
 
     /** Adds two markers, one at the start location, one at the end location */
     private void addMarkers() {
-        if(routeOptions.getPoints().size() != 0) {
-            List<LatLng> latLngs = routeOptions.getPoints();
-            mMap.addMarker(new MarkerOptions().title("Activity Ended Here").position(latLngs.get(latLngs.size() - 1)));
+        if(userMovement.size() != 0) {
+            mMap.addMarker(new MarkerOptions().title("Activity Ended Here").
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).position(userMovement.get(userMovement.size() - 1)));
             mMap.addMarker(new MarkerOptions().title("Activity Started Here").
                     icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).position(locationUpdater.getFirstLocation()));
         }
+    }
+    private void addResumeMarkers(Location lastKnownLocation){
+        if(!userMovement.isEmpty()) {
+            LatLng latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            Marker pasueMarker = mMap.addMarker(new MarkerOptions().
+                    position(userMovement.get(userMovement.size() - 1)).
+                    title("Activity paused here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+            Marker unpauseMarker = mMap.addMarker(new MarkerOptions().
+                    position(latLng).
+                    title("Activity unpaused here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+            saveUserMovement(userMovement);
+            Polyline polyline = mMap.addPolyline(new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(userMovement));
+            userMovement.clear();
+            userMovement.add(latLng);
+            locationUpdater.setLastLocation(null);
+        }
+        requestLocationUpdates(); //enable Location updates like normal
     }
     /**
      * Changes the visibility of buttons depending on what code is given
@@ -351,8 +355,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.imageButtonResume)).setVisibility(visibility);
     }
 
-
-    /** Sets textView visibility */
     private void setTextViewVisibility(int visibility) {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
@@ -371,18 +373,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             time.setVisibility(visibility);
         }
     }
-    /** Saves the speed, distance, route, elapsed time of a activity in a instance of UserActivity */
-    private void saveActivity() {
-        Date currentTime = Calendar.getInstance().getTime();
-        PolylineOptions savedRoute = new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(routeOptions.getPoints());
-        saveActivityRoutes(savedRoute);
-        UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), activityRoutes,
-                elapsedActivityTime/1000, 0.0, currentTime,locationUpdater.getFirstLocation(), elevationArray);
-        userActivities.add(userActivity);
-        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m/s\n" + "size " + userActivity.getRoutes().size() + "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime();
-        Log.d(TAG, "userActivity: " + logString + "\n" + "number of saved activities " + userActivities.size() + "\n number of routes saved" + activityRoutes.size());
-        mMap.clear();
-    }
 
     private void startTimer() {
         Chronometer time = view.findViewById(R.id.timeChronometer);
@@ -396,12 +386,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         time.stop();
     }
 
-    private void saveActivityRoutes(PolylineOptions routeOptions) {
-        activityRoutes.add(routeOptions);
-        Log.d(TAG, "saveActivityRoutes: size av saved rutts" + activityRoutes.size());
-    }
-
     /** Sets the onClickListeners to all relevant buttons */
+
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             if(((MainActivity) getActivity()).getType() == null)
@@ -460,9 +446,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private View.OnClickListener saveListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            saveActivity();
+            //saveActivity();
         }
     };
+
+    /** Graph plot stuff */
 
     public void plotGraph() {
         if(this.activityStopped) {
@@ -485,15 +473,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         public void onDataGiven(ArrayList elevation);
     }
 
-    private View.OnClickListener xdButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            UserActivity userActivity = userActivities.get(userActivities.size() - 1);
-            ArrayList<PolylineOptions> userRoutes = userActivity.getRoutes();
-            Log.d(TAG, "onClick: user rut" + userRoutes.size());
-            for(PolylineOptions p : userRoutes) {
-                Polyline route = mMap.addPolyline(p);
-            }
-        }
-    };
 }

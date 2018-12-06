@@ -13,16 +13,16 @@ public class UserActivity {
     private Date dateTime;
     private LatLng firstLocation;
     private ArrayList<Double> elevationData;
-    private ArrayList<PolylineOptions> routes;
+    private ArrayList<ArrayList<LatLng>> listOfRoutes;
 
     UserActivity(double userSpeed, double userDistanceMoved,
-                 ArrayList<PolylineOptions> routes, long activityTime,
+                 ArrayList<ArrayList<LatLng>> listOfRoutes, long activityTime,
                  double caloriesBurned, Date dateTime,
                  LatLng firstLocation, ArrayList<Double> elevationData)
     {
         this.userSpeed = userSpeed;
         this.userDistanceMoved = userDistanceMoved;
-        this.routes = routes;
+        this.listOfRoutes = listOfRoutes;
         this.activityTime = activityTime;
         this.caloriesBurned = caloriesBurned;
         this.dateTime = dateTime;
@@ -38,8 +38,15 @@ public class UserActivity {
         return userDistanceMoved;
     }
 
-    public ArrayList<PolylineOptions> getRoutes() {
-        return routes;
+    public ArrayList<ArrayList<LatLng>> getListOfRoutes() {
+        return listOfRoutes;
+    }
+
+    public ArrayList<LatLng> getSpecificUserRoute(int index) {
+        return this.listOfRoutes.get(index);
+    }
+    public int getListSize() {
+        return listOfRoutes.size();
     }
 
     public long getActivityTime() {
@@ -59,6 +66,10 @@ public class UserActivity {
 
     public ArrayList<Double> getElevationData() {
         return elevationData;
+    }
+
+    public UserActivity getInstance() {
+        return this;
     }
 }
 

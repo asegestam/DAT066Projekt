@@ -24,6 +24,8 @@ import android.widget.PopupMenu;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static android.content.ContentValues.TAG;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MapFragment.OnPlotDataListener {
 
@@ -31,6 +33,8 @@ public class MainActivity extends AppCompatActivity
     private String type;
     private boolean activityStopped;
     StatsFragment newFragment;
+    ArrayList<UserActivity> savedUserActivities;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         /*When the application starts we want the "Home" fragment to be initilized*/
         setFragment(R.id.activity_option);
-
+        savedUserActivities = new ArrayList<>();
     }
 
     @Override
@@ -212,6 +216,18 @@ public class MainActivity extends AppCompatActivity
             */
         }
     }
+    public void saveUserActivity(UserActivity userActivity) {
+        savedUserActivities.add(userActivity);
+        Log.d(TAG, "saveUserActivity: antal sparade aktiviteter " + savedUserActivities.size());
+        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m\n" + "size " + userActivity.getListOfRoutes().size() +
+                "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime() + "\n";
+        Log.d(TAG, "saveUserActivity: Main Activity" + logString + "kalorier " + userActivity.getCaloriesBurned());
+    }
+
+    public ArrayList<UserActivity> getSavedUserActivities() {
+        return savedUserActivities;
+    }
+
     public String getType() {
         return type;
     }
