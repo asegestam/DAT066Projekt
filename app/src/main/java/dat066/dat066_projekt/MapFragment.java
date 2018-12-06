@@ -150,6 +150,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(onMapClickListener);
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);
+        Location userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(userLocation !=null){
+            LatLng latLng = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+            updateCamera(latLng);
+        }
     }
 
     private void getLocationPermission() {
@@ -202,7 +207,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void updateCamera(LatLng latLng) {
         if(followerModeEnabled) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 20f);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18.0f);
             mMap.animateCamera(cameraUpdate);
         }
     }
