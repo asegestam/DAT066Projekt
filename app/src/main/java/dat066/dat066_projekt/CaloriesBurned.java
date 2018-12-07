@@ -34,14 +34,13 @@ public class CaloriesBurned {
             bmr = (13.7 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.8 * calculateAge()) + 66;
         }
         else {
-            bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
+            bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * calculateAge()) + 665;
         }
         System.out.println(bmr);
     }
 
     @TargetApi(26)
     public int calculateAge(){
-
         LocalDate birthday = LocalDate.parse(age.replaceAll("/", "-"));
         LocalDate today = LocalDate.now();
         Period p = Period.between(birthday, today);

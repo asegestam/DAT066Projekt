@@ -1,15 +1,11 @@
 package dat066.dat066_projekt;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.MenuInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,20 +18,20 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 
 import java.util.ArrayList;
-import java.util.Map;
-
-import static android.content.ContentValues.TAG;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MapFragment.OnPlotDataListener {
-
     private static final String TAG = "MainActivity";
     private String type;
     private boolean activityStopped;
-    StatsFragment newFragment;
+    StatsFragment statsFragment;
     ArrayList<UserActivity> savedUserActivities;
     MapFragment mapFragment;
     ProfileFragment profileFragment;
+    UserActivityList userActivityList;
+    SettingsFragment settingsFragment;
+    List<Fragment> fragments;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,14 +44,30 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        initFragments();
+        addFragmentsToList();
         /*When the application starts we want the "Home" fragment to be initilized*/
-        profileFragment = new ProfileFragment();
-        newFragment = new StatsFragment();
         setFragment(R.id.activity_option);
         savedUserActivities = new ArrayList<>();
+    }
+
+    private void initFragments() {
+        mapFragment = new MapFragment();
+        profileFragment = new ProfileFragment();
+        statsFragment = new StatsFragment();
+        userActivityList = new UserActivityList();
+        settingsFragment = new SettingsFragment();
+        fragments = new ArrayList<>();
+    }
+
+    private void addFragmentsToList() {
+        fragments.add(mapFragment);
+        fragments.add(profileFragment);
+        fragments.add(statsFragment);
+        fragments.add(userActivityList);
+        fragments.add(settingsFragment);
     }
 
     @Override
@@ -102,13 +114,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setFragment(int id){
-
-        Fragment fragment = null;
-
         switch(id) {
             case R.id.activity_option:
                 if(mapFragment == null) {
                     mapFragment = new MapFragment();
+                    //fragments.add(mapFragment);
                 }
                 switchFragment(mapFragment);
                 break;
@@ -121,14 +131,18 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.settings_option:
-                fragment = new SettingsFragment();
-                //switchFragment(fragment);
+                switchFragment(settingsFragment);
                  break;
 
             case R.id.stats_option:
-                fragment = newFragment;
-                switchFragment(newFragment);
+                switchFragment(statsFragment);
                 break;
+            case R.id.saved_activities_option:
+                if(userActivityList == null) {
+                    userActivityList = new UserActivityList();
+                }
+                switchFragment(userActivityList);
+
             default:
                 break;
         }
@@ -137,38 +151,18 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
 
     }
+
     public void switchFragment(Fragment fragment) {
-        if(fragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            // switch to mapfragment
-            if(fragment instanceof MapFragment) {
-                if(!fragment.isAdded()){
-                    fragmentManager.beginTransaction().add(R.id.content_main, fragment).hide(profileFragment).hide(newFragment).show(fragment).commit();
-                    this.setTitle("Map");
-                }
-                else {
-                    fragmentManager.beginTransaction().hide(profileFragment).hide(newFragment).show(fragment).commit();
-                    this.setTitle("Map");
-                }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        for(Fragment f : fragments) {
+            if(!f.equals(fragment)) {
+                fragmentTransaction.hide(f);
             }
-            // switch to profilefragment
-            else if(fragment instanceof ProfileFragment){
-                if(!fragment.isAdded()) {
-                    fragmentManager.beginTransaction().add(R.id.content_main, fragment).hide(mapFragment).hide(newFragment).show(fragment).commit();
-                }
-                fragmentManager.beginTransaction().hide(mapFragment).hide(newFragment).show(fragment).commit();
-            }
-            // switch to statsfragment
-            else if (fragment instanceof StatsFragment) {
-                if(!fragment.isAdded()) {
-                    fragmentManager.beginTransaction().add(R.id.content_main, fragment).hide(profileFragment).hide(mapFragment).show(fragment).commit();
-                }
-                fragmentManager.beginTransaction().hide(profileFragment).hide(mapFragment).show(fragment).commit();
-            }
-        } else {
-            // error in creating fragment
-            Log.e("MainActivity", "Error in creating fragment");
         }
+        if(!fragment.isAdded()) fragmentTransaction.add(R.id.content_main, fragment).show(fragment);
+        else fragmentTransaction.show(fragment);
+        fragmentTransaction.commit();
     }
 
     public void showPopup() {
@@ -233,17 +227,17 @@ public class MainActivity extends AppCompatActivity
             // Otherwise, we're in the one-pane layout and must swap frags...
             Log.e(TAG,"Null Fragment!");
             // Create fragment and give it an argument for the selected article
-            newFragment = new StatsFragment();
+            statsFragment = new StatsFragment();
             Bundle args = new Bundle();
             args.putParcelableArrayList("elevation", elevation);
             Log.e(TAG,"Put elevation in bundle: "+elevation);
-            newFragment.setArguments(args);
+            statsFragment.setArguments(args);
 
            /* FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.content_main, newFragment);
+            transaction.replace(R.id.content_main, statsFragment);
             transaction.addToBackStack(null);
 
             // Commit the transaction

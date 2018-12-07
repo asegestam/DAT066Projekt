@@ -254,6 +254,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 plotGraph();
             }
         };
+        requestLocationUpdates();
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
@@ -262,7 +263,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
         saveSnackbar.dismiss();
         startTimer();
-        requestLocationUpdates();
         t.schedule(tTask, 1000,5000);
     }
 
@@ -336,10 +336,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             LatLng latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
             Marker pasueMarker = mMap.addMarker(new MarkerOptions().
                     position(userMovement.get(userMovement.size() - 1)).
-                    title("Activity paused here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+                    title("Activity paused here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_grey_pin)));
             Marker unpauseMarker = mMap.addMarker(new MarkerOptions().
                     position(latLng).
-                    title("Activity unpaused here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+                    title("Activity unpaused here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_grey_pin)));
             saveUserMovement(userMovement);
             Polyline polyline = mMap.addPolyline(new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(userMovement));
             userMovement.clear();
