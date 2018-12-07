@@ -397,6 +397,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         time.stop();
     }
 
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Map");
+        super.onStart();
+    }
+
     /** Sets the onClickListeners to all relevant buttons */
 
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {

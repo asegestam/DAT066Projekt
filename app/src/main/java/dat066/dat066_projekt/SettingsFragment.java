@@ -20,4 +20,10 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
+
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Settings");
+        super.onStart();
+    }
 }

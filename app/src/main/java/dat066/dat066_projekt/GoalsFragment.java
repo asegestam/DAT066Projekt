@@ -19,7 +19,11 @@ public class GoalsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-            
-            getActivity().setTitle("Goals-Fragment");
+    }
+
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Goals");
+        super.onStart();
     }
 }

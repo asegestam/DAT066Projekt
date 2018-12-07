@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity
     UserActivityList userActivityList;
     SettingsFragment settingsFragment;
     GoalsFragment goalsFragment;
-    List<Fragment> fragments;
+    ArrayList<Fragment> fragments;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,12 +143,14 @@ public class MainActivity extends AppCompatActivity
             case R.id.stats_option:
                 switchFragment(statsFragment);
                 break;
+
             case R.id.saved_activities_option:
                 if(userActivityList == null) {
                     userActivityList = new UserActivityList();
                 }
                 switchFragment(userActivityList);
                 break;
+
             case R.id.goal_option:
                 switchFragment(goalsFragment);
                 break;

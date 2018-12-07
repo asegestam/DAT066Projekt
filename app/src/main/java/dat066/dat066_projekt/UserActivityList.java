@@ -38,4 +38,10 @@ public class UserActivityList extends ListFragment {
             }
         });
     }
+
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Your Saved Activities");
+        super.onStart();
+    }
 }

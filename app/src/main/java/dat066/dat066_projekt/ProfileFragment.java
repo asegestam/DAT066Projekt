@@ -274,4 +274,9 @@ public class ProfileFragment extends Fragment {
                 }
             });
     }
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Profile");
+        super.onStart();
+    }
 }
