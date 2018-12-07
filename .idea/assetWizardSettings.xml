@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/Program/AndroidStudio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_pin_drop_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_place_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -44,11 +44,10 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="IMAGE" />
                                       <entry key="imageAsset" value="C:\Users\abbes\Downloads\pin\res\mipmap-xxxhdpi\ic_pin.png" />
-                                      <entry key="outputName" value="ic_red_pin" />
+                                      <entry key="outputName" value="ic_grey_pin" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="d12215" />
+                                      <entry key="themeColor" value="cfcbd1" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -95,7 +94,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/D:/Program/AndroidStudio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_pin_drop_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_cloud_queue_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -105,10 +104,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="d3d3d3" />
-                            <entry key="outputName" value="ic_pin" />
-                            <entry key="sourceFile" value="C:\Users\abbes\Downloads\pin.svg" />
+                            <entry key="outputName" value="ic_cloud_queue_black_24dp" />
+                            <entry key="overrideSize" value="true" />
+                            <entry key="sourceFile" value="C:\Users\abbes\Downloads\map-marker.psd" />
                           </map>
                         </option>
                       </PersistentState>
