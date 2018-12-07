@@ -85,8 +85,6 @@ public class UserActivity {
         data.put("velocity", String.valueOf(getUserSpeed()));
         data.put("calories", String.valueOf(getCaloriesBurned()));
         data.put("time",String.valueOf(getActivityTime()));
-        DataSnapshot snapshot;
-        mDatabase.
 
         Map<String, Object> update = new HashMap<>();
         update.put(key, data);
