@@ -22,6 +22,11 @@
             android:title="Saved Activities"/>
 
         <item
+          android:id="@+id/goal_option"
+          android:icon="@drawable/ic_goal_option"
+          android:title="Goals"/>
+
+        <item
             android:id="@+id/settings_option"
             android:icon="@drawable/ic_settings_option"
             android:title="Settings" />

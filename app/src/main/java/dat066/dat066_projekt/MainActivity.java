@@ -17,6 +17,9 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.PopupMenu;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity
     ProfileFragment profileFragment;
     UserActivityList userActivityList;
     SettingsFragment settingsFragment;
+    GoalsFragment goalsFragment;
     List<Fragment> fragments;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity
         statsFragment = new StatsFragment();
         userActivityList = new UserActivityList();
         settingsFragment = new SettingsFragment();
+        goalsFragment = new GoalsFragment();
         fragments = new ArrayList<>();
     }
 
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity
         fragments.add(statsFragment);
         fragments.add(userActivityList);
         fragments.add(settingsFragment);
+        fragments.add(goalsFragment);
     }
 
     @Override
@@ -142,7 +148,10 @@ public class MainActivity extends AppCompatActivity
                     userActivityList = new UserActivityList();
                 }
                 switchFragment(userActivityList);
-
+                break;
+            case R.id.goal_option:
+                switchFragment(goalsFragment);
+                break;
             default:
                 break;
         }

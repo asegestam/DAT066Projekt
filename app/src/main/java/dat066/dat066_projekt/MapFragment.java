@@ -313,6 +313,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), listOfUserMovement,
                     elapsedActivityTime / 1000, d, currentTime, locationUpdater.getFirstLocation(), elevationArray);
             ((MainActivity) getActivity()).saveUserActivity(userActivity);
+            userActivity.saveNote();
         }
     }
 

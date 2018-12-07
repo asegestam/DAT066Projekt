@@ -1,9 +1,20 @@
 package dat066.dat066_projekt;
+
+import android.view.View;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class UserActivity {
     private double userSpeed;
@@ -28,6 +39,20 @@ public class UserActivity {
         this.dateTime = dateTime;
         this.firstLocation = firstLocation;
         this.elevationData = elevationData;
+    }
+
+    public void saveNote(){
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference ref = mDatabase.getReference();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("date", getDateTime().toString());
+        data.put("distance", String.valueOf(getUserDistanceMoved()));
+        data.put("velocity", String.valueOf(getUserSpeed()));
+        data.put("calories", String.valueOf(getCaloriesBurned()));
+        data.put("time",String.valueOf(getActivityTime()));
+
+        ref.setValue(data, null);
     }
 
     public double getUserSpeed() {
@@ -72,4 +97,3 @@ public class UserActivity {
         return this;
     }
 }
-
