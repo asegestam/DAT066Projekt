@@ -44,7 +44,7 @@ public class StatsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getActivity().setTitle("Stats-Fragment");
+        getActivity().setTitle("Elevation");
     }
 
     public void setPlotData(ArrayList array){

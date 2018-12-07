@@ -75,6 +75,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     ArrayList<ArrayList<LatLng>> listOfUserMovement;
     Polyline route;
     Polyline savedPolyline;
+    Button startButton;
+    ImageButton stopButton;
+    Button activityButton;
+    ImageButton pauseButton;
+    ImageButton resumeButton;
 
 
     @SuppressLint("MissingPermission")
@@ -99,14 +104,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
     }
-
     private void initGlobalVariables() {
         graph = (GraphView) view.findViewById(R.id.graph);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -306,9 +309,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
         Log.d(TAG, "stopActivity: KALORIER" + d);
         saveUserMovement(userMovement);
-        UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), listOfUserMovement,
-                elapsedActivityTime/1000, d, currentTime,locationUpdater.getFirstLocation(), elevationArray);
-        ((MainActivity)getActivity()).saveUserActivity(userActivity);
+        if(userMovement != null) {
+            UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), listOfUserMovement,
+                    elapsedActivityTime / 1000, d, currentTime, locationUpdater.getFirstLocation(), elevationArray);
+            ((MainActivity) getActivity()).saveUserActivity(userActivity);
+        }
     }
 
 
@@ -477,5 +482,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public interface OnPlotDataListener{
         public void onDataGiven(ArrayList elevation);
     }
-
 }

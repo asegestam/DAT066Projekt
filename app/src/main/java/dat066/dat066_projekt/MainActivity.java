@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity
     private boolean activityStopped;
     StatsFragment newFragment;
     ArrayList<UserActivity> savedUserActivities;
-
+    MapFragment mapFragment;
+    ProfileFragment profileFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         /*When the application starts we want the "Home" fragment to be initilized*/
+        profileFragment = new ProfileFragment();
+        newFragment = new StatsFragment();
         setFragment(R.id.activity_option);
         savedUserActivities = new ArrayList<>();
     }
@@ -104,36 +107,68 @@ public class MainActivity extends AppCompatActivity
 
         switch(id) {
             case R.id.activity_option:
-                fragment = new MapFragment();
+                if(mapFragment == null) {
+                    mapFragment = new MapFragment();
+                }
+                switchFragment(mapFragment);
                 break;
 
             case R.id.profile_option:
-                fragment = new ProfileFragment();
+                if(profileFragment == null) {
+                    profileFragment = new ProfileFragment();
+                }
+                switchFragment(profileFragment);
                 break;
 
             case R.id.settings_option:
                 fragment = new SettingsFragment();
+                //switchFragment(fragment);
                  break;
 
             case R.id.stats_option:
                 fragment = newFragment;
+                switchFragment(newFragment);
                 break;
             default:
                 break;
         }
 
-        if (fragment != null) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
+    }
+    public void switchFragment(Fragment fragment) {
+        if(fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_main, fragment).commit();
+            // switch to mapfragment
+            if(fragment instanceof MapFragment) {
+                if(!fragment.isAdded()){
+                    fragmentManager.beginTransaction().add(R.id.content_main, fragment).hide(profileFragment).hide(newFragment).show(fragment).commit();
+                    this.setTitle("Map");
+                }
+                else {
+                    fragmentManager.beginTransaction().hide(profileFragment).hide(newFragment).show(fragment).commit();
+                    this.setTitle("Map");
+                }
+            }
+            // switch to profilefragment
+            else if(fragment instanceof ProfileFragment){
+                if(!fragment.isAdded()) {
+                    fragmentManager.beginTransaction().add(R.id.content_main, fragment).hide(mapFragment).hide(newFragment).show(fragment).commit();
+                }
+                fragmentManager.beginTransaction().hide(mapFragment).hide(newFragment).show(fragment).commit();
+            }
+            // switch to statsfragment
+            else if (fragment instanceof StatsFragment) {
+                if(!fragment.isAdded()) {
+                    fragmentManager.beginTransaction().add(R.id.content_main, fragment).hide(profileFragment).hide(mapFragment).show(fragment).commit();
+                }
+                fragmentManager.beginTransaction().hide(profileFragment).hide(mapFragment).show(fragment).commit();
+            }
         } else {
             // error in creating fragment
             Log.e("MainActivity", "Error in creating fragment");
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-
     }
 
     public void showPopup() {

@@ -42,6 +42,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Creating a new ProfileFragment");
+        getActivity().setTitle("Profile");
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         sharedPref = getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
@@ -58,7 +59,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Profile");
     }
 
 
