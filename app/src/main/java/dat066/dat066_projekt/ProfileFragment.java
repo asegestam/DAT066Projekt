@@ -34,16 +34,15 @@ public class ProfileFragment extends Fragment {
     private TextView mDisplayUsername;
     private TextView mDisplayWeight;
     private TextView mDisplayHeight;
-    private ProfileSaverScreen pf;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
-
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Creating a new ProfileFragment");
+        getActivity().setTitle("Profile");
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         sharedPref = getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
@@ -52,19 +51,18 @@ public class ProfileFragment extends Fragment {
         heightOnClickListener(v);
         birthDayOnClickListener(v);
         getSharedPreferences(v);
-
+        genderOnClickListener(v);
         //Get sharedpreferences data
         return v;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            getActivity().setTitle("Change Profile Inputs");
+        super.onViewCreated(view, savedInstanceState);
     }
 
 
-    private void getSharedPreferences(View v){
+    private void getSharedPreferences(View v) {
         String gender = sharedPref.getString("gender", "");
         String weight = sharedPref.getString("weight", "");
         String height = sharedPref.getString("height", "");
@@ -74,18 +72,17 @@ public class ProfileFragment extends Fragment {
         mDisplayUsername.setText(userName);
         mDisplayWeight.setText(weight + " kg");
         mDisplayHeight.setText(height + " cm");
-        if(gender.equals("Male")){
-            RadioButton b =v.findViewById(R.id.male);
+        if (gender.equals("Male")) {
+            RadioButton b = v.findViewById(R.id.male);
             b.toggle();
-        }
-        else{
-            RadioButton b =v.findViewById(R.id.female);
+        } else {
+            RadioButton b = v.findViewById(R.id.female);
             b.toggle();
         }
 
     }
 
-    private void weightOnClickListener(View v){
+    private void weightOnClickListener(View v) {
 
         mDisplayWeight = (TextView) v.findViewById(R.id.tvWeight);
         mDisplayWeight.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +104,7 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String weight = input.getText().toString();
                         mDisplayWeight.setText(weight + " kg");
-                        if(!weight.isEmpty()) {
+                        if (!weight.isEmpty()) {
                             editor.putString("weight", weight);
                             editor.apply();
                         }
@@ -126,7 +123,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void heightOnClickListener(View v){
+    private void heightOnClickListener(View v) {
 
         mDisplayHeight = (TextView) v.findViewById(R.id.tvHeight);
         mDisplayHeight.setOnClickListener(new View.OnClickListener() {
@@ -148,7 +145,7 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String height = input.getText().toString();
                         mDisplayHeight.setText(height + " cm");
-                        if(!height.isEmpty()) {
+                        if (!height.isEmpty()) {
                             editor.putString("height", height);
                             editor.apply();
                         }
@@ -167,7 +164,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void usernameOnClickListener(View v){
+    private void usernameOnClickListener(View v) {
 
         mDisplayUsername = (TextView) v.findViewById(R.id.tvUsername);
         mDisplayUsername.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +186,7 @@ public class ProfileFragment extends Fragment {
                         dialog.dismiss();
                         String username = input.getText().toString();
                         mDisplayUsername.setText(username);
-                        if(!username.isEmpty()) {
+                        if (!username.isEmpty()) {
                             editor.putString("username", username);
                             editor.apply();
                         }
@@ -207,7 +204,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void birthDayOnClickListener(View v){
+    private void birthDayOnClickListener(View v) {
         mDisplayDate = (TextView) v.findViewById(R.id.tvDate);
         mDisplayDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,22 +233,50 @@ public class ProfileFragment extends Fragment {
                 month = month + 1;
                 String date;
                 Log.d(TAG, "onDateSet: yyyy/mm/dd:" + year + "/" + month + "/" + dayOfMonth);
-                if(month < 10 && dayOfMonth > 10){
-                    date = "" + year + "/"  + String.format("%02d", month) + "/" + dayOfMonth;
-                }
-                else if(month > 10 && dayOfMonth < 10){
-                    date = "" + year + "/"  + month + "/" + String.format("%02d", dayOfMonth);
-                }
-                else if(month < 10 && dayOfMonth < 10){
-                    date = "" + year + "/"  + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
-                }
-                else {
-                    date = "" + year + "/"  + month + "/" + dayOfMonth;
+                if (month < 10 && dayOfMonth > 10) {
+                    date = "" + year + "/" + String.format("%02d", month) + "/" + dayOfMonth;
+                } else if (month > 10 && dayOfMonth < 10) {
+                    date = "" + year + "/" + month + "/" + String.format("%02d", dayOfMonth);
+                } else if (month < 10 && dayOfMonth < 10) {
+                    date = "" + year + "/" + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
+                } else {
+                    date = "" + year + "/" + month + "/" + dayOfMonth;
                 }
                 mDisplayDate.setText(date);
                 editor.putString("age", date);
                 editor.apply();
             }
         };
+    }
+
+    private void genderOnClickListener(View v) {
+        final RadioGroup radioGenderGroup = (RadioGroup) (v.findViewById(R.id.sex));
+
+               radioGenderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+            {
+                String gender;
+
+                public void onCheckedChanged(RadioGroup group, int checkedId)
+                {
+                    switch(checkedId)
+                    {
+                        case R.id.male:
+                            gender = "Male";
+                            editor.putString("gender", gender);
+                            editor.apply();
+                            break;
+                        case R.id.female:
+                            gender = "Female";
+                            editor.putString("gender", gender);
+                            editor.apply();
+                            break;
+                    }
+                }
+            });
+    }
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Profile");
+        super.onStart();
     }
 }

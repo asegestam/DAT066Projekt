@@ -41,7 +41,6 @@ public class SpeedDistanceCalculator {
         }
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         map.addLatLngToRoute(latLng);
-        map.reDrawRoute();
         map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
         map.updateCamera(latLng);
     }

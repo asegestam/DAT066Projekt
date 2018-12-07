@@ -1,15 +1,11 @@
 package dat066.dat066_projekt;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.MenuInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,15 +21,21 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MapFragment.OnPlotDataListener {
-
     private static final String TAG = "MainActivity";
     private String type;
     private boolean activityStopped;
-    StatsFragment newFragment;
+    StatsFragment statsFragment;
+    ArrayList<UserActivity> savedUserActivities;
+    MapFragment mapFragment;
+    ProfileFragment profileFragment;
+    UserActivityList userActivityList;
+    SettingsFragment settingsFragment;
+    GoalsFragment goalsFragment;
+    ArrayList<Fragment> fragments;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,9 +50,30 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        initFragments();
+        addFragmentsToList();
         /*When the application starts we want the "Home" fragment to be initilized*/
         setFragment(R.id.activity_option);
+        savedUserActivities = new ArrayList<>();
+    }
 
+    private void initFragments() {
+        mapFragment = new MapFragment();
+        profileFragment = new ProfileFragment();
+        statsFragment = new StatsFragment();
+        userActivityList = new UserActivityList();
+        settingsFragment = new SettingsFragment();
+        goalsFragment = new GoalsFragment();
+        fragments = new ArrayList<>();
+    }
+
+    private void addFragmentsToList() {
+        fragments.add(mapFragment);
+        fragments.add(profileFragment);
+        fragments.add(statsFragment);
+        fragments.add(userActivityList);
+        fragments.add(settingsFragment);
+        fragments.add(goalsFragment);
     }
 
     @Override
@@ -97,44 +120,60 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setFragment(int id){
-
-        Fragment fragment = null;
-
         switch(id) {
             case R.id.activity_option:
-                fragment = new MapFragment();
+                if(mapFragment == null) {
+                    mapFragment = new MapFragment();
+                    //fragments.add(mapFragment);
+                }
+                switchFragment(mapFragment);
                 break;
 
             case R.id.profile_option:
-                fragment = new ProfileFragment();
+                if(profileFragment == null) {
+                    profileFragment = new ProfileFragment();
+                }
+                switchFragment(profileFragment);
                 break;
 
             case R.id.settings_option:
-                fragment = new SettingsFragment();
+                switchFragment(settingsFragment);
                  break;
 
             case R.id.stats_option:
-                fragment = newFragment;
+                switchFragment(statsFragment);
                 break;
+
+            case R.id.saved_activities_option:
+                if(userActivityList == null) {
+                    userActivityList = new UserActivityList();
+                }
+                switchFragment(userActivityList);
+                break;
+
             case R.id.goal_option:
-                fragment = new GoalsFragment();
+                switchFragment(goalsFragment);
                 break;
             default:
                 break;
         }
 
-        if (fragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_main, fragment).commit();
-        } else {
-            // error in creating fragment
-            Log.e("MainActivity", "Error in creating fragment");
-        }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
+    }
+
+    public void switchFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        for(Fragment f : fragments) {
+            if(!f.equals(fragment)) {
+                fragmentTransaction.hide(f);
+            }
+        }
+        if(!fragment.isAdded()) fragmentTransaction.add(R.id.content_main, fragment).show(fragment);
+        else fragmentTransaction.show(fragment);
+        fragmentTransaction.commit();
     }
 
     public void showPopup() {
@@ -152,22 +191,24 @@ public class MainActivity extends AppCompatActivity
             case R.id.run:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(type);
+                changeActivityText();
 
                 break;
             case R.id.bike:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                changeActivityText(type);
+                changeActivityText();
                 break;
 
         }
         return true;
     }
 
-    public void changeActivityText(String activity){
-        Button button = (Button)findViewById(R.id.activity_button);
-        button.setText("Type of Activity (" + activity + ")");
+    public void changeActivityText(){
+        if(getType() != null) {
+            Button button = (Button) findViewById(R.id.activity_button);
+            button.setText("Type of Activity (" + getType() + ")");
+        }
     }
 
     @Override
@@ -197,17 +238,17 @@ public class MainActivity extends AppCompatActivity
             // Otherwise, we're in the one-pane layout and must swap frags...
             Log.e(TAG,"Null Fragment!");
             // Create fragment and give it an argument for the selected article
-            newFragment = new StatsFragment();
+            statsFragment = new StatsFragment();
             Bundle args = new Bundle();
             args.putParcelableArrayList("elevation", elevation);
             Log.e(TAG,"Put elevation in bundle: "+elevation);
-            newFragment.setArguments(args);
+            statsFragment.setArguments(args);
 
            /* FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.content_main, newFragment);
+            transaction.replace(R.id.content_main, statsFragment);
             transaction.addToBackStack(null);
 
             // Commit the transaction
@@ -215,6 +256,18 @@ public class MainActivity extends AppCompatActivity
             */
         }
     }
+    public void saveUserActivity(UserActivity userActivity) {
+        savedUserActivities.add(userActivity);
+        Log.d(TAG, "saveUserActivity: antal sparade aktiviteter " + savedUserActivities.size());
+        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m\n" + "size " + userActivity.getListOfRoutes().size() +
+                "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime() + "\n";
+        Log.d(TAG, "saveUserActivity: Main Activity" + logString + "kalorier " + userActivity.getCaloriesBurned());
+    }
+
+    public ArrayList<UserActivity> getSavedUserActivities() {
+        return savedUserActivities;
+    }
+
     public String getType() {
         return type;
     }

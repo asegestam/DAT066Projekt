@@ -52,33 +52,34 @@ public class LocationUpdater implements LocationListener {
 
     /*Räknar ut höjden*/
     public void getElevation(){
+        if(lastLocation != null) {
+            final double LONGITUDE = lastLocation.getLongitude();
+            final double LATITUDE = lastLocation.getLatitude();
+            final String url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyDVhNkpid7dwf_jsBQ02XQKJNW4vW-DhvA";
 
-        final double LONGITUDE = lastLocation.getLongitude();
-        final double LATITUDE = lastLocation.getLatitude();
-        final String url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyDVhNkpid7dwf_jsBQ02XQKJNW4vW-DhvA";
+            new Thread() {
+                public void run() {
+                    HttpHandler sh = new HttpHandler();
+                    double elevation = 0;
+                    String jsonStr = sh.makeServiceCall(url);
+                    // Log.e(TAG, "parsed: LAT: " + LATITUDE + " LONG: " + LONGITUDE);
+                    // Log.e(TAG, "String: " + jsonStr);
 
-        new Thread() {
-            public void run() {
-                HttpHandler sh = new HttpHandler();
-                double elevation = 0;
-                String jsonStr = sh.makeServiceCall(url);
-                Log.e(TAG, "parsed: LAT: " + LATITUDE + " LONG: " + LONGITUDE);
-                Log.e(TAG, "String: " + jsonStr);
+                    if (jsonStr != null) {
+                        try {
 
-                if (jsonStr != null) {
-                    try {
+                            ele = getData(jsonStr, elevation);
 
-                        ele = getData(jsonStr,elevation);
-
-                        Log.e(TAG, jsonStr);
-                    } catch (final JSONException e) {
-                        Log.e(TAG, "Json parsing error: " + e.getMessage());
+                            //Log.e(TAG, jsonStr);
+                        } catch (final JSONException e) {
+                            Log.e(TAG, "Json parsing error: " + e.getMessage());
+                        }
+                    } else {
+                        Log.e(TAG, "Couldn't get json from server.");
                     }
-                } else {
-                    Log.e(TAG, "Couldn't get json from server.");
                 }
-            }
-        }.start();
+            }.start();
+        }
     }
 
     public double getData(String jsonStr, double elevation) throws JSONException {

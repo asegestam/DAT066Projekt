@@ -31,17 +31,16 @@ public class CaloriesBurned {
         age = sharedPref.getString("age", "");
         height = sharedPref.getString("height", "");
         if(gender.equals("Male")){
-           bmr = (10 * Double.parseDouble(weight)) + (6.25 * Double.parseDouble(height)) - (4.92 * calculateAge() + 5);
+            bmr = (13.7 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.8 * calculateAge()) + 66;
         }
         else {
-           bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * Double.parseDouble(age)) + 665;
+            bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * calculateAge()) + 665;
         }
         System.out.println(bmr);
     }
 
     @TargetApi(26)
     public int calculateAge(){
-
         LocalDate birthday = LocalDate.parse(age.replaceAll("/", "-"));
         LocalDate today = LocalDate.now();
         Period p = Period.between(birthday, today);
@@ -50,17 +49,16 @@ public class CaloriesBurned {
 
 
     public double CalculateCalories(double speed, long time) {
-
         if(training.equals("Running")){
-            met = (0.816 * speed * 3.6) + 1.662;
-            Log.d(TAG, "CalculateCalories: speed calories"  + speed * 3.6);
-            Log.d(TAG, "CalculateCalories: calories met" + met);
+            met = (1.411 * Math.pow(speed * 3.6, 0.8435));
             calories = (bmr/24) * met * time/3600000;
         }
         else if(training.equals("Cycling")){
-
+            met = (0.03982 * Math.pow(speed * 3.6, 1.724));
+            calories = (bmr/24) * met * time/3600000;
         }
         return calories;
+
     }
 
     public void setTraining(String s){

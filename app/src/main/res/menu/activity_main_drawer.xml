@@ -13,17 +13,23 @@
             android:icon="@drawable/ic_profile_option"
             android:title="Profile" />
         <item
-            android:id="@+id/settings_option"
-            android:icon="@drawable/ic_settings_option"
-            android:title="Settings" />
-        <item
             android:id="@+id/stats_option"
             android:icon="@drawable/ic_stats_option"
             android:title="Statistics"/>
         <item
-            android:id="@+id/goal_option"
-            android:icon="@drawable/ic_goal_option"
-            android:title="Goals"/>
+            android:id="@+id/saved_activities_option"
+            android:icon="@drawable/ic_cloud_queue_black_24dp"
+            android:title="Saved Activities"/>
+
+        <item
+          android:id="@+id/goal_option"
+          android:icon="@drawable/ic_goal_option"
+          android:title="Goals"/>
+
+        <item
+            android:id="@+id/settings_option"
+            android:icon="@drawable/ic_settings_option"
+            android:title="Settings" />
     </group>
 
     <!--<item android:title="Communicate">

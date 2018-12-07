@@ -43,8 +43,6 @@ public class StatsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        getActivity().setTitle("Stats-Fragment");
     }
 
     public void setPlotData(ArrayList array){
@@ -72,6 +70,12 @@ public class StatsFragment extends Fragment {
         graph.getViewport().setScalableY(true);*/
         graph.addSeries(series);
         Log.e(TAG, "Added point: " + data);
+    }
+
+    @Override
+    public void onStart() {
+        getActivity().setTitle("Elevation");
+        super.onStart();
     }
 
 

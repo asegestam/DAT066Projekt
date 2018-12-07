@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,22 +23,26 @@ import static android.content.ContentValues.TAG;
 public class UserActivity {
     private double userSpeed;
     private double userDistanceMoved;
-    private PolylineOptions route;
     private long activityTime;
     private double caloriesBurned;
     private Date dateTime;
     private LatLng firstLocation;
-    private DatabaseReference mDatabase;
+    private ArrayList<Double> elevationData;
+    private ArrayList<ArrayList<LatLng>> listOfRoutes;
 
-
-    UserActivity(double userSpeed, double userDistanceMoved, PolylineOptions route, long activityTime, double caloriesBurned, Date dateTime, LatLng firstLocation) {
+    UserActivity(double userSpeed, double userDistanceMoved,
+                 ArrayList<ArrayList<LatLng>> listOfRoutes, long activityTime,
+                 double caloriesBurned, Date dateTime,
+                 LatLng firstLocation, ArrayList<Double> elevationData)
+    {
         this.userSpeed = userSpeed;
         this.userDistanceMoved = userDistanceMoved;
-        this.route = route;
+        this.listOfRoutes = listOfRoutes;
         this.activityTime = activityTime;
         this.caloriesBurned = caloriesBurned;
         this.dateTime = dateTime;
         this.firstLocation = firstLocation;
+        this.elevationData = elevationData
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -101,8 +107,15 @@ public class UserActivity {
         return userDistanceMoved;
     }
 
-    public PolylineOptions getRoute() {
-        return route;
+    public ArrayList<ArrayList<LatLng>> getListOfRoutes() {
+        return listOfRoutes;
+    }
+
+    public ArrayList<LatLng> getSpecificUserRoute(int index) {
+        return this.listOfRoutes.get(index);
+    }
+    public int getListSize() {
+        return listOfRoutes.size();
     }
 
     public long getActivityTime() {
@@ -119,5 +132,12 @@ public class UserActivity {
     public LatLng getFirstLocation() {
         return firstLocation;
     }
-}
 
+    public ArrayList<Double> getElevationData() {
+        return elevationData;
+    }
+
+    public UserActivity getInstance() {
+        return this;
+    }
+}
