@@ -363,6 +363,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), routeOptions,
                 elapsedActivityTime/1000, 0.0, currentTime,locationUpdater.getFirstLocation());
         userActivities.add(userActivity);
+        userActivity.saveNote();
         Toast.makeText(getActivity(), "Activity saved", Toast.LENGTH_SHORT).show();
         String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m/s\n" + "size " + userActivity.getRoute().getPoints().size() + "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime();
         Log.d(TAG, "userActivity: " + logString + "\n" + "number of saved activities " + userActivities.size());

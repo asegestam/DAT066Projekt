@@ -44,9 +44,6 @@ public class SpeedDistanceCalculator {
         map.reDrawRoute();
         map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
         map.updateCamera(latLng);
-        if(!currentLocation.equals(lastLocation)){
-            map.plotGraph();
-        }
     }
 
     /** Calculates average speed */
