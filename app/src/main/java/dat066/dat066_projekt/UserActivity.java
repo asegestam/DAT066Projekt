@@ -1,6 +1,8 @@
 package dat066.dat066_projekt;
 
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -14,6 +16,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static android.content.ContentValues.TAG;
+
 public class UserActivity {
     private double userSpeed;
     private double userDistanceMoved;
@@ -22,6 +26,7 @@ public class UserActivity {
     private double caloriesBurned;
     private Date dateTime;
     private LatLng firstLocation;
+    private DatabaseReference mDatabase;
 
 
     UserActivity(double userSpeed, double userDistanceMoved, PolylineOptions route, long activityTime, double caloriesBurned, Date dateTime, LatLng firstLocation) {
@@ -32,11 +37,47 @@ public class UserActivity {
         this.caloriesBurned = caloriesBurned;
         this.dateTime = dateTime;
         this.firstLocation = firstLocation;
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     public void saveNote(){
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference ref = mDatabase.getReference();
+
+        mDatabase.child("Activity").addListenerForSingleValueEvent(
+
+                new ValueEventListener() {
+
+                    @Override
+
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                            writeNewPost();
+
+                    }
+
+                    @Override
+
+                    public void onCancelled(DatabaseError databaseError) {
+
+                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+
+                        // [START_EXCLUDE]
+
+                        //setEditingEnabled(true);
+
+                        // [END_EXCLUDE]
+
+                    }
+
+                });
+    }
+
+    private void writeNewPost() {
+
+        // Create new post at /user-posts/$userid/$postid and at
+
+        // /posts/$postid simultaneously
+        String key = mDatabase.child("Activity").push().getKey();
 
         Map<String, Object> data = new HashMap<>();
         data.put("date", getDateTime().toString());
@@ -44,8 +85,14 @@ public class UserActivity {
         data.put("velocity", String.valueOf(getUserSpeed()));
         data.put("calories", String.valueOf(getCaloriesBurned()));
         data.put("time",String.valueOf(getActivityTime()));
+        DataSnapshot snapshot;
+        mDatabase.
 
-        ref.setValue(data, null);
+        Map<String, Object> update = new HashMap<>();
+        update.put(key, data);
+
+        mDatabase.updateChildren(update);
+
     }
 
     public double getUserSpeed() {
