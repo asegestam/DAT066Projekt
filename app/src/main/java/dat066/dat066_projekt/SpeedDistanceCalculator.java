@@ -39,10 +39,7 @@ public class SpeedDistanceCalculator {
             speed = distance/timeBetween;
             avgSpeedArray.add(speed);
         }
-        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        map.addLatLngToRoute(latLng);
         map.updateTextViews(distanceInMetres, calcAverageSpeed(), System.currentTimeMillis());
-        map.updateCamera(latLng);
     }
 
     /** Calculates average speed */

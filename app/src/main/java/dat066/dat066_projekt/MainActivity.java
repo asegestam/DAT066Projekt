@@ -2,8 +2,11 @@ package dat066.dat066_projekt;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -22,6 +25,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
 
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,14 +49,17 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private String type;
     private boolean activityStopped;
+    private final int REQUEST_CHECK_SETTINGS = 0; // a unique identifier
+    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 1500; /* 2 sec */
     StatsFragment statsFragment;
-    ArrayList<UserActivity> savedUserActivities;
     MapFragment mapFragment;
     ProfileFragment profileFragment;
     UserActivityList userActivityList;
     SettingsFragment settingsFragment;
     GoalsFragment goalsFragment;
     ArrayList<Fragment> fragments;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +75,49 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         activityStopped = true;
+        createLocationRequest();
         if(savedInstanceState == null) {
             mapFragment = new MapFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.content_main, mapFragment, "map").commit();
         } else {
             mapFragment = (MapFragment)getSupportFragmentManager().findFragmentByTag("map");
         }
+    }
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        final Task<LocationSettingsResponse> locationSettingsResponseTask = task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                mapFragment.startLocationUpdates();
+            }
+        });
+        Task<LocationSettingsResponse> locationSettingsResponseTask1 = task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(MainActivity.this,
+                                REQUEST_CHECK_SETTINGS);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -77,11 +130,8 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "onBackPressed: ALERT");
             showAlertDialog().show();
         }
-        else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        else if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStackImmediate();
-        }
-        else {
-            super.onBackPressed();
         }
     }
 
@@ -261,5 +311,9 @@ public class MainActivity extends AppCompatActivity
 
     public void setActivityStopped(boolean activityStopped) {
         this.activityStopped = activityStopped;
+    }
+
+    public LocationRequest getLocationRequest() {
+        return mLocationRequest;
     }
 }
