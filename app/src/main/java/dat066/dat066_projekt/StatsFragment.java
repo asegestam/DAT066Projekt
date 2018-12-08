@@ -78,5 +78,11 @@ public class StatsFragment extends Fragment {
         super.onStart();
     }
 
+    @Override
+    public void onResume() {
+        getActivity().setTitle("Elevation");
+        super.onResume();
+    }
+
 
 }

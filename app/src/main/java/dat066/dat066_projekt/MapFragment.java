@@ -3,7 +3,9 @@ package dat066.dat066_projekt;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.icu.util.Calendar;
@@ -18,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -312,7 +315,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(userMovement != null) {
             UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), listOfUserMovement,
                     elapsedActivityTime / 1000, d, currentTime, locationUpdater.getFirstLocation(), elevationArray);
-            ((MainActivity) getActivity()).saveUserActivity(userActivity);
             userActivity.saveNote();
         }
     }
@@ -398,11 +400,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onStart() {
-        getActivity().setTitle("Map");
-        super.onStart();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+        }
     }
-
     /** Sets the onClickListeners to all relevant buttons */
 
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
@@ -415,6 +418,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Chronometer time = view.findViewById(R.id.timeChronometer);
                 timeStopped = 0;
                 time.setBase(SystemClock.elapsedRealtime());
+                ((MainActivity)getActivity()).setActivityStopped(false);
                 startActivity();
             }
         }
@@ -433,6 +437,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Chronometer time = view.findViewById(R.id.timeChronometer);
             elapsedActivityTime = SystemClock.elapsedRealtime() - time.getBase();
             Log.d(TAG, "chronometerElaspedTime " + elapsedActivityTime/1000);
+            ((MainActivity)getActivity()).setActivityStopped(true);
             stopActivity();
             if(locationUpdater.getFirstLocation() != null &&  locationUpdater.getLastLocation() != null) {
                 plotGraph();
@@ -488,5 +493,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public interface OnPlotDataListener{
         public void onDataGiven(ArrayList elevation);
+    }
+
+    @Override
+    public void onResume() {
+        getActivity().setTitle("");
+        super.onResume();
+    }
+
+    public void discardActivity() {
+        locationManager.removeUpdates(locationUpdater);
+        activityStopped = true;
+        t.cancel();
+        t.purge();
+        setButtonVisibility(0);
+        (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
+        setTextViewVisibility(8);
+        (view.findViewById(R.id.stop_button)).setVisibility(View.GONE);
+        stopTimer();
     }
 }

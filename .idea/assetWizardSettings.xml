@@ -94,8 +94,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_cloud_queue_black_24dp.xml" />
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/toggle/ic_star_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/D:/Program/AndroidStudio/plugins/android/lib/android.jar!/images/material_design_icons/alert/ic_warning_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -105,11 +104,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="d3d3d3" />
-                            <entry key="outputName" value="ic_cloud_queue_black_24dp" />
+                            <entry key="color" value="d3d213" />
+                            <entry key="outputName" value="ic_warning" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\abbes\Downloads\map-marker.psd" />
-                            <entry key="outputName" value="ic_goal_option" />
                             <entry key="sourceFile" value="C:\Users\akesv" />
                           </map>
                         </option>

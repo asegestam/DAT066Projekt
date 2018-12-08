@@ -44,4 +44,10 @@ public class UserActivityList extends ListFragment {
         getActivity().setTitle("Your Saved Activities");
         super.onStart();
     }
+
+    @Override
+    public void onResume() {
+        getActivity().setTitle("Your Saved Activities");
+        super.onResume();
+    }
 }

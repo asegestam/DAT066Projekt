@@ -16,6 +16,9 @@
     <string name="enter_gender">Enter your Gender</string>
     <string name="save_string">SAVE</string>
     <string name="save_activity">Do you want to save this activity?</string>
+    <string name="discard_activity">Do you want to discard this activity?</string>
+    <string name="discard">DISCARD</string>
+    <string name="cancel">CANCEL</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -1,9 +1,13 @@
 package dat066.dat066_projekt;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.support.design.widget.NavigationView;
@@ -14,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
 
@@ -22,6 +27,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MapFragment.OnPlotDataListener {
@@ -36,6 +44,7 @@ public class MainActivity extends AppCompatActivity
     SettingsFragment settingsFragment;
     GoalsFragment goalsFragment;
     ArrayList<Fragment> fragments;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,33 +56,15 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        initFragments();
-        addFragmentsToList();
-        /*When the application starts we want the "Home" fragment to be initilized*/
-        setFragment(R.id.activity_option);
-        savedUserActivities = new ArrayList<>();
-    }
-
-    private void initFragments() {
-        mapFragment = new MapFragment();
-        profileFragment = new ProfileFragment();
-        statsFragment = new StatsFragment();
-        userActivityList = new UserActivityList();
-        settingsFragment = new SettingsFragment();
-        goalsFragment = new GoalsFragment();
-        fragments = new ArrayList<>();
-    }
-
-    private void addFragmentsToList() {
-        fragments.add(mapFragment);
-        fragments.add(profileFragment);
-        fragments.add(statsFragment);
-        fragments.add(userActivityList);
-        fragments.add(settingsFragment);
-        fragments.add(goalsFragment);
+        activityStopped = true;
+        if(savedInstanceState == null) {
+            mapFragment = new MapFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.content_main, mapFragment, "map").commit();
+        } else {
+            mapFragment = (MapFragment)getSupportFragmentManager().findFragmentByTag("map");
+        }
     }
 
     @Override
@@ -81,7 +72,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if(!activityStopped) {
+            Log.d(TAG, "onBackPressed: ALERT");
+            showAlertDialog().show();
+        }
+        else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -122,36 +121,32 @@ public class MainActivity extends AppCompatActivity
     public void setFragment(int id){
         switch(id) {
             case R.id.activity_option:
-                if(mapFragment == null) {
-                    mapFragment = new MapFragment();
-                    //fragments.add(mapFragment);
-                }
+                if(mapFragment == null) mapFragment = new MapFragment();
                 switchFragment(mapFragment);
                 break;
 
             case R.id.profile_option:
-                if(profileFragment == null) {
-                    profileFragment = new ProfileFragment();
-                }
+                if(profileFragment == null) profileFragment = new ProfileFragment();
                 switchFragment(profileFragment);
                 break;
 
             case R.id.settings_option:
+                if(settingsFragment == null) settingsFragment = new SettingsFragment();
                 switchFragment(settingsFragment);
                  break;
 
             case R.id.stats_option:
+                if(statsFragment == null) statsFragment = new StatsFragment();
                 switchFragment(statsFragment);
                 break;
 
             case R.id.saved_activities_option:
-                if(userActivityList == null) {
-                    userActivityList = new UserActivityList();
-                }
+                if(userActivityList == null) userActivityList = new UserActivityList();
                 switchFragment(userActivityList);
                 break;
 
             case R.id.goal_option:
+                if(goalsFragment == null) goalsFragment = new GoalsFragment();
                 switchFragment(goalsFragment);
                 break;
             default:
@@ -166,14 +161,7 @@ public class MainActivity extends AppCompatActivity
     public void switchFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        for(Fragment f : fragments) {
-            if(!f.equals(fragment)) {
-                fragmentTransaction.hide(f);
-            }
-        }
-        if(!fragment.isAdded()) fragmentTransaction.add(R.id.content_main, fragment).show(fragment);
-        else fragmentTransaction.show(fragment);
-        fragmentTransaction.commit();
+        fragmentTransaction.replace(R.id.content_main, fragment).addToBackStack(null).commit();
     }
 
     public void showPopup() {
@@ -219,18 +207,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     @Override
     public void onDataGiven(ArrayList elevation) {
-
-
         StatsFragment statsFrag = (StatsFragment)
                 getSupportFragmentManager().findFragmentById(R.id.statistics);
 
-
         if (statsFrag != null) {
             // If article frag is available, we're in two-pane layout...
-
             // Call a method in the ArticleFragment to update its content
             statsFrag.setPlotData(elevation);
             Log.e(TAG, "sent; "+ elevation + "to StatsFragmemt");
@@ -243,29 +226,29 @@ public class MainActivity extends AppCompatActivity
             args.putParcelableArrayList("elevation", elevation);
             Log.e(TAG,"Put elevation in bundle: "+elevation);
             statsFragment.setArguments(args);
-
-           /* FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.content_main, statsFragment);
-            transaction.addToBackStack(null);
-
-            // Commit the transaction
-            transaction.commit();
-            */
         }
     }
-    public void saveUserActivity(UserActivity userActivity) {
-        savedUserActivities.add(userActivity);
-        Log.d(TAG, "saveUserActivity: antal sparade aktiviteter " + savedUserActivities.size());
-        String logString = "\n" + userActivity.getUserSpeed() + " m/s\n" + userActivity.getUserDistanceMoved() + " m\n" + "size " + userActivity.getListOfRoutes().size() +
-                "\n" + userActivity.getActivityTime() + " s\n" + userActivity.getDateTime() + "\n";
-        Log.d(TAG, "saveUserActivity: Main Activity" + logString + "kalorier " + userActivity.getCaloriesBurned());
-    }
-
-    public ArrayList<UserActivity> getSavedUserActivities() {
-        return savedUserActivities;
+    public Dialog showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.discard_activity)
+                .setPositiveButton(R.string.discard, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MapFragment mapf = (MapFragment)getSupportFragmentManager().findFragmentByTag("map");
+                        mapf.discardActivity();
+                        activityStopped = true;
+                        Log.d(TAG, "onClick: discard activity");
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dismiss dialog
+                    }
+                })
+                .setTitle("Warning!")
+                .setIcon(R.drawable.ic_warning);
+        return builder.create();
     }
 
     public String getType() {

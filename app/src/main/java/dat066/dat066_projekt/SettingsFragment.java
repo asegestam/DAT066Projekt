@@ -26,4 +26,9 @@ public class SettingsFragment extends Fragment {
         getActivity().setTitle("Settings");
         super.onStart();
     }
+    @Override
+    public void onResume() {
+        getActivity().setTitle("Settings");
+        super.onResume();
+    }
 }
