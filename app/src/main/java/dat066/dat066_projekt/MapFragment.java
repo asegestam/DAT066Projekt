@@ -120,7 +120,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         listOfUserMovement = new ArrayList<>();
         route = null;
         savedPolyline = null;
-        mLocationRequest = ((MainActivity)getActivity()).getmLocationRequest();
+        mLocationRequest = ((MainActivity)getActivity()).getLocationRequest();
         activityStopped = true;
         activityPaused = true;
     }
