@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/map_fragment">
+
+    <fragment
+        android:id="@+id/map_fragment"
+        android:name="dat066.dat066_projekt.MapFragment"
+        android:label="Activity"
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/action_mapFragment_to_profileFragment"
+            app:destination="@id/profile_fragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_userActivityList"
+            app:destination="@id/useractivity_fragment" />
+        <action
+            android:id="@+id/action_map_fragment_to_statsFragment"
+            app:destination="@id/stats_fragment" />
+        <action
+            android:id="@+id/action_map_fragment_to_goalsFragment"
+            app:destination="@id/goals_fragment" />
+        <action
+            android:id="@+id/action_map_fragment_to_settingsFragment"
+            app:destination="@id/settings_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profile_fragment"
+        android:name="dat066.dat066_projekt.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_mapFragment"
+            app:destination="@id/map_fragment"
+            app:popUpTo="@id/map_fragment" />
+        <argument
+            android:name="title_profile"
+            android:defaultValue="Profile"
+            app:argType="string" />
+    </fragment>
+    <action android:id="@+id/action_global_mapFragment" app:popUpTo="@id/map_fragment" />
+    <fragment
+        android:id="@+id/useractivity_fragment"
+        android:name="dat066.dat066_projekt.UserActivityList"
+        android:label="Activities"
+        tools:layout="@layout/useractivity_list_fragment">
+        <action
+            android:id="@+id/action_userActivityList_to_mapFragment"
+            app:destination="@id/map_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stats_fragment"
+        android:name="dat066.dat066_projekt.StatsFragment"
+        android:label="Elevation"
+        tools:layout="@layout/fragment_stats">
+        <action
+            android:id="@+id/action_statsFragment_to_map_fragment"
+            app:destination="@id/map_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/goals_fragment"
+        android:name="dat066.dat066_projekt.GoalsFragment"
+        android:label="Goals"
+        tools:layout="@layout/fragment_goals">
+        <action
+            android:id="@+id/action_goalsFragment_to_map_fragment"
+            app:destination="@id/map_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="dat066.dat066_projekt.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_map_fragment"
+            app:destination="@id/map_fragment" />
+    </fragment>
+</navigation>

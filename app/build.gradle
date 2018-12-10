@@ -49,6 +49,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     //CircleImages
     implementation 'de.hdodenhof:circleimageview:2.2.0'
+    def nav_version = "1.0.0-alpha08"
+    implementation "android.arch.navigation:navigation-fragment:$nav_version" // use -ktx for Kotlin
+    implementation "android.arch.navigation:navigation-ui:$nav_version" // use -ktx for Kotlin
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -71,18 +71,4 @@ public class StatsFragment extends Fragment {
         graph.addSeries(series);
         Log.e(TAG, "Added point: " + data);
     }
-
-    @Override
-    public void onStart() {
-        getActivity().setTitle("Elevation");
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        getActivity().setTitle("Elevation");
-        super.onResume();
-    }
-
-
 }

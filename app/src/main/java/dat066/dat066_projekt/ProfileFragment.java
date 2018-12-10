@@ -273,9 +273,4 @@ public class ProfileFragment extends Fragment {
                 }
             });
     }
-    @Override
-    public void onResume() {
-        getActivity().setTitle("Your Profile");
-        super.onResume();
-    }
 }

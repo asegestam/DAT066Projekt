@@ -5,29 +5,29 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/activity_option"
+            android:id="@+id/map_fragment"
             android:icon="@drawable/ic_activity_option"
             android:title="Activity" />
         <item
-            android:id="@+id/profile_option"
+            android:id="@+id/profile_fragment"
             android:icon="@drawable/ic_profile_option"
             android:title="Profile" />
         <item
-            android:id="@+id/stats_option"
+            android:id="@+id/stats_fragment"
             android:icon="@drawable/ic_stats_option"
             android:title="Statistics"/>
         <item
-            android:id="@+id/saved_activities_option"
+            android:id="@+id/useractivity_fragment"
             android:icon="@drawable/ic_cloud_queue_black_24dp"
-            android:title="Saved Activities"/>
+            android:title="Activities"/>
 
         <item
-          android:id="@+id/goal_option"
+          android:id="@+id/goals_fragment"
           android:icon="@drawable/ic_goal_option"
           android:title="Goals"/>
 
         <item
-            android:id="@+id/settings_option"
+            android:id="@+id/settings_fragment"
             android:icon="@drawable/ic_settings_option"
             android:title="Settings" />
     </group>
