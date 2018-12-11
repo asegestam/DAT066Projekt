@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -221,28 +222,40 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onDataGiven(ArrayList elevation) {
+    public void onDataGiven(ArrayList elevation, Date date, double speed, double caloriesBurned, double distance, long time) {
 
 
-        StatsFragment statsFrag = (StatsFragment)
-                getSupportFragmentManager().findFragmentById(R.id.statistics);
+        UserActivityList userAct = (UserActivityList)
+                getSupportFragmentManager().findFragmentById(R.id.activity_list);
 
 
-        if (statsFrag != null) {
+        if (userAct != null) {
             // If article frag is available, we're in two-pane layout...
 
             // Call a method in the ArticleFragment to update its content
-            statsFrag.setPlotData(elevation);
+            //userAct.setPlotData(elevation);
             Log.e(TAG, "sent; "+ elevation + "to StatsFragmemt");
         } else {
             // Otherwise, we're in the one-pane layout and must swap frags...
             Log.e(TAG,"Null Fragment!");
+
+
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("elevation",elevation);
+            args.putString("date", date.toString());
+            args.putDouble("speed", speed);
+            args.putDouble("calories", caloriesBurned);
+            args.putDouble("distance", distance);
+            args.putLong("time", time);
+            userActivityList.setArguments(args);
+            if(userActivityList.adapter != null)
+                userActivityList.updateListView(args);
             // Create fragment and give it an argument for the selected article
-            statsFragment = new StatsFragment();
+            /*statsFragment = new StatsFragment();
             Bundle args = new Bundle();
             args.putParcelableArrayList("elevation", elevation);
             Log.e(TAG,"Put elevation in bundle: "+elevation);
-            statsFragment.setArguments(args);
+            statsFragment.setArguments(args);*/
 
            /* FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 

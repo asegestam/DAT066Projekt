@@ -473,7 +473,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(this.activityStopped) {
             if(locationUpdater.getEle() > 0)
                 elevationArray.add(locationUpdater.getEle());
-            mCallback.onDataGiven(elevationArray);
+            CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
+            caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
+            double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
+            mCallback.onDataGiven(elevationArray, Calendar.getInstance().getTime(), speedDistanceCalculator.getAverageSpeed(), d, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime / 1000);
         }else{
             if(locationUpdater.getEle() != 0.0) {
                 elevationArray.add(locationUpdater.getEle());
@@ -487,6 +490,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public interface OnPlotDataListener{
-        public void onDataGiven(ArrayList elevation);
+        public void onDataGiven(ArrayList elevation, Date date, double speed, double caloriesBurned, double distance, long time);
     }
 }
