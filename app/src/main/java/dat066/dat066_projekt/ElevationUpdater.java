@@ -12,12 +12,11 @@ import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
-class ElevationUpdater {
+public class ElevationUpdater {
 
     private static ElevationUpdater elevationUpdater_instance = null;
     private volatile double ele;
     private Location location;
-    OnPlotDataListener mCallback;
     ArrayList<Double> elevationArray;
     private boolean activityStopped;
 
@@ -84,31 +83,6 @@ class ElevationUpdater {
         return ele;
     }
 
-    /** Graph plot stuff */
-
-    public void plotGraph() {
-        if(activityStopped) {
-            if(getEle() > 0) {
-                elevationArray.add(getEle());
-            }
-            Log.d(TAG, "plotGraph: elevationarray size " + elevationArray.size());
-          mCallback.onDataGiven(elevationArray);
-        }else{
-            if(getEle() != 0.0) {
-                elevationArray.add(getEle());
-                Log.e(TAG, "Added: " + getEle() + " in MapFragment!");
-            }
-        }
-    }
-
-    public void setOnPlotDataListener(Activity activity){
-        mCallback = (OnPlotDataListener) activity;
-    }
-
-    public interface OnPlotDataListener{
-        public void onDataGiven(ArrayList elevation);
-    }
-
     public void setLocation(Location location) {
         this.location = location;
     }
@@ -119,5 +93,8 @@ class ElevationUpdater {
 
     public void setActivityStopped(boolean activityStopped) {
         this.activityStopped = activityStopped;
+    }
+    public void addToElevationArray() {
+        elevationArray.add(getEle());
     }
 }

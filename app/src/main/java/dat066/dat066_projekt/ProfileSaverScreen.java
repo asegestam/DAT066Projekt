@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +18,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.Calendar;
 
@@ -53,9 +51,6 @@ public class ProfileSaverScreen extends AppCompatActivity{
         weightOnClickListener(v);
         birthDayOnClickListener(v);
         heightOnClickListener(v);
-
-
-
     }
 
     public void init(View view) {

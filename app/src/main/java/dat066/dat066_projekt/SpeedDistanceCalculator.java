@@ -2,17 +2,9 @@ package dat066.dat066_projekt;
 
 import android.location.Location;
 import android.util.Log;
-import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
-import android.os.Bundle;
-import android.os.Looper;
-import android.util.Log;
-import android.widget.Toast;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import static android.content.ContentValues.TAG;
 
 public class SpeedDistanceCalculator {

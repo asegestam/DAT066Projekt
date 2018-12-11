@@ -2,16 +2,10 @@ package dat066.dat066_projekt;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.PeriodicSync;
 import android.content.SharedPreferences;
-import android.support.annotation.CheckResult;
-import android.util.Log;
 
-import java.lang.annotation.Target;
 import java.time.LocalDate;
 import java.time.Period;
-
-import static android.support.constraint.Constraints.TAG;
 
 public class CaloriesBurned {
     private double calories;

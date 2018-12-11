@@ -2,23 +2,23 @@ package dat066.dat066_projekt;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+import dat066.dat066_projekt.database.UserActivityEntity;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,19 +39,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.jjoe64.graphview.GraphView;
-import android.support.v4.content.ContextCompat;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.jjoe64.graphview.GraphView;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+
 import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -81,6 +80,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     ArrayList<ArrayList<LatLng>> listOfUserMovement;
     Polyline route;
     Polyline savedPolyline;
+    double calories;
+    private UserActivityViewModel activityViewModel;
 
     @SuppressLint("MissingPermission")
     @Nullable
@@ -106,6 +107,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         initButtons();
         startLocationUpdates();
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     private void initGlobalVariables() {
@@ -175,7 +181,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);;
         if(currentLocation !=null){
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            updateCamera(latLng);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18.0f);
+            mMap.moveCamera(cameraUpdate);
         }
     }
     @SuppressLint("MissingPermission")
@@ -246,13 +253,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void startActivity() {
         activityStopped = false;
         activityPaused = false;
-        t = new Timer();
-        TimerTask tTask = new TimerTask() {
-            @Override
-            public void run() {
-                elevationUpdater.plotGraph();
-            }
-        };
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
@@ -261,14 +261,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
        // saveSnackbar.dismiss();
         startTimer();
-        t.schedule(tTask, 1000,5000);
     }
 
     public void stopActivity() {
         activityStopped = true;
         activityPaused = true;
-        t.cancel();
-        t.purge();
         setButtonVisibility(0);
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
@@ -305,15 +302,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Date currentTime = Calendar.getInstance().getTime();
         CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
         caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
-        double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
-        Log.d(TAG, "stopActivity: KALORIER" + d);
+        calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
+        Log.d(TAG, "stopActivity: KALORIER " + calories);
         saveUserMovement(userMovement);
         if(firstLocation != null) {
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
-            UserActivity userActivity = new UserActivity(speedDistanceCalculator.getAverageSpeed(), speedDistanceCalculator.getDistanceInMetres(), listOfUserMovement,
-                    elapsedActivityTime / 1000, d, currentTime, firstLatLng , elevationUpdater.getElevationArray());
-            String logstring = "Speed " + userActivity.getUserSpeed() + "\n" + "Distance " + userActivity.getUserDistanceMoved() + "\n"  + "listofusermovement size" + userActivity.getListSize();
-            Log.d(TAG, "saveActivity: " + logstring);
+            UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime.toString(), speedDistanceCalculator.getSpeed()
+                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000);
+            ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
+            Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
             //userActivity.saveNote();
         }
     }
@@ -431,9 +428,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             ((MainActivity)getActivity()).setActivityStopped(true);
             elevationUpdater.setActivityStopped(true);
             stopActivity();
-            if(firstLocation != null &&  lastLocation != null) {
-                elevationUpdater.plotGraph();
-            }
         }
     };
     private View.OnClickListener activityButtonOnClickListener = new View.OnClickListener() {
@@ -488,33 +482,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
         public void onStop() {
         Log.d(TAG, "onStop: mapfrag");
-        if(t != null) {
-            t.cancel();
-            t.purge();
-        }
         activityPaused = true;
         activityStopped = true;
         ((MainActivity)getActivity()).setActivityStopped(true);
         super.onStop();
     }
-
-    public interface OnPlotDataListener{
-        public void onDataGiven(ArrayList elevation, Date date, double speed, double caloriesBurned, double distance, long time);
-      }
-    public void plotGraph() {
-        if(this.activityStopped) {
-            if(locationUpdater.getEle() > 0)
-                elevationArray.add(locationUpdater.getEle());
-            CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
-            caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
-            double d = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
-            mCallback.onDataGiven(elevationArray, Calendar.getInstance().getTime(), speedDistanceCalculator.getAverageSpeed(), d, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime / 1000);
-        }else{
-            if(locationUpdater.getEle() != 0.0) {
-                elevationArray.add(locationUpdater.getEle());
-                Log.e(TAG, "Added: " + locationUpdater.getEle() + " in MapFragment!");
-            }
-          }
-        }
-
 }

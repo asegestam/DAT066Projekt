@@ -1,22 +1,18 @@
 package dat066.dat066_projekt;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuInflater;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.PopupMenu;
+
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -26,28 +22,26 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import java.util.ArrayList;
+
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
-import java.util.Date;
-import java.util.List;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity
-        implements PopupMenu.OnMenuItemClickListener, ElevationUpdater.OnPlotDataListener {
+        implements PopupMenu.OnMenuItemClickListener {
     private static final String TAG = "MainActivity";
     private String type;
     private boolean activityStopped;
     private final int REQUEST_CHECK_SETTINGS = 0; // a unique identifier
     private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 1500; /* 2 sec */
-    StatsFragment statsFragment;
     private LocationRequest mLocationRequest;
     NavController navController;
-    MapFragment mapFragment;
     ElevationUpdater elevationUpdater;
-    ElevationUpdater.OnPlotDataListener plotDataListener;
+    private UserActivityViewModel userActivityViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +58,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         NavigationUI.setupWithNavController(navigationView, navController);
         NavigationUI.setupWithNavController(toolbar, navController, drawer);
+        RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        userActivityViewModel = ViewModelProviders.of(this).get(UserActivityViewModel.class);
         activityStopped = true;
         createLocationRequest();
         elevationUpdater = ElevationUpdater.getInstance();
-        plotDataListener = this;
-        elevationUpdater.setOnPlotDataListener(this);
     }
 
 
@@ -136,52 +130,6 @@ public class MainActivity extends AppCompatActivity
             Button button = (Button) findViewById(R.id.activity_button);
             button.setText("Type of Activity (" + getType() + ")");
         }
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment){
-        if(fragment instanceof MapFragment){
-            MapFragment mapFragment = (MapFragment) fragment;
-            mapFragment.setOnPlotDataListener(this);
-        }
-    }
-
-
-    @Override
-    public void onDataGiven(ArrayList elevation, Date date, double speed, double caloriesBurned, double distance, long time) {
-
-
-        UserActivityList userAct = (UserActivityList)
-                getSupportFragmentManager().findFragmentById(R.id.activity_list);
-
-
-        if (userAct != null) {
-            // If article frag is available, we're in two-pane layout...
-            // Call a method in the ArticleFragment to update its content
-            //userAct.setPlotData(elevation);
-            Log.e(TAG, "sent; "+ elevation + "to StatsFragmemt");
-        } else {
-            // Otherwise, we're in the one-pane layout and must swap frags...
-            Log.e(TAG,"Null Fragment!");
-
-
-            Bundle args = new Bundle();
-            args.putParcelableArrayList("elevation",elevation);
-            args.putString("date", date.toString());
-            args.putDouble("speed", speed);
-            args.putDouble("calories", caloriesBurned);
-            args.putDouble("distance", distance);
-            args.putLong("time", time);
-            userActivityList.setArguments(args);
-            if(userActivityList.adapter != null)
-                userActivityList.updateListView(args);
-            // Create fragment and give it an argument for the selected article
-            /*statsFragment = new StatsFragment();
-            Bundle args = new Bundle();
-            args.putParcelableArrayList("elevation", elevation);
-            Log.e(TAG,"Put elevation in bundle: "+elevation);
-            statsFragment.setArguments(args);
-        }S
     }
 
     public String getType() {
