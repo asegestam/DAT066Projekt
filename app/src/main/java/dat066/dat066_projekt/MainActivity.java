@@ -31,6 +31,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements PopupMenu.OnMenuItemClickListener, ElevationUpdater.OnPlotDataListener {
@@ -137,25 +139,49 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDataGiven(ArrayList elevation) {
-        StatsFragment statsFrag = (StatsFragment)
-                getSupportFragmentManager().findFragmentById(R.id.stats_fragment);
+    public void onAttachFragment(Fragment fragment){
+        if(fragment instanceof MapFragment){
+            MapFragment mapFragment = (MapFragment) fragment;
+            mapFragment.setOnPlotDataListener(this);
+        }
+    }
 
-        if (statsFrag != null) {
+
+    @Override
+    public void onDataGiven(ArrayList elevation, Date date, double speed, double caloriesBurned, double distance, long time) {
+
+
+        UserActivityList userAct = (UserActivityList)
+                getSupportFragmentManager().findFragmentById(R.id.activity_list);
+
+
+        if (userAct != null) {
             // If article frag is available, we're in two-pane layout...
             // Call a method in the ArticleFragment to update its content
-            statsFrag.setPlotData(elevation);
+            //userAct.setPlotData(elevation);
             Log.e(TAG, "sent; "+ elevation + "to StatsFragmemt");
         } else {
             // Otherwise, we're in the one-pane layout and must swap frags...
             Log.e(TAG,"Null Fragment!");
+
+
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("elevation",elevation);
+            args.putString("date", date.toString());
+            args.putDouble("speed", speed);
+            args.putDouble("calories", caloriesBurned);
+            args.putDouble("distance", distance);
+            args.putLong("time", time);
+            userActivityList.setArguments(args);
+            if(userActivityList.adapter != null)
+                userActivityList.updateListView(args);
             // Create fragment and give it an argument for the selected article
-            statsFragment = new StatsFragment();
+            /*statsFragment = new StatsFragment();
             Bundle args = new Bundle();
             args.putParcelableArrayList("elevation", elevation);
             Log.e(TAG,"Put elevation in bundle: "+elevation);
             statsFragment.setArguments(args);
-        }
+        }S
     }
 
     public String getType() {
