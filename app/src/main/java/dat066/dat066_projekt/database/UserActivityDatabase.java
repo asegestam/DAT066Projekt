@@ -37,4 +37,8 @@ public abstract class UserActivityDatabase extends RoomDatabase {
 
         }
     };
+
+    public static void destroyInstance() {
+        INSTANCE = null;
+    }
 }

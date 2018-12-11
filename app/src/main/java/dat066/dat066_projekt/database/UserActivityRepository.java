@@ -2,12 +2,14 @@ package dat066.dat066_projekt.database;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
 
 public class UserActivityRepository {
+    private static String TAG = "Repository";
     private UserActivityDao mUserActivityDao;
     private LiveData<List<UserActivityEntity>> allUserActivities;
 
@@ -30,7 +32,12 @@ public class UserActivityRepository {
     }
 
     public void deleteAllActivities() {
-        mUserActivityDao.deleteAllActivities();
+        Log.d(TAG, "deleteAllActivities: hejejj");
+        new deleteAllAsyncTask(mUserActivityDao).execute();
+    }
+
+    public LiveData<Integer> getTableSize() {
+        return mUserActivityDao.getTableSize();
     }
 
     private static class insertAsyncTask extends AsyncTask<UserActivityEntity, Void, Void> {
@@ -59,6 +66,22 @@ public class UserActivityRepository {
         @Override
         protected Void doInBackground(final UserActivityEntity... params) {
             mAsyncTaskDao.deleteActivity(params[0]);
+            return null;
+        }
+    }
+
+    private static class deleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private UserActivityDao mAsyncTaskDao;
+
+        deleteAllAsyncTask(UserActivityDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteAllActivities();
+            Log.d(TAG, "doInBackground: deleted table");
             return null;
         }
     }

@@ -25,7 +25,7 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
     }
 
     private final LayoutInflater mInflater;
-    private List<UserActivityEntity> mActivities = Collections.emptyList(); // Cached copy of words
+    private List<UserActivityEntity> mActivities = Collections.emptyList(); // Cached copy of userActivities
 
     UserActivityAdapter(Context context) {
         mInflater = LayoutInflater.from(context);

@@ -15,6 +15,8 @@ public class UserActivityViewModel extends AndroidViewModel {
 
     private LiveData<List<UserActivityEntity>> mAllUserActivites;
 
+    private LiveData<Integer> tableSize;
+
     public UserActivityViewModel(Application application) {
         super(application);
         mRepository = new UserActivityRepository(application);
@@ -26,4 +28,12 @@ public class UserActivityViewModel extends AndroidViewModel {
     }
 
     public void insertActivity(UserActivityEntity userActivity) { mRepository.insertActivity(userActivity); }
+
+    public void deleteAllActivities() {
+        mRepository.deleteAllActivities();
+    }
+
+    public LiveData<Integer> getTableSize() {
+      return mRepository.getTableSize();
+    }
 }

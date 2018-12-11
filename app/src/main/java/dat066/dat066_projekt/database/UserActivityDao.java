@@ -21,4 +21,7 @@ public interface UserActivityDao {
 
     @Query("DELETE FROM user_activity_table")
     void deleteAllActivities();
+
+    @Query("SELECT COUNT(id) FROM user_activity_table")
+    LiveData<Integer> getTableSize();
 }
