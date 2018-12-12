@@ -6,8 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,7 +43,11 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
     @Override
     public void onBindViewHolder(UserActivityViewHolder holder, int position) {
         UserActivityEntity current = mActivities.get(position);
-        holder.activityItemView.setText(current.getDate() + "\n" + current.getDistance() + " m\n" + current.getSpeed() + " m/s\n" + current.getTime() + " s");
+        Date date = new Date(current.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String formatted = formatter.format(date);
+        holder.activityItemView.setText(current.getDate() + "\n" + current.getDistance() + " m\n" + current.getSpeed() + " m/s\n" + current.getCalories() +" calories\n" + formatted );
     }
 
     void setActivities(List<UserActivityEntity> activities) {

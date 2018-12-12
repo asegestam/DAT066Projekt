@@ -308,7 +308,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(firstLocation != null) {
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
             UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime.toString(), speedDistanceCalculator.getSpeed()
-                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000);
+                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime);
             ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
             Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
             //userActivity.saveNote();
