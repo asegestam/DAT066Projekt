@@ -8,7 +8,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
 
 import androidx.recyclerview.widget.RecyclerView;
 import dat066.dat066_projekt.database.UserActivityEntity;
@@ -51,8 +54,12 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
         UserActivityEntity current = mActivities.get(position);
         ArrayList<Double> elevationArray = current.getElevation();
         double sum = elevationArray.size();
+        Date date = new Date(current.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String formatted = formatter.format(date);
         holder.dateView.setText(current.getDate());
-        holder.timeView.setText("" + current.getTime() + " s");
+        holder.timeView.setText(formatter);
         holder.distanceView.setText("" + current.getDistance() + " m");
         holder.speedView.setText("" + current.getSpeed() + " m/s");
         holder.caloriesView.setText("" + current.getDistance() + " m");

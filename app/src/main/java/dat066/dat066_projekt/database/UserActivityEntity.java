@@ -56,17 +56,17 @@ public class UserActivityEntity {
 
     @NonNull
     public double getSpeed() {
-        return speed;
+        return Math.round(speed*100.0)/100.0;
     }
 
     @NonNull
     public double getCalories() {
-        return calories;
+        return ((int) calories);
     }
 
     @NonNull
     public double getDistance() {
-        return distance;
+        return Math.round(distance);
     }
 
     @NonNull
