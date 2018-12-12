@@ -1,9 +1,12 @@
 package dat066.dat066_projekt.database;
 
+import java.util.ArrayList;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 @Entity(tableName = "user_activity_table")
 public class UserActivityEntity {
@@ -26,15 +29,19 @@ public class UserActivityEntity {
     @NonNull
     @ColumnInfo(name = "time")
     private long time;
+    @TypeConverters(DoubleArrayConverter.class)
+    @ColumnInfo(name = "elevation")
+    private ArrayList<Double> elevation;
 
 
-    public UserActivityEntity(int id, String date, double speed, double calories, double distance, long time) {
+    public UserActivityEntity(int id, String date, double speed, double calories, double distance, long time, ArrayList<Double> elevation) {
         this.id = id;
         this.date = date;
         this.speed = speed;
         this.calories = calories;
         this.distance = distance;
         this.time = time;
+        this.elevation = elevation;
     }
 
     @NonNull
@@ -65,5 +72,9 @@ public class UserActivityEntity {
     @NonNull
     public long getTime() {
         return time;
+    }
+
+    public ArrayList<Double> getElevation() {
+        return elevation;
     }
 }

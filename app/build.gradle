@@ -68,7 +68,10 @@ dependencies {
     implementation "androidx.room:room-coroutines:$room_version"
 
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
+    implementation 'com.google.code.gson:gson:2.8.2'
     // Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
 }

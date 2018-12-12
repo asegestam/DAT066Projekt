@@ -8,17 +8,6 @@ import android.icu.util.Calendar;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
-import dat066.dat066_projekt.database.UserActivityEntity;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +17,7 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -44,12 +34,25 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProviders;
+import dat066.dat066_projekt.database.UserActivityEntity;
 
 import static android.content.ContentValues.TAG;
 
@@ -299,16 +302,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void saveActivity() {
-        Date currentTime = Calendar.getInstance().getTime();
+        Date myDate = Calendar.getInstance().getTime();
+        String currentTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myDate);
         CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
         caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
         calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(),elapsedActivityTime);
         Log.d(TAG, "stopActivity: KALORIER " + calories);
         saveUserMovement(userMovement);
         if(firstLocation != null) {
+            ArrayList<Double> test = new ArrayList<>();
+            for(double i=0; i<10; i++) {
+                test.add(i);
+            }
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
             UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime.toString(), speedDistanceCalculator.getSpeed()
-                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000);
+                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000, test);
             ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
             Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
             //userActivity.saveNote();

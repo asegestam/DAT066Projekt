@@ -6,21 +6,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import dat066.dat066_projekt.database.UserActivityEntity;
 
 public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapter.UserActivityViewHolder> {
 
     class UserActivityViewHolder extends RecyclerView.ViewHolder {
-        private final TextView activityItemView;
+        private final TextView dateView;
+        private final TextView timeView;
+        private final TextView distanceView;
+        private final TextView speedView;
+        private final TextView caloriesView;
+
 
         private UserActivityViewHolder(View itemView) {
             super(itemView);
-            activityItemView = itemView.findViewById(R.id.textView);
+            dateView = itemView.findViewById(R.id.txtDate);
+            timeView = itemView.findViewById(R.id.txtTime);
+            distanceView = itemView.findViewById(R.id.txtDistance);
+            speedView = itemView.findViewById(R.id.txtSpeed);
+            caloriesView = itemView.findViewById(R.id.txtCalories);
         }
     }
 
@@ -40,7 +49,13 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
     @Override
     public void onBindViewHolder(UserActivityViewHolder holder, int position) {
         UserActivityEntity current = mActivities.get(position);
-        holder.activityItemView.setText(current.getDate() + "\n" + current.getDistance() + " m\n" + current.getSpeed() + " m/s\n" + current.getTime() + " s");
+        ArrayList<Double> elevationArray = current.getElevation();
+        double sum = elevationArray.size();
+        holder.dateView.setText(current.getDate());
+        holder.timeView.setText("" + current.getTime() + " s");
+        holder.distanceView.setText("" + current.getDistance() + " m");
+        holder.speedView.setText("" + current.getSpeed() + " m/s");
+        holder.caloriesView.setText("" + current.getDistance() + " m");
     }
 
     void setActivities(List<UserActivityEntity> activities) {
