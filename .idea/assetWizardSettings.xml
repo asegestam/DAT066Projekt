@@ -94,7 +94,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/D:/Program/AndroidStudio/plugins/android/lib/android.jar!/images/material_design_icons/alert/ic_warning_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/D:/Program/AndroidStudio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_directions_run_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -104,8 +104,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="d3d213" />
-                            <entry key="outputName" value="ic_warning" />
+                            <entry key="color" value="2124d3" />
+                            <entry key="outputName" value="ic_directions_run_black_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\akesv" />
                           </map>

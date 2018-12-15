@@ -14,7 +14,7 @@ public class UserActivityRepository {
     private LiveData<List<UserActivityEntity>> allUserActivities;
 
     public UserActivityRepository(Application application) {
-        UserActivityDatabase db = UserActivityDatabase.getDatabase(application);
+        Database db = Database.getDatabase(application);
         mUserActivityDao = db.userActivityDao();
         allUserActivities = mUserActivityDao.getAllActivities();
     }

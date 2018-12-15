@@ -59,10 +59,10 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         String formatted = formatter.format(date);
         holder.dateView.setText(current.getDate());
-        holder.timeView.setText(formatter);
+        holder.timeView.setText(formatted);
         holder.distanceView.setText("" + current.getDistance() + " m");
         holder.speedView.setText("" + current.getSpeed() + " m/s");
-        holder.caloriesView.setText("" + current.getDistance() + " m");
+        holder.caloriesView.setText("" + current.getCalories() + " calories burned");
     }
 
     void setActivities(List<UserActivityEntity> activities) {

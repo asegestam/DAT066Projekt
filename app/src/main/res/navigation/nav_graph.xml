@@ -77,4 +77,9 @@
             android:id="@+id/action_settingsFragment_to_map_fragment"
             app:destination="@id/map_fragment" />
     </fragment>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="dat066.dat066_projekt.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
 </navigation>
