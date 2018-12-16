@@ -36,7 +36,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
@@ -122,17 +121,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume: register receiver");
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
     }
 
     @Override
     protected void onPause() {
+        Log.i(TAG, "onPause: unregister receiver");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "onStop: " + "mbound " + mBound + " activitystop " + activityStopped);
+        Log.d(TAG, "onStop: mainactiv  ");
         if (mBound) {
             // Unbind from the service. This signals to the service that this activity is no longer
             // in the foreground, and the service can respond by promoting itself to a foreground
@@ -145,9 +147,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         locationService.removeLocationUpdates();
-        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        super.onDestroy();
     }
 
     private boolean checkPermissions() {
@@ -234,18 +236,10 @@ public class MainActivity extends AppCompatActivity
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "onReceive: receiving");
             Location location = intent.getParcelableExtra(LocationUpdatesService.CURRENT_LOCATION);
+            Log.i(TAG, "onReceive: receiving singe location");
             if (location != null) {
-                if(serviceIsRunningInForeground(getApplicationContext())) {
-                    //om appen är minimerad men får plats uppdateringar
-                    batchedLocations.add(location); // samla ihop alla positioner i en lista
-                    locationViewModel.getListOfLocations().setValue(batchedLocations);
-                    Log.i(TAG, "onReceive: service is in forground, adding to list");
-                } else {
-                    // om appen inte är minimerad och får uppdateringar uppdatera platsen direkt
-                    locationViewModel.getLocation().setValue(location);
-                }
+                locationViewModel.getLocation().setValue(location);
             }
         }
     }

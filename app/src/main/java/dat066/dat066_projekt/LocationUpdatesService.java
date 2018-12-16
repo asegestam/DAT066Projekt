@@ -22,13 +22,15 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class LocationUpdatesService extends Service {
@@ -42,12 +44,13 @@ public class LocationUpdatesService extends Service {
     static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
 
     static final String CURRENT_LOCATION = PACKAGE_NAME + ".location";
+    static final String LOCATIONS = PACKAGE_NAME + ".locations";
     static final String LAST_LOCATION = PACKAGE_NAME + ".lastLocation";
     private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
             ".started_from_notification";
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 10;
+            UPDATE_INTERVAL_IN_MILLISECONDS /5;
     private final IBinder mBinder = new LocalBinder();
     private static final int NOTIFICATION_ID = 12345678;
     private NotificationManager mNotificationManager;
@@ -55,8 +58,8 @@ public class LocationUpdatesService extends Service {
     private LocationRequest mLocationRequest;
     private LocationCallback mLocationCallback;
     private Handler mServiceHandler;
-    private SpeedDistanceCalculator speedDistanceCalculator;
     private Location lastLocation = null;
+    private ArrayList<Location> listOfLocations;
 
     /**
      * The current location.
@@ -69,19 +72,24 @@ public class LocationUpdatesService extends Service {
     @Override
     public void onCreate() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        speedDistanceCalculator = SpeedDistanceCalculator.getInstance();
+        listOfLocations = new ArrayList<>();
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 Location location = locationResult.getLastLocation();
-                Log.i(TAG, "onLocationResult: " + location.getLatitude() + " " + location.getLongitude());
-                broadCastLocation(location);
+                if(serviceIsRunningInForeground(getApplicationContext())) {
+                    Log.i(TAG, "onLocationResult: adding locaiton to list " + location.getLatitude() + " " + location.getLongitude());
+                    listOfLocations.add(location);
+                }else {
+                    Log.i(TAG, "onLocationResult: " + location.getLatitude() + " " + location.getLongitude());
+                    broadCastLocation(location);
+                }
+
             }
         };
 
         createLocationRequest();
         getLastLocation();
-        broadCastLocation(mLocation);
 
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
@@ -104,9 +112,10 @@ public class LocationUpdatesService extends Service {
         mLocation = location;
         Intent intent = new Intent(ACTION_BROADCAST);
         intent.putExtra(CURRENT_LOCATION, location);
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        Log.i(TAG, "broadCastLocation: broadcasting " + latLng );
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -125,13 +134,26 @@ public class LocationUpdatesService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        // Called when MainActivity comes to the foreground
         stopForeground(true);
+        if(listOfLocations != null) {
+            for(Location location : listOfLocations) {
+                broadCastLocation(location);
+            }
+            listOfLocations.clear();
+        }
         return mBinder;
     }
 
     @Override
     public void onRebind(Intent intent) {
         stopForeground(true);
+        if(listOfLocations != null) {
+            for(Location location : listOfLocations) {
+                broadCastLocation(location);
+            }
+            listOfLocations.clear();
+        }
         super.onRebind(intent);
     }
 

@@ -123,10 +123,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onChanged(ArrayList<Location> locations) {
                 if (!locations.isEmpty()) {
-                    lastLocation = locations.get(locations.size() - 1);
+                    lastLocation = locations.get(0);
                     ArrayList<LatLng> latLngs = new ArrayList<>();
                     for (Location location : locations) {
-                        speedDistanceCalculator.handleLocationChange(location, lastLocation);
+                       speedDistanceCalculator.handleLocationChange(location, lastLocation);
                         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                         if (!userMovement.contains(latLng)) {
                             latLngs.add(latLng);
@@ -135,6 +135,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                     Log.i(TAG, "onChanged: list of locaitons size " + latLngs.size());
                     userMovement.addAll(latLngs);
+                    lastLocation = null;
+                    currentLocation = null;
+                    latLngs.clear();
                 }
             }
         });
