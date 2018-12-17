@@ -16,6 +16,7 @@ public class SpeedDistanceCalculator {
     private static SpeedDistanceCalculator INSTANCE = null;
     private double distanceInMetres;
     private double speed;
+    private double highestSpeed = 0;
     private ArrayList<Double> avgSpeedArray = new ArrayList<>();
     private double averageSpeed;
     private Location firstRecordedLocation = null;
@@ -45,6 +46,9 @@ public class SpeedDistanceCalculator {
         Log.i(TAG, "Distans " + distanceInMetres  + " m");
         if(timeBetween > 0) { // to avoid dividing by 0
             speed = distance/timeBetween;
+            if(speed > highestSpeed) {
+                highestSpeed = speed;
+            }
         }
     }
 
@@ -57,7 +61,8 @@ public class SpeedDistanceCalculator {
     }
 
     private double calcAveragePace() {
-        return 60/calcAverageSpeed();
+        if(calcAverageSpeed() <= 0) return 0;
+        else return 60/calcAverageSpeed();
     }
 
     /** Resets values, used when wanting to reset the recorded speed and distance */
@@ -90,5 +95,9 @@ public class SpeedDistanceCalculator {
     }
     public double getAveragePace() {
         return calcAveragePace();
+    }
+
+    public double getHighestSpeed() {
+        return highestSpeed;
     }
 }

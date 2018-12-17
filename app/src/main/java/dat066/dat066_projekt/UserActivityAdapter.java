@@ -22,6 +22,7 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
         private final TextView dateView;
         private final TextView timeView;
         private final TextView distanceView;
+        private final TextView paceView;
         private final TextView speedView;
         private final TextView caloriesView;
 
@@ -31,7 +32,8 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
             dateView = itemView.findViewById(R.id.txtDate);
             timeView = itemView.findViewById(R.id.txtTime);
             distanceView = itemView.findViewById(R.id.txtDistance);
-            speedView = itemView.findViewById(R.id.txtSpeed);
+            paceView = itemView.findViewById(R.id.txtPace);
+            speedView = itemView.findViewById(R.id.txtTopSpeed);
             caloriesView = itemView.findViewById(R.id.txtCalories);
         }
     }
@@ -60,8 +62,13 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
         String formatted = formatter.format(date);
         holder.dateView.setText(current.getDate());
         holder.timeView.setText(formatted);
-        holder.distanceView.setText("" + current.getDistance() + " m");
-        holder.speedView.setText("" + current.getSpeed() + " m/s");
+        if(current.getDistance() > 1000 ) {
+            holder.distanceView.setText("Distance " + current.getDistance()/1000 + " km");
+        }else {
+            holder.distanceView.setText("Distance " + current.getDistance() + " m");
+        }
+        holder.paceView.setText("Pace " + current.getPace() + " min/km");
+        holder.speedView.setText("Top Speed " + current.getSpeed() + " m/s");
         holder.caloriesView.setText("" + current.getCalories() + " calories burned");
     }
 

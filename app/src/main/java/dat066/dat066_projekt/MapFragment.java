@@ -205,7 +205,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
         double distance = speedDistanceCalculator.getDistanceInMetres();
-        if(distance < 1000) {
+        if(distance > 1000) {
             distance = distance/1000;
             TextView distanceM = view.findViewById(R.id.distanceM);
             TextView distanceKm = view.findViewById(R.id.distanceKm);
@@ -263,6 +263,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.clear(); // clears the map of all polylines and markers
         resetValues(); //resets all previous activity values to start recording a new one
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
+        followerModeEnabled = true;
         startTimer();
     }
 
@@ -307,9 +308,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             for(double i=0; i<10; i++) {
                 test.add(i);
             }
-            LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
-            UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime.toString(), speedDistanceCalculator.getSpeed()
-                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime, test);
+            UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime,
+                    speedDistanceCalculator.getHighestSpeed(),
+                    speedDistanceCalculator.getAveragePace(),
+                    calories,
+                    speedDistanceCalculator.getDistanceInMetres(),
+                    elapsedActivityTime,
+                    test);
             ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
             Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
         }

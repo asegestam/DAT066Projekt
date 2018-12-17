@@ -21,6 +21,9 @@ public class UserActivityEntity {
     @ColumnInfo(name = "speed")
     private double speed;
     @NonNull
+    @ColumnInfo(name = "pace")
+    private double pace;
+    @NonNull
     @ColumnInfo(name = "calories")
     private double calories;
     @NonNull
@@ -34,10 +37,11 @@ public class UserActivityEntity {
     private ArrayList<Double> elevation;
 
 
-    public UserActivityEntity(int id, String date, double speed, double calories, double distance, long time, ArrayList<Double> elevation) {
+    public UserActivityEntity(int id, String date, double speed, double pace, double calories, double distance, long time, ArrayList<Double> elevation) {
         this.id = id;
         this.date = date;
         this.speed = speed;
+        this.pace = pace;
         this.calories = calories;
         this.distance = distance;
         this.time = time;
@@ -59,6 +63,10 @@ public class UserActivityEntity {
         return Math.round(speed*100.0)/100.0;
     }
 
+    @NonNull
+    public double getPace() {
+        return Math.round(pace);
+    }
     @NonNull
     public double getCalories() {
         return ((int) calories);
