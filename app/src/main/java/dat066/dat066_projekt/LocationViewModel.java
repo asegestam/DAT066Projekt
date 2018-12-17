@@ -17,6 +17,7 @@ public class LocationViewModel extends AndroidViewModel {
     private MutableLiveData<Location> lastLocationLiveData = new MutableLiveData<>();
     private MutableLiveData<Location> firstLocation = new MutableLiveData<>();
     private MutableLiveData<ArrayList<Location>> listOfLocations = new MutableLiveData<>();
+    private MutableLiveData<Location> lastKnownLocation = new MutableLiveData<>();
 
 
 
@@ -48,5 +49,12 @@ public class LocationViewModel extends AndroidViewModel {
 
     public MutableLiveData<ArrayList<Location>> getListOfLocations() {
         return listOfLocations;
+    }
+
+    public MutableLiveData<Location> getLastKnownLocation() {
+        if (lastKnownLocation == null) {
+            lastKnownLocation = new MutableLiveData<Location>();
+        }
+        return lastKnownLocation;
     }
 }

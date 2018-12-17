@@ -44,8 +44,7 @@ public class LocationUpdatesService extends Service {
     static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
 
     static final String CURRENT_LOCATION = PACKAGE_NAME + ".location";
-    static final String LOCATIONS = PACKAGE_NAME + ".locations";
-    static final String LAST_LOCATION = PACKAGE_NAME + ".lastLocation";
+    static final String LAST_KNOWN_LOCATION = PACKAGE_NAME + ".lastknownlocation";
     private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
             ".started_from_notification";
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
@@ -60,6 +59,7 @@ public class LocationUpdatesService extends Service {
     private Handler mServiceHandler;
     private Location lastLocation = null;
     private ArrayList<Location> listOfLocations;
+    private Location lastKnownLocation;
 
     /**
      * The current location.
@@ -89,8 +89,6 @@ public class LocationUpdatesService extends Service {
         };
 
         createLocationRequest();
-        getLastLocation();
-
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         mServiceHandler = new Handler(handlerThread.getLooper());
@@ -116,6 +114,17 @@ public class LocationUpdatesService extends Service {
         Log.i(TAG, "broadCastLocation: broadcasting " + latLng );
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
+
+
+    private void broadCastLastKnownLocation(Location location) {
+        mLocation = location;
+        Intent intent = new Intent(ACTION_BROADCAST);
+        intent.putExtra(LAST_KNOWN_LOCATION, location);
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        Log.i(TAG, "broadCastLocation: broadcasting " + latLng );
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -207,11 +216,9 @@ public class LocationUpdatesService extends Service {
                 new Intent(this, MainActivity.class), 0);
 
         NotificationCompat.Action cancelAction = new NotificationCompat.Action.Builder(R.drawable.ic_cancel, getString(R.string.remove_location_updates), servicePendingIntent).build();
-        NotificationCompat.Action launchAction = new NotificationCompat.Action.Builder(R.drawable.ic_launch, getString(R.string.launch_activity), activityPendingIntent).build();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID )
                 .addAction(cancelAction)
-                .addAction(launchAction)
                 .setContentTitle("TrainR")
                 .setContentText("TrainR is running in the background")
                 .setSmallIcon(R.drawable.ic_directions_run_black_24dp)
@@ -237,7 +244,8 @@ public class LocationUpdatesService extends Service {
                         @Override
                         public void onComplete(@NonNull Task<Location> task) {
                             if (task.isSuccessful() && task.getResult() != null) {
-                                mLocation = task.getResult();
+                                lastKnownLocation = task.getResult();
+                                broadCastLastKnownLocation(lastKnownLocation);
                             } else {
                                 Log.w(TAG, "Failed to get location.");
                             }

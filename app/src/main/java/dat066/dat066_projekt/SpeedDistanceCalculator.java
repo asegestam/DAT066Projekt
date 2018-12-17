@@ -4,6 +4,7 @@ import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
@@ -13,7 +14,7 @@ import static android.content.ContentValues.TAG;
 public class SpeedDistanceCalculator {
 
     private static SpeedDistanceCalculator INSTANCE = null;
-    private static double distanceInMetres;
+    private double distanceInMetres;
     private double speed;
     private ArrayList<Double> avgSpeedArray = new ArrayList<>();
     private double averageSpeed;
@@ -51,8 +52,12 @@ public class SpeedDistanceCalculator {
     private double calcAverageSpeed() {
         long time = (lastRecordedLocation.getTime() - firstRecordedLocation.getTime())/1000;
         double avgspeed = (firstRecordedLocation.distanceTo(lastRecordedLocation))/time;
-        Log.d(TAG, "calcAverageSpeed: medelhastighet " + avgspeed + " m/s");
-        return avgspeed;
+        Log.d(TAG, "calcAverageSpeed: medelhastighet " + avgspeed*3.6 + " km/h");
+        return avgspeed*3.6;
+    }
+
+    private double calcAveragePace() {
+        return 60/calcAverageSpeed();
     }
 
     /** Resets values, used when wanting to reset the recorded speed and distance */
@@ -68,7 +73,7 @@ public class SpeedDistanceCalculator {
             e.printStackTrace();
         }
     }
-    public static double getDistanceInMetres() {
+    public double getDistanceInMetres() {
         return distanceInMetres;
     }
 
@@ -82,5 +87,8 @@ public class SpeedDistanceCalculator {
 
     public double getAverageSpeed() {
         return calcAverageSpeed();
+    }
+    public double getAveragePace() {
+        return calcAveragePace();
     }
 }

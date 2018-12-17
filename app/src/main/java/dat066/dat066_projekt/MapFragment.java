@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.location.Location;
 import android.os.Bundle;
@@ -141,6 +140,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+
+        locationViewModel.getLastKnownLocation().observe(this, new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                moveCamera(latLng);
+            }
+        });
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -176,6 +183,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.i(TAG, "onMapReady: map rdy");
         ((MainActivity) getActivity()).changeActivityText();
         this.mMap = googleMap;
 
@@ -186,10 +194,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setPadding(0, 0, 0, 0);
         mMap.setOnMapClickListener(onMapClickListener);
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);
-        if(currentLocation !=null){
-            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            moveCamera(latLng);
-        }
     }
 
     private boolean checkPermissions() {
@@ -200,8 +204,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void updateTextViews() {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
-        distanceText.setText(numberFormat.format(speedDistanceCalculator.getDistanceInMetres()) + " m");
-        speedText.setText(numberFormat.format(speedDistanceCalculator.getAverageSpeed()) + " m/s");
+        double distance = speedDistanceCalculator.getDistanceInMetres();
+        if(distance < 1000) {
+            distance = distance/1000;
+            TextView distanceM = view.findViewById(R.id.distanceM);
+            TextView distanceKm = view.findViewById(R.id.distanceKm);
+            distanceM.setVisibility(View.GONE);
+            distanceKm.setVisibility(View.VISIBLE);
+        }
+        distanceText.setText(numberFormat.format(distance));
+        speedText.setText(numberFormat.format(speedDistanceCalculator.getAveragePace()));
     }
 
     private void updateCamera(LatLng latLng) {
@@ -233,7 +245,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             route.setPoints(userMovement);
         }
         else {
-            route = mMap.addPolyline(new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(userMovement));
+            route = mMap.addPolyline(new PolylineOptions().width(15).color(getActivity().getColor(R.color.colorAccent)).geodesic(true).addAll(userMovement));
         }
 
     }
@@ -279,6 +291,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         activityPaused = false;
         addResumeMarkers();
+        followerModeEnabled = true;
         startTimer();
     }
 
@@ -324,7 +337,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     position(latLng).
                     title("Activity unpaused here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_grey_pin)));
             //saveUserMovement(userMovement);
-            Polyline polyline = mMap.addPolyline(new PolylineOptions().width(15).color(Color.BLUE).geodesic(true).addAll(userMovement));
+            Polyline polyline = mMap.addPolyline(new PolylineOptions().width(15).color(getActivity().getColor(R.color.colorAccent)).geodesic(true).addAll(userMovement));
             userMovement.clear();
             userMovement.add(latLng);
             lastLocation = null;
@@ -353,7 +366,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //textview
         view.findViewById(R.id.distanceText).setVisibility(View.GONE);
         view.findViewById(R.id.speedText).setVisibility(View.GONE);
-        view.findViewById(R.id.distanceWord).setVisibility(View.GONE);
+        view.findViewById(R.id.distanceM).setVisibility(View.GONE);
         view.findViewById(R.id.speedWord).setVisibility(View.GONE);
         view.findViewById(R.id.rectangle).setVisibility(View.GONE);
         view.findViewById(R.id.timeChronometer).setVisibility(View.GONE);
@@ -365,7 +378,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         view.findViewById(R.id.distanceText).setVisibility(View.VISIBLE);
         view.findViewById(R.id.speedText).setVisibility(View.VISIBLE);
-        view.findViewById(R.id.distanceWord).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.distanceM).setVisibility(View.VISIBLE);
         view.findViewById(R.id.speedWord).setVisibility(View.VISIBLE);
         view.findViewById(R.id.rectangle).setVisibility(View.VISIBLE);
         view.findViewById(R.id.timeChronometer).setVisibility(View.VISIBLE);
@@ -492,10 +505,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         Log.d(TAG, "onResume: mapfrag");
         super.onResume();
-        if(currentLocation !=null){
-            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            moveCamera(latLng);
-        }
+        ((MainActivity)getActivity()).getLastKnownLocation();
        // initSavedUI();
 
     }

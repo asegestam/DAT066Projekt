@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private LocationReceiver myReceiver;
     private SharedPreferences mPrefs;
     private ArrayList<Location> batchedLocations;
+    private Location location;
     // Monitors the state of the connection to the service.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocationUpdatesService.LocalBinder binder = (LocationUpdatesService.LocalBinder) service;
             locationService = binder.getService();
+            getLastKnownLocation();
             mBound = true;
         }
 
@@ -236,10 +238,15 @@ public class MainActivity extends AppCompatActivity
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Location location = intent.getParcelableExtra(LocationUpdatesService.CURRENT_LOCATION);
-            Log.i(TAG, "onReceive: receiving singe location");
-            if (location != null) {
-                locationViewModel.getLocation().setValue(location);
+            if(intent.hasExtra(LocationUpdatesService.CURRENT_LOCATION)) {
+                location = intent.getParcelableExtra(LocationUpdatesService.CURRENT_LOCATION);
+                if (location != null) {
+                    locationViewModel.getLocation().setValue(location);
+                }
+            } else {
+                Log.i(TAG, "onReceive: receiving lastknown location");
+                location = intent.getParcelableExtra(LocationUpdatesService.LAST_KNOWN_LOCATION);
+                locationViewModel.getLastKnownLocation().setValue(location);
             }
         }
     }
@@ -281,7 +288,7 @@ public class MainActivity extends AppCompatActivity
     public void changeActivityText(){
         if(getType() != null) {
             Button button = (Button) findViewById(R.id.activity_button);
-            button.setText("Type of Activity (" + getType() + ")");
+            button.setText("Type of Activity - " + getType());
         }
     }
 
@@ -313,6 +320,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
         return false;
+    }
+    /* Returns the last known location and any observers get notified, in this case MapFragment will observe and move camera*/
+    public void getLastKnownLocation() {
+        if(locationService != null) locationService.getLastLocation();
     }
 
 }
