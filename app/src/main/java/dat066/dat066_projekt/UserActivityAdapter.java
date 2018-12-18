@@ -19,14 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.GraphViewXML;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
 
 import androidx.annotation.DrawableRes;
 import androidx.fragment.app.Fragment;
@@ -36,14 +34,23 @@ import dat066.dat066_projekt.database.UserActivityEntity;
 
 public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapter.UserActivityViewHolder> {
 
-    private int id;
+    class UserActivityViewHolder extends RecyclerView.ViewHolder {
+        private final TextView dateView;
+        private final TextView timeView;
+        private final TextView distanceView;
+        private final TextView paceView;
+        private final TextView speedView;
+        private final TextView caloriesView;
 
-    public static class UserActivityViewHolder extends RecyclerView.ViewHolder {
-        private final TextView activityItemView;
 
         private UserActivityViewHolder(View itemView) {
             super(itemView);
-            activityItemView = itemView.findViewById(R.id.textView);
+            dateView = itemView.findViewById(R.id.txtDate);
+            timeView = itemView.findViewById(R.id.txtTime);
+            distanceView = itemView.findViewById(R.id.txtDistance);
+            paceView = itemView.findViewById(R.id.txtPace);
+            speedView = itemView.findViewById(R.id.txtTopSpeed);
+            caloriesView = itemView.findViewById(R.id.txtCalories);
         }
     }
 
@@ -63,11 +70,24 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
     @Override
     public void onBindViewHolder(final UserActivityViewHolder holder, final int position) {
         UserActivityEntity current = mActivities.get(position);
-        id = current.getDate().hashCode();
-        holder.activityItemView.setId(current.getDate().hashCode());
-        System.out.println("onBindViewHolder ID: "+current.getDate().hashCode());
-        holder.activityItemView.setText(current.getDate() + "\n" + current.getDistance() + " m\n" + current.getSpeed() + " m/s\n" + current.getTime() + " s");
-        holder.activityItemView.setOnClickListener(new View.OnClickListener() {
+        holder.dateView.setId(current.getDate().hashCode());
+        ArrayList<Double> elevationArray = current.getElevation();
+        double sum = elevationArray.size();
+        Date date = new Date(current.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String formatted = formatter.format(date);
+        holder.dateView.setText(current.getDate());
+        holder.timeView.setText(formatted);
+        if(current.getDistance() > 1000 ) {
+            holder.distanceView.setText("Distance " + current.getDistance()/1000 + " km");
+        }else {
+            holder.distanceView.setText("Distance " + current.getDistance() + " m");
+        }
+        holder.paceView.setText("Pace " + current.getPace() + " min/km");
+        holder.speedView.setText("Top Speed " + current.getSpeed() + " m/s");
+        holder.caloriesView.setText("" + current.getCalories() + " calories burned");
+        holder.dateView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 System.out.println("View ID: " + v.getId());
@@ -75,13 +95,7 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
                 System.out.println("Entity ID: " + entity.getListId());
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("array", entity.getElevationArray());
-                //v = setPlotData(entity.getElevationArray(), v);
                 Navigation.findNavController(v).navigate(R.id.action_useractivity_fragment_to_stats_fragment, bundle);
-                /*PopupWindow popupWindow = new PopupWindow(v, 750, 1250,true);
-                popupWindow.setBackgroundDrawable(new ColorDrawable(Color.CYAN));
-                v.setBackgroundColor(Color.WHITE);
-                popupWindow.setAnimationStyle(R.style.AnimationPopup);
-                popupWindow.showAtLocation(holder.activityItemView, Gravity.CENTER,0,0);*/
             }
         });
     }
@@ -95,5 +109,3 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
         return mActivities.size();
     }
 }
-
-

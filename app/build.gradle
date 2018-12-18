@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "dat066.dat066_projekt"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -45,8 +45,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-database:16.0.5'
-    /*implementation 'com.google.firebase:firebase-auth:16.1.0'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'*/
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     //CircleImages
     implementation 'de.hdodenhof:circleimageview:2.2.0'
@@ -68,8 +66,10 @@ dependencies {
     implementation "androidx.room:room-coroutines:$room_version"
 
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
+    implementation 'com.google.code.gson:gson:2.8.2'
     // Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
 }

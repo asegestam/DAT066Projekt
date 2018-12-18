@@ -3,24 +3,22 @@ package dat066.dat066_projekt.database;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
-import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {UserActivityEntity.class}, version = 10)
-@TypeConverters({Converters.class})
-public abstract class UserActivityDatabase extends RoomDatabase {
+@androidx.room.Database(entities = {UserActivityEntity.class}, version = 3)
+public abstract class Database extends RoomDatabase {
 
-    private static volatile UserActivityDatabase INSTANCE;
+    private static volatile Database INSTANCE;
 
-    public static UserActivityDatabase getDatabase(final Context context) {
+    public static Database getDatabase(final Context context) {
         if(INSTANCE == null) {
-            synchronized (UserActivityDatabase.class) {
+            synchronized (Database.class) {
                 if(INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            UserActivityDatabase.class, "user_activity_database")
+                            Database.class, "user_activity_database")
                             .fallbackToDestructiveMigration()
                             .addCallback(sRoomDatabaseCallback)
                             .allowMainThreadQueries()

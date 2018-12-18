@@ -12,16 +12,32 @@
         tools:layout="@layout/fragment_map">
         <action
             android:id="@+id/action_mapFragment_to_profileFragment"
-            app:destination="@id/profile_fragment" />
+            app:destination="@id/profile_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_mapFragment_to_userActivityList"
-            app:destination="@id/useractivity_fragment" />
+            app:destination="@id/useractivity_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_map_fragment_to_goalsFragment"
-            app:destination="@id/goals_fragment" />
+            app:destination="@id/goals_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_map_fragment_to_settingsFragment"
-            app:destination="@id/settings_fragment" />
+            app:destination="@id/settings_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/profile_fragment"
@@ -31,6 +47,10 @@
         <action
             android:id="@+id/action_profileFragment_to_mapFragment"
             app:destination="@id/map_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/map_fragment" />
         <argument
             android:name="title_profile"
@@ -66,7 +86,11 @@
         tools:layout="@layout/fragment_goals">
         <action
             android:id="@+id/action_goalsFragment_to_map_fragment"
-            app:destination="@id/map_fragment" />
+            app:destination="@id/map_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/settings_fragment"
@@ -75,6 +99,15 @@
         tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_settingsFragment_to_map_fragment"
-            app:destination="@id/map_fragment" />
+            app:destination="@id/map_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="dat066.dat066_projekt.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
 </navigation>

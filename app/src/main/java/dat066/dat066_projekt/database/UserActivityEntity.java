@@ -1,11 +1,6 @@
 package dat066.dat066_projekt.database;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import java.sql.Blob;
 import java.util.ArrayList;
-
-import javax.annotation.Nonnull;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -26,6 +21,9 @@ public class UserActivityEntity {
     @ColumnInfo(name = "speed")
     private double speed;
     @NonNull
+    @ColumnInfo(name = "pace")
+    private double pace;
+    @NonNull
     @ColumnInfo(name = "calories")
     private double calories;
     @NonNull
@@ -42,10 +40,11 @@ public class UserActivityEntity {
     private int listId;
 
 
-    public UserActivityEntity(int id, String date, double speed, double calories, double distance, long time, ArrayList elevationArray) {
+    public UserActivityEntity(int id, String date, double speed, double pace, double calories, double distance, long time, ArrayList elevationArray) {
         this.id = id;
         this.date = date;
         this.speed = speed;
+        this.pace = pace;
         this.calories = calories;
         this.distance = distance;
         this.time = time;
@@ -65,17 +64,21 @@ public class UserActivityEntity {
 
     @NonNull
     public double getSpeed() {
-        return speed;
+        return Math.round(speed*100.0)/100.0;
     }
 
     @NonNull
+    public double getPace() {
+        return Math.round(pace);
+    }
+    @NonNull
     public double getCalories() {
-        return calories;
+        return ((int) calories);
     }
 
     @NonNull
     public double getDistance() {
-        return distance;
+        return Math.round(distance);
     }
 
     @NonNull
