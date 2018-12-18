@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -69,13 +70,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     boolean activityPaused;
     boolean followerModeEnabled;
     Snackbar saveSnackbar;
-    ArrayList<LatLng> userMovement;
     ArrayList<ArrayList<LatLng>> listOfUserMovement;
     Polyline route;
     Polyline savedPolyline;
     double calories;
     private UserActivityViewModel activityViewModel;
     private ArrayList<LatLng> userMovement = new ArrayList<>();
+    private ArrayList speedArray = new ArrayList<>();
     TextView distanceText;
     TextView speedText;
     private LocationViewModel locationViewModel;
@@ -121,7 +122,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         reDrawRoute();
                         updateCamera(latLng);
                         speedDistanceCalculator.handleLocationChange(location, lastLocation);
+                        speedArray.add(speedDistanceCalculator.getSpeed());
                         updateTextViews();
+                        elevationUpdater.setLocation(currentLocation);
                         lastLocation = location;
                     }
                 }
@@ -166,7 +169,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void initGlobalVariables() {
-        graph = (GraphView) view.findViewById(R.id.graph);
         speedDistanceCalculator = SpeedDistanceCalculator.getInstance();
         followerModeEnabled = true;
        //saveSnackbar = Snackbar.make(view.findViewById(R.id.myCoordinatorLayout), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
@@ -327,8 +329,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "stopActivity: KALORIER " + calories);
         if(firstLocation != null) {
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
-            UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime, speedDistanceCalculator.getHighestSpeed(), speedDistanceCalculator.getPace(),
-                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000, elevationUpdater.getElevationArray());
+            UserActivityEntity userActivityEntity = new UserActivityEntity(0,
+                    currentTime,
+                    speedDistanceCalculator.getHighestSpeed(),
+                    speedDistanceCalculator.getAveragePace(),
+                    calories,
+                    speedDistanceCalculator.getDistanceInMetres(),
+                    elapsedActivityTime,
+                    speedArray,
+                    elevationUpdater.getElevationArray());
             ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
             Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
         }

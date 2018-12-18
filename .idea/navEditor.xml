@@ -34,25 +34,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="mainActivity">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="-1345" />
-                            <option name="y" value="287" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="map_fragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1055" />
-                            <option name="y" value="277" />
+                            <option name="x" value="-735" />
+                            <option name="y" value="273" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -73,11 +61,6 @@
                               </value>
                             </entry>
                             <entry key="action_map_fragment_to_settingsFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_map_fragment_to_statsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -140,7 +123,7 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_statsFragment_to_map_fragment">
+                            <entry key="action_stats_fragment_to_useractivity_fragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -162,6 +145,11 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_userActivityList_to_mapFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_useractivity_fragment_to_stats_fragment">
                               <value>
                                 <LayoutPositions />
                               </value>

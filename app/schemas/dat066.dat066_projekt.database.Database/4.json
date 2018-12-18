@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 3,
-    "identityHash": "30ea05cb4e56f6b4ce26a45d9433246b",
+    "version": 4,
+    "identityHash": "ed7804c843abb4c87e0f0289dc12b241",
     "entities": [
       {
         "tableName": "user_activity_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `speed` REAL NOT NULL, `pace` REAL NOT NULL, `calories` REAL NOT NULL, `distance` REAL NOT NULL, `time` INTEGER NOT NULL, `elevation` TEXT NOT NULL, `ListId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT NOT NULL, `speed` REAL NOT NULL, `pace` REAL NOT NULL, `calories` REAL NOT NULL, `distance` REAL NOT NULL, `time` INTEGER NOT NULL, `elevation` TEXT NOT NULL, `speedArray` TEXT NOT NULL, `ListId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -57,6 +57,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "speedArray",
+            "columnName": "speedArray",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "listId",
             "columnName": "ListId",
             "affinity": "INTEGER",
@@ -76,7 +82,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"30ea05cb4e56f6b4ce26a45d9433246b\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"ed7804c843abb4c87e0f0289dc12b241\")"
     ]
   }
 }

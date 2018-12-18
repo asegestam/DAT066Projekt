@@ -37,44 +37,63 @@ public class StatsFragment extends Fragment  {
 
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_stats, container, false);
-        ArrayList elevation = this.getArguments().getParcelableArrayList("array");
-        Log.d(TAG,"array in stats: "+elevation.size());
-        setPlotData(elevation);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        GraphView elevationGraph = (GraphView) view.findViewById(R.id.elevation_graph);
+        elevationGraph.setTitle("Elevation");
+        GraphView speedGraph = (GraphView) view.findViewById(R.id.speed_graph);
+        speedGraph.setTitle("Speed");
+        setPlotData(this.getArguments().getParcelableArrayList("elevationArray"),elevationGraph);
+        setPlotData(this.getArguments().getParcelableArrayList("speedArray"),speedGraph);
+        return view;
     }
-    private void setPlotData(ArrayList array){
 
-        GraphView graph = (GraphView) view.findViewById(R.id.graph);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void setPlotData(ArrayList array, GraphView graph){
+
         DataPoint[] dataPoints = new DataPoint[array.size()];
         for (int i = 0; i < array.size(); i++) {
-            dataPoints[i] = new DataPoint(i, (double) array.get(i));
+            dataPoints[i] = new DataPoint(i*5, (double) array.get(i));
         }
 
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
+        final LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
+        final double maxX = series.getHighestValueX();
+        final GraphView graphView = graph;
+        final double minX = series.getLowestValueX();
+        final double maxY = series.getHighestValueY();
+        final double minY = series.getLowestValueY();
         series.setColor(Color.BLACK);
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
         series.setThickness(8);
-        graph.getViewport().setScrollable(true);
-        graph.getViewport().setMaxX(60);
-        /*graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(15);
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(0);
-        graph.getViewport().set;
-        graph.getViewport().setScalable(true);
-        graph.getViewport().setScalableY(true);*/
-        graph.removeAllSeries();
-        graph.addSeries(series);
+        series.setDrawAsPath(true);
+        series.setAnimated(true);
+        graph.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                graphView.getViewport().setMinY(minY);
+                graphView.getViewport().setMaxY(maxY);
+                graphView.getViewport().setMinX(minX);
+                graphView.getViewport().setMaxX(maxX);
+                return false;
+
+            }
+        });
+        graphView.getViewport().setScrollable(true);
+        graphView.getViewport().setYAxisBoundsManual(true);
+        graphView.getViewport().setMinY(minY);
+        graphView.getViewport().setMaxY(maxY);
+        graphView.getViewport().setXAxisBoundsManual(true);
+        graphView.getViewport().setMinX(minX);
+        graphView.getViewport().setMaxX(maxX);
+        graphView.getViewport().setScalable(true);
+        graphView.getViewport().setScalableY(true);
+        graphView.addSeries(series);
     }
 }

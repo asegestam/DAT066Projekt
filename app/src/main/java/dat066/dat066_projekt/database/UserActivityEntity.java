@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 @Entity(tableName = "user_activity_table")
+@TypeConverters(Converters.class)
 public class UserActivityEntity {
     @PrimaryKey(autoGenerate = true)
     @NonNull
@@ -36,11 +37,14 @@ public class UserActivityEntity {
     @ColumnInfo(name = "elevation")
     private ArrayList elevationArray;
     @NonNull
+    @ColumnInfo(name = "speedArray")
+    private ArrayList speedArray;
+    @NonNull
     @ColumnInfo(name = "ListId")
     private int listId;
 
 
-    public UserActivityEntity(int id, String date, double speed, double pace, double calories, double distance, long time, ArrayList elevationArray) {
+    public UserActivityEntity(int id, String date, double speed, double pace, double calories, double distance, long time,ArrayList speedArray, ArrayList elevationArray) {
         this.id = id;
         this.date = date;
         this.speed = speed;
@@ -49,6 +53,7 @@ public class UserActivityEntity {
         this.distance = distance;
         this.time = time;
         this.elevationArray = elevationArray;
+        this.speedArray = speedArray;
         this.listId = date.hashCode();
     }
 
@@ -88,6 +93,9 @@ public class UserActivityEntity {
 
     @NonNull
     public ArrayList getElevationArray(){ return elevationArray; }
+
+    @NonNull
+    public ArrayList getSpeedArray(){ return speedArray; }
 
     @NonNull
     public int getListId(){ return listId; }
