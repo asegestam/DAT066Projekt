@@ -273,14 +273,19 @@ public class MainActivity extends AppCompatActivity
                 type = item.getTitle().toString();
                 item.setChecked(true);
                 changeActivityText();
-
                 break;
+
             case R.id.bike:
                 type = item.getTitle().toString();
                 item.setChecked(true);
                 changeActivityText();
                 break;
 
+            case R.id.walking:
+                type = item.getTitle().toString();
+                item.setChecked(true);
+                changeActivityText();
+                break;
         }
         return true;
     }
