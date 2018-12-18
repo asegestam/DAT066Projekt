@@ -21,11 +21,14 @@ public class UserActivityViewModel extends AndroidViewModel {
         super(application);
         mRepository = new UserActivityRepository(application);
         mAllUserActivites = mRepository.getAllUserActivities();
+
     }
 
     public LiveData<List<UserActivityEntity>> getAllUserActivites() {
         return mAllUserActivites;
     }
+
+    public UserActivityEntity getActivity(int ID) { return mRepository.getActivity(ID);}
 
     public void insertActivity(UserActivityEntity userActivity) { mRepository.insertActivity(userActivity); }
 

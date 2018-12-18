@@ -1,23 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/stats_fragment"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".StatsFragment">
-
-<ListView
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-</ListView>
-    <com.jjoe64.graphview.GraphView
-        android:id="@+id/graph"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/elevation_card_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:seriesType="line"
-        android:title="Elevation"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:cardBackgroundColor="@color/colorAccent"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="15dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false">
 
-</RelativeLayout>
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/elevation_graph"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:title="Elevation"
+            app:seriesColor="#00cc00"
+            app:seriesType="line" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/speed_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:cardBackgroundColor="@color/colorAccent"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="15dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false">
+
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/speed_graph"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:title="Speed"
+            app:seriesColor="#00cc00"
+            app:seriesType="line" />
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

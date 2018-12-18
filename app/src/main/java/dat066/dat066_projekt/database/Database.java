@@ -5,9 +5,11 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@androidx.room.Database(entities = {UserActivityEntity.class}, version = 3)
+@androidx.room.Database(entities = {UserActivityEntity.class}, version = 4)
 public abstract class Database extends RoomDatabase {
 
     private static volatile Database INSTANCE;
@@ -20,6 +22,7 @@ public abstract class Database extends RoomDatabase {
                             Database.class, "user_activity_database")
                             .fallbackToDestructiveMigration()
                             .addCallback(sRoomDatabaseCallback)
+                            .allowMainThreadQueries()
                             .build();
                 }
             }

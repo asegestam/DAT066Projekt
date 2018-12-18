@@ -25,13 +25,6 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_map_fragment_to_statsFragment"
-            app:destination="@id/stats_fragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
             android:id="@+id/action_map_fragment_to_goalsFragment"
             app:destination="@id/goals_fragment"
             app:enterAnim="@anim/nav_default_enter_anim"
@@ -72,11 +65,10 @@
         tools:layout="@layout/useractivity_list_fragment">
         <action
             android:id="@+id/action_userActivityList_to_mapFragment"
-            app:destination="@id/map_fragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:destination="@id/map_fragment" />
+        <action
+            android:id="@+id/action_useractivity_fragment_to_stats_fragment"
+            app:destination="@id/stats_fragment" />
     </fragment>
     <fragment
         android:id="@+id/stats_fragment"
@@ -84,12 +76,8 @@
         android:label="Elevation"
         tools:layout="@layout/fragment_stats">
         <action
-            android:id="@+id/action_statsFragment_to_map_fragment"
-            app:destination="@id/map_fragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            android:id="@+id/action_stats_fragment_to_useractivity_fragment"
+            app:destination="@id/useractivity_fragment" />
     </fragment>
     <fragment
         android:id="@+id/goals_fragment"

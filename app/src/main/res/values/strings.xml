@@ -19,6 +19,7 @@
     <string name="discard_activity">Do you want to discard this activity?</string>
     <string name="discard">DISCARD</string>
     <string name="cancel">CANCEL</string>
+    <string name="elevation_key">AIzaSyAEzpANRDqkS9s6NXF3gaoOcW114ahHh8M</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="clear_all_data">Clear Data</string>

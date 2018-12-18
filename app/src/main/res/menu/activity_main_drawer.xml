@@ -13,10 +13,6 @@
             android:icon="@drawable/ic_profile_option"
             android:title="Profile" />
         <item
-            android:id="@+id/stats_fragment"
-            android:icon="@drawable/ic_stats_option"
-            android:title="Statistics"/>
-        <item
             android:id="@+id/useractivity_fragment"
             android:icon="@drawable/ic_cloud_queue_black_24dp"
             android:title="Activities"/>
