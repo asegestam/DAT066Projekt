@@ -10,6 +10,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import androidx.annotation.StringRes;
+
 import static android.content.ContentValues.TAG;
 
 public class ElevationUpdater {
@@ -40,15 +42,15 @@ public class ElevationUpdater {
         if(location != null) {
             final double LONGITUDE = location.getLongitude();
             final double LATITUDE = location.getLatitude();
-            final String url = "https://maps.googleapis.com/maps/api/ele/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyDVhNkpid7dwf_jsBQ02XQKJNW4vW-DhvA";
+            final String url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + LATITUDE + "," + LONGITUDE + "&key=AIzaSyAEzpANRDqkS9s6NXF3gaoOcW114ahHh8M";
 
             new Thread() {
                 public void run() {
                     HttpHandler sh = new HttpHandler();
                     double elevation = 0;
                     String jsonStr = sh.makeServiceCall(url);
-                    Log.e(TAG, "parsed: LAT: " + LATITUDE + " LONG: " + LONGITUDE);
-                    Log.e(TAG, "String: " + jsonStr);
+                    /*Log.e(TAG, "parsed: LAT: " + LATITUDE + " LONG: " + LONGITUDE);
+                    Log.e(TAG, "String: " + jsonStr);*/
 
                     if (jsonStr != null) {
                         try {
@@ -73,7 +75,7 @@ public class ElevationUpdater {
         elevation = -1;
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonTemp = jsonArray.getJSONObject(i);
-            elevation = jsonTemp.getDouble("ele");
+            elevation = jsonTemp.getDouble("elevation");
         }
         return elevation;
     }

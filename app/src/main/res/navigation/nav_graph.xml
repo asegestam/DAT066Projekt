@@ -17,9 +17,6 @@
             android:id="@+id/action_mapFragment_to_userActivityList"
             app:destination="@id/useractivity_fragment" />
         <action
-            android:id="@+id/action_map_fragment_to_statsFragment"
-            app:destination="@id/stats_fragment" />
-        <action
             android:id="@+id/action_map_fragment_to_goalsFragment"
             app:destination="@id/goals_fragment" />
         <action
@@ -49,6 +46,9 @@
         <action
             android:id="@+id/action_userActivityList_to_mapFragment"
             app:destination="@id/map_fragment" />
+        <action
+            android:id="@+id/action_useractivity_fragment_to_stats_fragment"
+            app:destination="@id/stats_fragment" />
     </fragment>
     <fragment
         android:id="@+id/stats_fragment"
@@ -56,8 +56,8 @@
         android:label="Elevation"
         tools:layout="@layout/fragment_stats">
         <action
-            android:id="@+id/action_statsFragment_to_map_fragment"
-            app:destination="@id/map_fragment" />
+            android:id="@+id/action_stats_fragment_to_useractivity_fragment"
+            app:destination="@id/useractivity_fragment" />
     </fragment>
     <fragment
         android:id="@+id/goals_fragment"

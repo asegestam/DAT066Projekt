@@ -3,7 +3,9 @@ package dat066.dat066_projekt;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.icu.util.Calendar;
 import android.location.Location;
 import android.os.Bundle;
@@ -26,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -45,11 +48,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.ByteArrayOutputStream;
+import java.sql.Blob;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
 
@@ -71,7 +79,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Location firstLocation = null;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
     GraphView graph;
+    public int id = 0;
     Timer t;
+    TimerTask tTask;
     boolean activityStopped;
     boolean activityPaused;
     boolean followerModeEnabled;
@@ -229,6 +239,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void resetValues() {
         elapsedActivityTime = 0;
         userMovement.clear();
+        elevationUpdater.getElevationArray().clear();
         speedDistanceCalculator.resetValues();
         route = null;
         listOfUserMovement.clear();
@@ -253,6 +264,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void startActivity() {
         activityStopped = false;
         activityPaused = false;
+        t = new Timer();
+        tTask = new TimerTask() {
+            @Override
+            public void run() {
+                plotGraph();
+            }
+        };
         setButtonVisibility(8);
         setTextViewVisibility(0);
         (view.findViewById(R.id.stop_button)).setVisibility(View.VISIBLE);
@@ -260,12 +278,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         resetValues(); //resets all previous activity values to start recording a new one
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
        // saveSnackbar.dismiss();
+        t.schedule(tTask, 1000,5000);
         startTimer();
     }
 
     public void stopActivity() {
         activityStopped = true;
         activityPaused = true;
+        t.cancel();
+        t.purge();
         setButtonVisibility(0);
         (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
         setTextViewVisibility(8);
@@ -276,6 +297,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         stopTimer();
         saveActivity();
         addMarkers();
+        plotGraph();
     }
 
     /** Pauses the current active activity */
@@ -308,10 +330,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if(firstLocation != null) {
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
             UserActivityEntity userActivityEntity = new UserActivityEntity(0, currentTime.toString(), speedDistanceCalculator.getSpeed()
-                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000);
+                    , calories, speedDistanceCalculator.getDistanceInMetres(), elapsedActivityTime/1000, elevationUpdater.getElevationArray());
             ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
             Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
-            //userActivity.saveNote();
+        }
+    }
+
+    public void plotGraph() {
+        if(this.activityStopped) {
+            if(elevationUpdater.getEle() > 0)
+                elevationUpdater.elevationArray.add(elevationUpdater.getEle());
+        }else{
+            if(elevationUpdater.getEle() != 0.0) {
+                elevationUpdater.elevationArray.add(elevationUpdater.getEle());
+                Log.e(TAG, "Added: " + elevationUpdater.getEle() + " in MapFragment!");
+            }
         }
     }
 

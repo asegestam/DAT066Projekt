@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import dat066.dat066_projekt.MapFragment;
 
 public class UserActivityRepository {
     private static String TAG = "Repository";
@@ -25,6 +26,10 @@ public class UserActivityRepository {
 
     public void insertActivity(UserActivityEntity userActivity) {
         new insertAsyncTask(mUserActivityDao).execute(userActivity);
+    }
+
+    public UserActivityEntity getActivity(int ID) {
+        return mUserActivityDao.getActivity(ID);
     }
 
     public void deleteActiviy(UserActivityEntity userActivity) {

@@ -1,14 +1,23 @@
 package dat066.dat066_projekt;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -18,31 +27,33 @@ import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
-public class StatsFragment extends Fragment {
+public class StatsFragment extends Fragment  {
 
     private View view;
+    ArrayList array = new ArrayList();
     double data = 0;
+
+    public StatsFragment(){
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_stats, container, false);
-
-        Bundle bundle = this.getArguments();
-
-        if(bundle != null)
-            setPlotData(bundle.getParcelableArrayList("elevation"));
-
-        return view;
+        ArrayList elevation = this.getArguments().getParcelableArrayList("array");
+        Log.d(TAG,"array in stats: "+elevation.size());
+        setPlotData(elevation);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
+    private void setPlotData(ArrayList array){
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    public void setPlotData(ArrayList array){
-
-        GraphView graph = view.findViewById(R.id.graph);
+        GraphView graph = (GraphView) view.findViewById(R.id.graph);
         DataPoint[] dataPoints = new DataPoint[array.size()];
         for (int i = 0; i < array.size(); i++) {
             dataPoints[i] = new DataPoint(i, (double) array.get(i));
@@ -63,7 +74,7 @@ public class StatsFragment extends Fragment {
         graph.getViewport().set;
         graph.getViewport().setScalable(true);
         graph.getViewport().setScalableY(true);*/
+        graph.removeAllSeries();
         graph.addSeries(series);
-        Log.e(TAG, "Added point: " + data);
     }
 }
