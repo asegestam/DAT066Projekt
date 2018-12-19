@@ -156,8 +156,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationViewModel.getLastKnownLocation().observe(this, new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                moveCamera(latLng);
+                if(location != null) {
+                    Log.i(TAG, "onChanged: lastKnownLocation " + location.getLatitude() + " " + location.getLongitude());
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    moveCamera(latLng);
+                }
             }
         });
         super.onViewCreated(view, savedInstanceState);
@@ -197,11 +200,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.i(TAG, "onMapReady: map rdy");
         ((MainActivity) getActivity()).changeActivityText();
         this.mMap = googleMap;
-
-        if(checkPermissions()) {
-            mMap.setMyLocationEnabled(true);
-
-        }
+        mMap.setMyLocationEnabled(true);
         mMap.setPadding(0, 0, 0, 0);
         mMap.setOnMapClickListener(onMapClickListener);
         mMap.setOnMyLocationButtonClickListener(onMyLocationButtonClickListener);

@@ -49,10 +49,6 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private String type;
     private boolean activityStopped;
-    private final int REQUEST_CHECK_SETTINGS = 0; // a unique identifier
-    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 1500; /* 2 sec */
-    private LocationRequest mLocationRequest;
     NavController navController;
     ElevationUpdater elevationUpdater;
     private UserActivityViewModel userActivityViewModel;
@@ -64,7 +60,6 @@ public class MainActivity extends AppCompatActivity
     private LocationReceiver myReceiver;
     private SharedPreferences mPrefs;
     private ArrayList<Location> batchedLocations;
-    private Location location;
     // Monitors the state of the connection to the service.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -238,16 +233,17 @@ public class MainActivity extends AppCompatActivity
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.hasExtra(LocationUpdatesService.CURRENT_LOCATION)) {
-                location = intent.getParcelableExtra(LocationUpdatesService.CURRENT_LOCATION);
-                if (location != null) {
-                    locationViewModel.getLocation().setValue(location);
-                }
-            } else {
-                Log.i(TAG, "onReceive: receiving lastknown location");
-                location = intent.getParcelableExtra(LocationUpdatesService.LAST_KNOWN_LOCATION);
-                locationViewModel.getLastKnownLocation().setValue(location);
+            Log.d(TAG, "onReceive: started");
+            Location location = intent.getParcelableExtra(LocationUpdatesService.CURRENT_LOCATION);
+            if (location != null) {
+                locationViewModel.getLocation().setValue(location);
             }
+            Location lastKnownlocation = intent.getParcelableExtra(LocationUpdatesService.LAST_KNOWN_LOCATION);
+            if(lastKnownlocation != null) {
+                Log.i(TAG, "onReceive: receiving lastknown location " + lastKnownlocation.getLatitude() + " " + lastKnownlocation.getLongitude());
+                locationViewModel.getLastKnownLocation().setValue(lastKnownlocation);
+            }
+            Log.d(TAG, "onReceive: ended");
         }
     }
 
