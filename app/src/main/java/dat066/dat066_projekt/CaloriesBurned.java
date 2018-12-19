@@ -16,11 +16,8 @@ public class CaloriesBurned {
     private String age;
     private String weight;
     private String height;
-    private String training;
-    private double met;
     private double bsa;
     private double bmr;
-    private long time = System.currentTimeMillis();
 
     public CaloriesBurned(Context context){
         SharedPreferences sharedPref = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -34,7 +31,6 @@ public class CaloriesBurned {
         else {
             bmr = (9.56 * Double.parseDouble(weight)) + (1.85 * Double.parseDouble(height)) - (4.68 * calculateAge()) + 665;
         }
-        System.out.println(bmr);
     }
 
     @TargetApi(26)
@@ -53,15 +49,12 @@ public class CaloriesBurned {
             training = "Running";
         }
         if(training.equals("Running")){
-            //met = (1.411 * Math.pow(speed, 0.8435));
-            //calories = (bmr/24) * met * time/3600000;
+
             double horizontal = (v * 0.2);
             double vertical = (a * v * 0.9);
             calories = ((horizontal + vertical) * Double.parseDouble(weight)/1000) * 5.05 * time/60;
         }
         else if(training.equals("Cycling")){
-            //met = 0.6923 * (speed * 3.6) + -6.727;
-            //calories = ((bmr/24) * met * time/3600000)/4.184;
 
             bsa = Math.sqrt((Double.parseDouble(height) * Double.parseDouble(weight)/3600));
             double horizontal = 131 - (9.8 * speed) + 0.92 * Math.pow(speed, 2);
@@ -73,13 +66,8 @@ public class CaloriesBurned {
             double vertical = (a * v * 1.8);
             calories = ((horizontal + vertical) * Double.parseDouble(weight)/1000) * 5.05 * time/60;
         }
-        Log.d(TAG, "CalculateCalories: CALORIES: " + calories);
         return calories;
 
-    }
-
-    public void setTraining(String s){
-        training = s;
     }
 
 }

@@ -111,7 +111,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onChanged(Location location) {
                 Log.d(TAG, "onChanged: location updated");
                 if(location != null){
-                    userLocations.add(location);
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     currentLocation = location;
                     if(firstLocation == null) {
@@ -129,6 +128,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         speedArray.add(speedDistanceCalculator.getSpeed());
                         updateTextViews();
                         elevationUpdater.setLocation(currentLocation);
+                        plotGraph();
                         lastLocation = location;
                     }
                 }
@@ -280,7 +280,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         tTask = new TimerTask() {
             @Override
             public void run() {
-              //plotGraph();
+                System.out.println("10 sekunder åt skogen");
             }
         };
         ((MainActivity)getActivity()).requestLocationUpdates();
@@ -293,14 +293,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         startTimer();
     }
 
-    private double totalCalories(String training, Location[] locations, int counter){
+    private double totalCalories(String training, Location[] locations, Double[] elevations, int counter){
         if(counter < locations.length - 1)
-            return caloriesBurned.CalculateCalories((((MainActivity) getActivity()).getType())
-,
+            return caloriesBurned.CalculateCalories((((MainActivity) getActivity()).getType()),
                     calcTime(locations[counter], locations[counter + 1]),
                     calcSpeed(locations[counter], locations[counter + 1]),
-                    calcElevationAngel(locations[counter], locations[counter + 1]))
-                    + totalCalories(training, locations, counter + 1);
+                    calcElevationAngel(locations[counter], locations[counter + 1],elevations[counter], elevations[counter + 1]))
+                    + totalCalories(training, locations, elevations, counter + 1);
         else
         return 0;
     }
@@ -315,8 +314,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return speed*3.6;
     }
 
-    private double calcElevationAngel(Location loc1, Location loc2){
-        return 0.06;
+    private double calcElevationAngel(Location loc1, Location loc2, double ele1, double ele2){
+        double height = ele2 - ele1;
+        double base = (double)loc1.distanceTo(loc2);
+
+        Log.d(TAG, "calcElevationAngel: " + (Math.toDegrees(Math.atan2(height, base)))/100);
+        return (Math.toDegrees(Math.atan2(height, base))/100);
     }
 
     private void stopActivity() {
@@ -356,7 +359,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         String currentTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myDate);
         //double calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(), elapsedActivityTime);
         Log.i(TAG, "saveActivity: SIZE" + userLocations.toString());
-        double calories = totalCalories(((MainActivity) getActivity()).getType(), userLocations.toArray(new Location[userLocations.size()]), 0);
+        double calories = totalCalories(((MainActivity) getActivity()).getType(),
+                            userLocations.toArray(new Location[userLocations.size()]),
+                            elevationUpdater.getElevationArray().toArray(new Double[elevationUpdater.getElevationArray().size()]),
+                            0);
         Log.d(TAG, "stopActivity: KALORIER " + calories);
         if(firstLocation != null) {
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
@@ -375,15 +381,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void plotGraph() {
-        if(this.activityStopped) {
-            if(elevationUpdater.getEle() > 0)
-                elevationUpdater.elevationArray.add(elevationUpdater.getEle());
-        }else{
-            if(elevationUpdater.getEle() != 0.0) {
-                elevationUpdater.elevationArray.add(elevationUpdater.getEle());
-                Log.e(TAG, "Added: " + elevationUpdater.getEle() + " in MapFragment!");
+        double elevation = elevationUpdater.getEle();
+
+        if(elevation > 0){
+            elevationUpdater.elevationArray.add(elevation);
+            userLocations.add(currentLocation);
+
+        }else if(elevation != 0.0) {
+                elevationUpdater.elevationArray.add(elevation);
+                userLocations.add(currentLocation);
             }
-        }
     }
 
     /** Adds two markers, one at the start location, one at the end location */

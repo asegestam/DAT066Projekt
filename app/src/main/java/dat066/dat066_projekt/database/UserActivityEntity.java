@@ -74,7 +74,7 @@ public class UserActivityEntity {
 
     @NonNull
     public double getPace() {
-        return Math.round(speed*100.0)/100.0;
+        return Math.round(pace*100.0)/100.0;
     }
     @NonNull
     public double getCalories() {
