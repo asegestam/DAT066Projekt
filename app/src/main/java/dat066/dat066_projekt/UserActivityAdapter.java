@@ -72,13 +72,13 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
 
     @Override
     public void onBindViewHolder(final UserActivityViewHolder holder, final int position) {
-        UserActivityEntity current = mActivities.get(position);
+        final UserActivityEntity current = mActivities.get(position);
         holder.cardView.setId(current.getDate().hashCode());
         ArrayList<Double> elevationArray = current.getElevationArray();
         Date date = new Date(current.getTime());
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String formatted = formatter.format(date);
+        final String formatted = formatter.format(date);
         holder.dateView.setText(current.getDate());
         holder.timeView.setText(formatted);
         if(current.getDistance() > 1000 ) {
@@ -98,6 +98,11 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("elevationArray", entity.getElevationArray());
                 bundle.putParcelableArrayList("speedArray", entity.getSpeedArray());
+                bundle.putDouble("distance",entity.getDistance());
+                bundle.putDouble("topSpeed", entity.getSpeed());
+                bundle.putDouble("averagePace",entity.getPace());
+                bundle.putString("date",entity.getDate());
+                bundle.putString("time",formatted);
                 Navigation.findNavController(v).navigate(R.id.action_useractivity_fragment_to_stats_fragment, bundle);
             }
         });

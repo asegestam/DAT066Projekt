@@ -144,7 +144,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         }
                         lastLocation = location;
                     }
-                    Log.i(TAG, "onChanged: list of locaitons size " + latLngs.size());
+                    Log.i(TAG, "onChanged: list of locations size " + latLngs.size());
                     userMovement.addAll(latLngs);
                     lastLocation = null;
                     currentLocation = null;
@@ -344,15 +344,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void plotGraph() {
-        if(this.activityStopped) {
-            if(elevationUpdater.getEle() > 0)
-                elevationUpdater.elevationArray.add(elevationUpdater.getEle());
-        }else{
-            if(elevationUpdater.getEle() != 0.0) {
-                elevationUpdater.elevationArray.add(elevationUpdater.getEle());
-                Log.e(TAG, "Added: " + elevationUpdater.getEle() + " in MapFragment!");
+        double elevation = elevationUpdater.getEle();
+            if(elevation > 0){
+                elevationUpdater.elevationArray.add(elevation);
+        }else if(elevation != 0.0) {
+                elevationUpdater.elevationArray.add(elevation);
             }
-        }
     }
 
     /** Adds two markers, one at the start location, one at the end location */
