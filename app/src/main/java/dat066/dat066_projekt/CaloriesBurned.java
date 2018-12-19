@@ -28,7 +28,6 @@ public class CaloriesBurned {
         weight = sharedPref.getString("weight", "");
         age = sharedPref.getString("age", "");
         height = sharedPref.getString("height", "");
-        training = "Running";
         if(gender.equals("Male")){
             bmr = (13.7 * Double.parseDouble(weight)) + (5 * Double.parseDouble(height)) - (6.8 * calculateAge()) + 66;
         }
@@ -47,9 +46,9 @@ public class CaloriesBurned {
     }
 
 
-    public double CalculateCalories(double speed, long time) {
+    public double CalculateCalories(String training, long time, double speed, double alpha) {
         double v = 16.67 * speed; // m/min
-        double a = 0.0; // gradient
+        double a = alpha; // gradient
         if(training == null) {
             training = "Running";
         }
