@@ -25,7 +25,6 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -264,26 +263,23 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        MaterialButton button = findViewById(R.id.activity_button);
+
         switch (item.getItemId()) {
             case R.id.run:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                button.setIcon(getDrawable(R.drawable.ic_directions_run_black_24dp));
                 changeActivityText();
                 break;
 
             case R.id.bike:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                button.setIcon(getDrawable(R.drawable.ic_directions_bike_black_24dp));
                 changeActivityText();
                 break;
 
             case R.id.walking:
                 type = item.getTitle().toString();
                 item.setChecked(true);
-                button.setIcon(getDrawable(R.drawable.ic_directions_walk_black_24dp));
                 changeActivityText();
                 break;
         }
