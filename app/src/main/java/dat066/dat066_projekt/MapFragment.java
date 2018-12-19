@@ -61,11 +61,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Location lastLocation = null;
     private Location firstLocation = null;
     private Location initLocation = null;
+    Chronometer time;
     private DecimalFormat numberFormat = new DecimalFormat("#.00");
     GraphView graph;
     public int id = 0;
-    Timer t;
-    TimerTask tTask;
     boolean activityStopped;
     boolean activityPaused;
     boolean followerModeEnabled;
@@ -78,6 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<LatLng> userMovement = new ArrayList<>();
     private ArrayList<Location> userLocations = new ArrayList<>();
     private ArrayList speedArray = new ArrayList<>();
+    private ArrayList timeArray = new ArrayList<>();
     TextView distanceText;
     TextView speedText;
     private LocationViewModel locationViewModel;
@@ -124,6 +124,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         userMovement.add(latLng);
                         reDrawRoute();
                         updateCamera(latLng);
+                        timeArray.add(SystemClock.elapsedRealtime() - time.getBase());
                         speedDistanceCalculator.handleLocationChange(location, lastLocation);
                         speedArray.add(speedDistanceCalculator.getSpeed());
                         updateTextViews();
@@ -276,20 +277,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void startActivity() {
         activityStopped = false;
-        t = new Timer();
-        tTask = new TimerTask() {
-            @Override
-            public void run() {
-                System.out.println("10 sekunder åt skogen");
-            }
-        };
         ((MainActivity)getActivity()).requestLocationUpdates();
         initActivityUI();
         mMap.clear(); // clears the map of all polylines and markers
         resetValues(); //resets all previous activity values to start recording a new one
         Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
         followerModeEnabled = true;
-        t.schedule(tTask, 1000,5000);
         startTimer();
     }
 
@@ -324,8 +317,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void stopActivity() {
         activityStopped = true;
-        t.cancel();
-        t.purge();
         ((MainActivity)getActivity()).removeLocationUpdates();
         initIdleUI();
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
@@ -374,7 +365,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     speedDistanceCalculator.getDistanceInMetres(),
                     elapsedActivityTime,
                     speedArray,
-                    elevationUpdater.getElevationArray());
+                    elevationUpdater.getElevationArray(),
+                    timeArray);
             ViewModelProviders.of(getActivity()).get(UserActivityViewModel.class).insertActivity(userActivityEntity);
             Log.d(TAG, "saveActivity: insertActivity " + userActivityEntity.getDate());
         }
@@ -519,7 +511,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Toast.makeText(getActivity(), "Please select Type of Activity", Toast.LENGTH_SHORT).show();
             }
             else {
-                Chronometer time = view.findViewById(R.id.timeChronometer);
+                time = view.findViewById(R.id.timeChronometer);
                 timeStopped = 0;
                 time.setBase(SystemClock.elapsedRealtime());
                 elevationUpdater.setActivityStopped(false);

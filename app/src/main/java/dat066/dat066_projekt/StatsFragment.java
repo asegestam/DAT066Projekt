@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
 import android.media.Image;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -38,6 +39,7 @@ public class StatsFragment extends Fragment  {
     TextView speedTextView;
     GraphView elevationGraph;
     GraphView speedGraph;
+    ArrayList time;
 
     public StatsFragment(){
 
@@ -48,6 +50,7 @@ public class StatsFragment extends Fragment  {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_stats, container, false);
         array = this.getArguments().getParcelableArrayList("elevationArray");
+        time = this.getArguments().getParcelableArrayList("timeArray");
         headline = view.findViewById(R.id.stats_headling);
         elevationTextView = view.findViewById(R.id.stats_text);
         speedTextView = view.findViewById(R.id.speed_stats);
@@ -85,7 +88,7 @@ public class StatsFragment extends Fragment  {
 
         DataPoint[] dataPoints = new DataPoint[array.size()];
         for (int i = 0; i < array.size(); i++) {
-            dataPoints[i] = new DataPoint(i*5, (double) array.get(i));
+            dataPoints[i] = new DataPoint((double) time.get(i)/1000, (double) array.get(i));
         }
 
         final LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
@@ -96,7 +99,7 @@ public class StatsFragment extends Fragment  {
         final double minY = series.getLowestValueY();
         series.setColor(Color.BLACK);
         series.setDrawDataPoints(true);
-        series.setDataPointsRadius(10);
+        series.setDataPointsRadius(0);
         series.setThickness(8);
         series.setDrawAsPath(true);
         series.setAnimated(true);

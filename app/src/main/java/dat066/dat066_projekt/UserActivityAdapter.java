@@ -98,6 +98,7 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("elevationArray", entity.getElevationArray());
                 bundle.putParcelableArrayList("speedArray", entity.getSpeedArray());
+                bundle.putParcelableArrayList("timeArray", entity.getTimeArray());
                 bundle.putDouble("distance",entity.getDistance());
                 bundle.putDouble("topSpeed", entity.getSpeed());
                 bundle.putDouble("averagePace",entity.getPace());
