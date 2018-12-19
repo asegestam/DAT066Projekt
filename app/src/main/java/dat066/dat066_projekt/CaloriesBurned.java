@@ -46,7 +46,7 @@ public class CaloriesBurned {
     }
 
 
-    public double CalculateCalories(String training, long time, double speed, double alpha) {
+    public double CalculateCalories(String training, double time, double speed, double alpha) {
         double v = 16.67 * speed; // m/min
         double a = alpha; // gradient
         if(training == null) {
@@ -57,7 +57,7 @@ public class CaloriesBurned {
             //calories = (bmr/24) * met * time/3600000;
             double horizontal = (v * 0.2);
             double vertical = (a * v * 0.9);
-            calories = ((horizontal + vertical) * Double.parseDouble(weight)/1000) * 5.05 * time/60000;
+            calories = ((horizontal + vertical) * Double.parseDouble(weight)/1000) * 5.05 * time/60;
         }
         else if(training.equals("Cycling")){
             //met = 0.6923 * (speed * 3.6) + -6.727;
@@ -65,14 +65,15 @@ public class CaloriesBurned {
 
             bsa = Math.sqrt((Double.parseDouble(height) * Double.parseDouble(weight)/3600));
             double horizontal = 131 - (9.8 * speed) + 0.92 * Math.pow(speed, 2);
-            double vertical = (271.5 * 0.0 * speed)/(0.236*bsa);
-            calories = (horizontal + vertical) * time/3600000 * 0.86 * bsa;
+            double vertical = (271.5 * a * speed)/(0.236*bsa);
+            calories = (horizontal + vertical) * time/3600 * 0.86 * bsa;
         }
         else if(training.equals("Walking")){
             double horizontal = (v * 0.1);
             double vertical = (a * v * 1.8);
-            calories = ((horizontal + vertical) * Double.parseDouble(weight)/1000) * 5.05 * time/60000;
+            calories = ((horizontal + vertical) * Double.parseDouble(weight)/1000) * 5.05 * time/60;
         }
+        Log.d(TAG, "CalculateCalories: CALORIES: " + calories);
         return calories;
 
     }

@@ -251,6 +251,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         route = null;
         lastLocation = null;
         firstLocation = null;
+        userLocations.clear();
         userMovement.clear();
         locationViewModel.getLastLocation().setValue(null);
         locationViewModel.getFirstLocation().setValue(null);
@@ -279,7 +280,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         tTask = new TimerTask() {
             @Override
             public void run() {
-              plotGraph();
+              //plotGraph();
             }
         };
         ((MainActivity)getActivity()).requestLocationUpdates();
@@ -293,7 +294,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private double totalCalories(String training, Location[] locations, int counter){
-        if(counter < locations.length)
+        if(counter < locations.length - 1)
             return caloriesBurned.CalculateCalories((((MainActivity) getActivity()).getType())
 ,
                     calcTime(locations[counter], locations[counter + 1]),
@@ -304,18 +305,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return 0;
     }
 
-    private long calcTime(Location loc1, Location loc2){
-
-        return (loc2.getTime() - loc1.getTime())/1000;
+    private double calcTime(Location loc1, Location loc2){
+        return (double)((loc2.getTime() - loc1.getTime())/1000);
     }
-    private double calcSpeed(Location loc1, Location loc2){
 
-        return loc1.distanceTo(loc2)/calcTime(loc1, loc2);
+    private double calcSpeed(Location loc1, Location loc2){
+        double distance = (double)loc1.distanceTo(loc2);
+        double speed = distance/calcTime(loc1, loc2);
+        return speed*3.6;
     }
 
     private double calcElevationAngel(Location loc1, Location loc2){
-
-        return 0;
+        return 0.06;
     }
 
     private void stopActivity() {
@@ -354,6 +355,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Date myDate = Calendar.getInstance().getTime();
         String currentTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myDate);
         //double calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(), elapsedActivityTime);
+        Log.i(TAG, "saveActivity: SIZE" + userLocations.toString());
         double calories = totalCalories(((MainActivity) getActivity()).getType(), userLocations.toArray(new Location[userLocations.size()]), 0);
         Log.d(TAG, "stopActivity: KALORIER " + calories);
         if(firstLocation != null) {

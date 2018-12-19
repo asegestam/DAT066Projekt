@@ -84,11 +84,11 @@ public class UserActivityAdapter extends RecyclerView.Adapter<UserActivityAdapte
         if(current.getDistance() > 1000 ) {
             holder.distanceView.setText("Distance " + current.getDistance()/1000 + " km");
         }else {
-            holder.distanceView.setText("Distance " + current.getDistance() + " m");
+            holder.distanceView.setText("Distance " + (int)current.getDistance() + " m");
         }
         holder.paceView.setText("Pace " + current.getPace() + " min/km");
         holder.speedView.setText("Top Speed " + current.getSpeed() + " m/s");
-        holder.caloriesView.setText("" + current.getCalories() + " calories burned");
+        holder.caloriesView.setText("" + (int)current.getCalories() + " calories burned");
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
