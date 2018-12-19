@@ -29,6 +29,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
 import java.text.DateFormat;
@@ -181,11 +183,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void initButtons() {
-        Button startButton = view.findViewById(R.id.start_button);
-        ImageButton stopButton =  view.findViewById(R.id.stop_button);
-        Button activityButton = view.findViewById(R.id.activity_button);
-        ImageButton pauseButton =  view.findViewById(R.id.imageButtonPause);
-        ImageButton resumeButton = view.findViewById(R.id.imageButtonResume);
+        FloatingActionButton startButton = view.findViewById(R.id.start_button);
+        FloatingActionButton stopButton =  view.findViewById(R.id.stop_button);
+        MaterialButton activityButton = view.findViewById(R.id.activity_button);
+        FloatingActionButton pauseButton =  view.findViewById(R.id.pause_button);
+        FloatingActionButton resumeButton = view.findViewById(R.id.resume_button);
         pauseButton.setOnClickListener(pauseButtonClickListener);
         startButton.setOnClickListener(startButtonClickListener);
         resumeButton.setOnClickListener(resumeButtonClickListener);
@@ -221,9 +223,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             TextView distanceKm = view.findViewById(R.id.distanceKm);
             distanceM.setVisibility(View.GONE);
             distanceKm.setVisibility(View.VISIBLE);
+            distanceText.setText(numberFormat.format(distance) + " km");
+        } else {
+            distanceText.setText(numberFormat.format(distance) + " m");
         }
-        distanceText.setText(numberFormat.format(distance));
-        speedText.setText(numberFormat.format(speedDistanceCalculator.getAveragePace()));
+        speedText.setText(numberFormat.format(speedDistanceCalculator.getAveragePace() + " min/km"));
     }
 
     private void updateCamera(LatLng latLng) {
@@ -303,16 +307,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     /** Pauses the current active activity */
     private void pauseActivity() {
-        (view.findViewById(R.id.imageButtonPause)).setVisibility(View.GONE);
-        (view.findViewById(R.id.imageButtonResume)).setVisibility(View.VISIBLE);
+        (view.findViewById(R.id.pause_button)).setVisibility(View.GONE);
+        (view.findViewById(R.id.resume_button)).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.stop_button).setVisibility(View.VISIBLE);
         activityPaused = true;
         stopTimer();
     }
 
     /** Resumes the paused activity */
     private void resumeActivity() {
-        (view.findViewById(R.id.imageButtonPause)).setVisibility(View.VISIBLE);
-        (view.findViewById(R.id.imageButtonResume)).setVisibility(View.GONE);
+        (view.findViewById(R.id.pause_button)).setVisibility(View.VISIBLE);
+        (view.findViewById(R.id.resume_button)).setVisibility(View.GONE);
+        view.findViewById(R.id.stop_button).setVisibility(View.GONE);
         activityPaused = false;
         addResumeMarkers();
         followerModeEnabled = true;
@@ -399,9 +405,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         //buttons
         view.findViewById(R.id.start_button).setVisibility(View.VISIBLE);
         view.findViewById(R.id.activity_button).setVisibility(View.VISIBLE);
-        view.findViewById(R.id.imageButtonPause).setVisibility(View.GONE);
+        view.findViewById(R.id.pause_button).setVisibility(View.GONE);
         view.findViewById(R.id.stop_button).setVisibility(View.GONE);
-        view.findViewById(R.id.imageButtonResume).setVisibility(View.GONE);
+        view.findViewById(R.id.resume_button).setVisibility(View.GONE);
         //textview
         view.findViewById(R.id.distanceText).setVisibility(View.GONE);
         view.findViewById(R.id.speedText).setVisibility(View.GONE);
@@ -421,18 +427,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         view.findViewById(R.id.speedWord).setVisibility(View.VISIBLE);
         view.findViewById(R.id.rectangle).setVisibility(View.VISIBLE);
         view.findViewById(R.id.timeChronometer).setVisibility(View.VISIBLE);
-        view.findViewById(R.id.stop_button).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.stop_button).setVisibility(View.GONE);
 
         if(!activityPaused) {
             Log.d(TAG, "initActivityUI: activity not paused");
-            view.findViewById(R.id.imageButtonPause).setVisibility(View.VISIBLE);
-            view.findViewById(R.id.imageButtonResume).setVisibility(View.GONE);
+            view.findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.resume_button).setVisibility(View.GONE);
 
         } else {
             Log.d(TAG, "initActivityUI: activity paused");
 
-            view.findViewById(R.id.imageButtonPause).setVisibility(View.GONE);
-            view.findViewById(R.id.imageButtonResume).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.pause_button).setVisibility(View.GONE);
+            view.findViewById(R.id.resume_button).setVisibility(View.VISIBLE);
         }
     }
     private void initSavedUI() {
