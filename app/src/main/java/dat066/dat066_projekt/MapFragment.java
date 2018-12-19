@@ -76,17 +76,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     double calories;
     private UserActivityViewModel activityViewModel;
     private ArrayList<LatLng> userMovement = new ArrayList<>();
+    private ArrayList<Location> userLocations = new ArrayList<>();
     private ArrayList speedArray = new ArrayList<>();
     TextView distanceText;
     TextView speedText;
     private LocationViewModel locationViewModel;
     private SharedPreferences sharedPreferences;
+    CaloriesBurned caloriesBurned;
 
     @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_map, container, false);
+        caloriesBurned = new CaloriesBurned(getContext());
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment == null) {
             FragmentManager fragmentManager = getFragmentManager();
@@ -125,6 +128,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         speedArray.add(speedDistanceCalculator.getSpeed());
                         updateTextViews();
                         elevationUpdater.setLocation(currentLocation);
+                        plotGraph();
                         lastLocation = location;
                     }
                 }
@@ -247,6 +251,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         route = null;
         lastLocation = null;
         firstLocation = null;
+        userLocations.clear();
         userMovement.clear();
         locationViewModel.getLastLocation().setValue(null);
         locationViewModel.getFirstLocation().setValue(null);
@@ -275,7 +280,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         tTask = new TimerTask() {
             @Override
             public void run() {
-              plotGraph();
+                System.out.println("10 sekunder åt skogen");
             }
         };
         ((MainActivity)getActivity()).requestLocationUpdates();
@@ -286,6 +291,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         followerModeEnabled = true;
         t.schedule(tTask, 1000,5000);
         startTimer();
+    }
+
+    private double totalCalories(String training, Location[] locations, Double[] elevations, int counter){
+        if(counter < locations.length - 1)
+            return caloriesBurned.CalculateCalories((((MainActivity) getActivity()).getType()),
+                    calcTime(locations[counter], locations[counter + 1]),
+                    calcSpeed(locations[counter], locations[counter + 1]),
+                    calcElevationAngel(locations[counter], locations[counter + 1],elevations[counter], elevations[counter + 1]))
+                    + totalCalories(training, locations, elevations, counter + 1);
+        else
+        return 0;
+    }
+
+    private double calcTime(Location loc1, Location loc2){
+        return (double)((loc2.getTime() - loc1.getTime())/1000);
+    }
+
+    private double calcSpeed(Location loc1, Location loc2){
+        double distance = (double)loc1.distanceTo(loc2);
+        double speed = distance/calcTime(loc1, loc2);
+        return speed*3.6;
+    }
+
+    private double calcElevationAngel(Location loc1, Location loc2, double ele1, double ele2){
+        double height = ele2 - ele1;
+        double base = (double)loc1.distanceTo(loc2);
+
+        Log.d(TAG, "calcElevationAngel: " + (Math.toDegrees(Math.atan2(height, base)))/100);
+        return (Math.toDegrees(Math.atan2(height, base))/100);
     }
 
     private void stopActivity() {
@@ -323,9 +357,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void saveActivity() {
         Date myDate = Calendar.getInstance().getTime();
         String currentTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myDate);
-        CaloriesBurned caloriesBurned = new CaloriesBurned(getContext());
-        caloriesBurned.setTraining(((MainActivity) getActivity()).getType());
-        double calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(), elapsedActivityTime);
+        //double calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(), elapsedActivityTime);
+        Log.i(TAG, "saveActivity: SIZE" + userLocations.toString());
+        double calories = totalCalories(((MainActivity) getActivity()).getType(),
+                            userLocations.toArray(new Location[userLocations.size()]),
+                            elevationUpdater.getElevationArray().toArray(new Double[elevationUpdater.getElevationArray().size()]),
+                            0);
         Log.d(TAG, "stopActivity: KALORIER " + calories);
         if(firstLocation != null) {
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
@@ -345,10 +382,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void plotGraph() {
         double elevation = elevationUpdater.getEle();
-            if(elevation > 0){
-                elevationUpdater.elevationArray.add(elevation);
+
+        if(elevation > 0){
+            elevationUpdater.elevationArray.add(elevation);
+            userLocations.add(currentLocation);
+
         }else if(elevation != 0.0) {
                 elevationUpdater.elevationArray.add(elevation);
+                userLocations.add(currentLocation);
             }
     }
 
