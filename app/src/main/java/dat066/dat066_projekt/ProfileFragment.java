@@ -228,14 +228,17 @@ public class ProfileFragment extends Fragment {
                 month = month + 1;
                 String date;
                 Log.d(TAG, "onDateSet: yyyy/mm/dd:" + year + "/" + month + "/" + dayOfMonth);
-                if (month < 10 && dayOfMonth > 10) {
-                    date = "" + year + "/" + String.format("%02d", month) + "/" + dayOfMonth;
-                } else if (month > 10 && dayOfMonth < 10) {
-                    date = "" + year + "/" + month + "/" + String.format("%02d", dayOfMonth);
-                } else if (month < 10 && dayOfMonth < 10) {
-                    date = "" + year + "/" + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
-                } else {
-                    date = "" + year + "/" + month + "/" + dayOfMonth;
+                if(month < 10 && dayOfMonth > 10){
+                    date = "" + year + "/"  + String.format("%02d", month) + "/" + dayOfMonth;
+                }
+                else if(month > 10 && dayOfMonth < 10){
+                    date = "" + year + "/"  + month + "/" + String.format("%02d", dayOfMonth);
+                }
+                else if(month < 10 && dayOfMonth < 10){
+                    date = "" + year + "/"  + String.format("%02d", month) + "/" + String.format("%02d", dayOfMonth);
+                }
+                else {
+                    date = "" + year + "/"  + month + "/" + dayOfMonth;
                 }
                 mDisplayDate.setText(date);
                 editor.putString("age", date);

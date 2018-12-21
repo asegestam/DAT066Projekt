@@ -9,7 +9,7 @@ import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@androidx.room.Database(entities = {UserActivityEntity.class}, version = 4)
+@androidx.room.Database(entities = {UserActivityEntity.class}, version = 7)
 public abstract class Database extends RoomDatabase {
 
     private static volatile Database INSTANCE;

@@ -40,11 +40,14 @@ public class UserActivityEntity {
     @ColumnInfo(name = "speedArray")
     private ArrayList speedArray;
     @NonNull
+    @ColumnInfo(name = "timeArray")
+    private ArrayList timeArray;
+    @NonNull
     @ColumnInfo(name = "ListId")
     private int listId;
 
 
-    public UserActivityEntity(int id, String date, double speed, double pace, double calories, double distance, long time,ArrayList speedArray, ArrayList elevationArray) {
+    public UserActivityEntity(int id, String date, double speed, double pace, double calories, double distance, long time,ArrayList speedArray, ArrayList elevationArray, ArrayList timeArray) {
         this.id = id;
         this.date = date;
         this.speed = speed;
@@ -54,6 +57,7 @@ public class UserActivityEntity {
         this.time = time;
         this.elevationArray = elevationArray;
         this.speedArray = speedArray;
+        this.timeArray = timeArray;
         this.listId = date.hashCode();
     }
 
@@ -74,11 +78,11 @@ public class UserActivityEntity {
 
     @NonNull
     public double getPace() {
-        return Math.round(pace);
+        return Math.round(pace*100.0)/100.0;
     }
     @NonNull
     public double getCalories() {
-        return ((int) calories);
+        return calories;
     }
 
     @NonNull
@@ -96,6 +100,9 @@ public class UserActivityEntity {
 
     @NonNull
     public ArrayList getSpeedArray(){ return speedArray; }
+
+    @NonNull
+    public ArrayList getTimeArray(){ return timeArray; }
 
     @NonNull
     public int getListId(){ return listId; }
