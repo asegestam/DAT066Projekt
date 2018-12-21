@@ -9,7 +9,7 @@
     android:orientation="vertical"
     app:cardBackgroundColor="@color/colorPrimaryLight"
     app:cardCornerRadius="5dp"
-    app:cardElevation="15dp"
+    app:cardElevation="8dp"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="false">
 

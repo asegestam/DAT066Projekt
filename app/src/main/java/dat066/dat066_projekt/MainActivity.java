@@ -32,6 +32,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -40,6 +41,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
@@ -101,6 +103,20 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         NavigationUI.setupWithNavController(navigationView, navController);
         NavigationUI.setupWithNavController(toolbar, navController, drawer);
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                Log.i(TAG, "onDestinationChanged: to " + destination.getLabel());
+                if(destination.getLabel().equals("Activity")) {
+                    LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
+                    Log.i(TAG, "onDestinationChange: register receiver");
+                } else {
+                    LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(myReceiver);
+                    removeLocationUpdates();
+                    Log.i(TAG, "onDestinationChange: unregister receiver");
+                }
+            }
+        });
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         userActivityViewModel = ViewModelProviders.of(this).get(UserActivityViewModel.class);
         locationViewModel = ViewModelProviders.of(this).get(LocationViewModel.class);
@@ -119,14 +135,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "onResume: register receiver");
-        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
     }
 
     @Override
     protected void onPause() {
         Log.i(TAG, "onPause: unregister receiver");
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(myReceiver);
         super.onPause();
     }
 

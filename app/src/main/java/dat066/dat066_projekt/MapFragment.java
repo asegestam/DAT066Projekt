@@ -351,14 +351,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void saveActivity() {
         Date myDate = Calendar.getInstance().getTime();
         String currentTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(myDate);
-        //double calories = caloriesBurned.CalculateCalories(speedDistanceCalculator.getAverageSpeed(), elapsedActivityTime);
-        Log.i(TAG, "saveActivity: SIZE" + userLocations.toString());
-        double calories = totalCalories(((MainActivity) getActivity()).getType(),
-                            userLocations.toArray(new Location[userLocations.size()]),
-                            elevationUpdater.getElevationArray().toArray(new Double[elevationUpdater.getElevationArray().size()]),
-                            0);
-        Log.d(TAG, "stopActivity: KALORIER " + calories);
         if(firstLocation != null) {
+            Log.i(TAG, "saveActivity: SIZE" + userLocations.toString());
+            double calories = totalCalories(((MainActivity) getActivity()).getType(),
+                    userLocations.toArray(new Location[userLocations.size()]),
+                    elevationUpdater.getElevationArray().toArray(new Double[elevationUpdater.getElevationArray().size()]),
+                    0);
+            Log.d(TAG, "stopActivity: KALORIER " + calories);
             LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
             UserActivityEntity userActivityEntity = new UserActivityEntity(0,
                     currentTime,
