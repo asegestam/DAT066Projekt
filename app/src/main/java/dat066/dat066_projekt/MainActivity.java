@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity
     public void changeActivityText(){
         if(getType() != null) {
             Button button = (Button) findViewById(R.id.activity_button);
-            button.setText("Type of Activity - " + getType());
+            button.setText("Activity - " + getType());
         }
     }
 

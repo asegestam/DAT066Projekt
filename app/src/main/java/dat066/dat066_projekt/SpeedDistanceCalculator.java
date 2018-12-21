@@ -54,15 +54,24 @@ public class SpeedDistanceCalculator {
 
     /** Calculates average speed */
     private double calcAverageSpeed() {
-        long time = (lastRecordedLocation.getTime() - firstRecordedLocation.getTime())/1000;
-        double avgspeed = (firstRecordedLocation.distanceTo(lastRecordedLocation))/time;
-        Log.d(TAG, "calcAverageSpeed: medelhastighet " + avgspeed*3.6 + " km/h");
-        return avgspeed*3.6;
+        if(firstRecordedLocation != null && lastRecordedLocation != null ) {
+            long time = (lastRecordedLocation.getTime() - firstRecordedLocation.getTime())/1000;
+            double avgspeed = (firstRecordedLocation.distanceTo(lastRecordedLocation))/time;
+            Log.d(TAG, "calcAverageSpeed: medelhastighet " + avgspeed*3.6 + " km/h");
+            return avgspeed*3.6;
+        } else {
+            return 0;
+        }
     }
 
     private double calcAveragePace() {
-        if(calcAverageSpeed() <= 0) return 0;
-        else return 60/calcAverageSpeed();
+        double pace =  60/calcAverageSpeed();
+        if(Double.isNaN(pace)) {
+            return 0;
+        } else {
+            Log.i(TAG, "calcAveragePace: " + pace);
+            return pace;
+        }
     }
 
     /** Resets values, used when wanting to reset the recorded speed and distance */
