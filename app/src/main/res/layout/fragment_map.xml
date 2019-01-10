@@ -45,7 +45,7 @@
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/activity_button"
+            android:id="@+id/activity_type"
             style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

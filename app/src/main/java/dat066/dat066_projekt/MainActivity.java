@@ -2,6 +2,7 @@ package dat066.dat066_projekt;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
@@ -23,14 +25,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
-
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
 import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -50,7 +49,8 @@ public class MainActivity extends AppCompatActivity
         implements PopupMenu.OnMenuItemClickListener {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    private String type;
+    private String type = "";
+    private Context mContext;
     private boolean activityStopped;
     NavController navController;
     ElevationUpdater elevationUpdater;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
         if(!checkPermissions()) {
             requestPermissions();
         }
@@ -107,14 +108,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
                 Log.i(TAG, "onDestinationChanged: to " + destination.getLabel());
-                if(destination.getLabel().equals("Activity")) {
-                    LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
-                    Log.i(TAG, "onDestinationChange: register receiver");
-                } else {
-                    LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(myReceiver);
-                    removeLocationUpdates();
-                    Log.i(TAG, "onDestinationChange: unregister receiver");
-                }
+                Utils.setActivityStopped(mContext, true);
+                removeLocationUpdates();
             }
         });
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -135,6 +130,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
+        Log.i(TAG, "onPause: register receiver");
     }
 
     @Override
@@ -214,7 +211,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
-                locationService.requestLocationUpdates();
+                return;
             } else {
                 // Permission denied.
                 Snackbar.make(
@@ -239,7 +236,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
 
     /**
 
@@ -269,7 +265,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showPopup() {
-        PopupMenu popup = new PopupMenu(this, findViewById(R.id.activity_button));
+        PopupMenu popup = new PopupMenu(this, findViewById(R.id.activity_type));
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.popup_menu, popup.getMenu());
         popup.show();
@@ -278,27 +274,24 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        MaterialButton button = findViewById(R.id.activity_button);
+        MaterialButton button = findViewById(R.id.activity_type);
         switch (item.getItemId()) {
             case R.id.run:
                 type = item.getTitle().toString();
                 item.setChecked(true);
                 button.setIcon(getDrawable(R.drawable.ic_directions_run_black_24dp));
-                changeActivityText();
                 break;
 
             case R.id.bike:
                 type = item.getTitle().toString();
                 item.setChecked(true);
                 button.setIcon(getDrawable(R.drawable.ic_directions_bike_black_24dp));
-                changeActivityText();
                 break;
 
             case R.id.walking:
                 type = item.getTitle().toString();
                 item.setChecked(true);
                 button.setIcon(getDrawable(R.drawable.ic_directions_walk_black_24dp));
-                changeActivityText();
                 break;
         }
         return true;
@@ -306,12 +299,15 @@ public class MainActivity extends AppCompatActivity
 
     public void changeActivityText(){
         if(getType() != null) {
-            Button button = (Button) findViewById(R.id.activity_button);
+            Button button = (Button) findViewById(R.id.activity_type);
             button.setText("Activity - " + getType());
         }
     }
 
     public String getType() {
+        if (type == null && type.isEmpty()) {
+            return "";
+        }
         return type;
     }
 
@@ -322,7 +318,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void removeLocationUpdates() {
-        if(checkPermissions()) {
+        if(checkPermissions() && locationService != null) {
             locationService.removeLocationUpdates();
         }
     }

@@ -57,9 +57,9 @@ public class ElevationUpdater {
 
                             ele = getData(jsonStr, elevation);
 
-                            //Log.e(TAG, jsonStr);
+                            Log.d(TAG, jsonStr);
                         } catch (final JSONException e) {
-                            Log.e(TAG, "Json parsing error: " + e.getMessage());
+                            Log.d(TAG, "Json parsing error: " + e.getMessage());
                         }
                     } else {
                         Log.e(TAG, "Couldn't get json from server.");

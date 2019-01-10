@@ -1,4 +1,5 @@
 package dat066.dat066_projekt;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,12 +13,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,12 +32,12 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.jjoe64.graphview.GraphView;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -48,11 +47,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import dat066.dat066_projekt.database.UserActivityEntity;
+
 import static android.content.ContentValues.TAG;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
-    private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private SpeedDistanceCalculator speedDistanceCalculator;
     private ElevationUpdater elevationUpdater = ElevationUpdater.getInstance();
@@ -67,19 +66,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private DecimalFormat numberFormat = new DecimalFormat("#.00");
     GraphView graph;
     public int id = 0;
-    boolean activityStopped;
-    boolean activityPaused;
-    boolean followerModeEnabled;
-    Snackbar saveSnackbar;
-    ArrayList<ArrayList<LatLng>> listOfUserMovement;
-    Polyline route;
-    Polyline savedPolyline;
-    double calories;
-    private UserActivityViewModel activityViewModel;
+    private boolean activityStopped;
+    private boolean activityPaused;
+    private boolean followerModeEnabled;
+    private Snackbar saveSnackbar;
+    private Polyline route;
     private ArrayList<LatLng> userMovement = new ArrayList<>();
     private ArrayList<Location> userLocations = new ArrayList<>();
-    private ArrayList speedArray = new ArrayList<>();
-    private ArrayList timeArray = new ArrayList<>();
+    private ArrayList<Double> speedArray = new ArrayList<>();
+    private ArrayList<Long> timeArray = new ArrayList<>();
     TextView distanceText;
     TextView speedText;
     private LocationViewModel locationViewModel;
@@ -92,7 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_map, container, false);
         caloriesBurned = new CaloriesBurned(getContext());
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment == null) {
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -107,11 +102,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         initGlobalVariables();
         initButtons();
+        String type = ((MainActivity)getActivity()).getType();
+        setActivity(type);
         locationViewModel = ViewModelProviders.of(getActivity()).get(LocationViewModel.class);
         locationViewModel.getLocation().observe(this, new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
-                Log.d(TAG, "onChanged: location updated");
+                Log.d(TAG, "onChanged: location updating");
                 if(location != null){
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     currentLocation = location;
@@ -133,33 +130,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         elevationUpdater.setLocation(currentLocation);
                         plotGraph();
                         lastLocation = location;
-                    }
-                }
-            }
-        });
-        locationViewModel.getListOfLocations().observe(this, new Observer<ArrayList<Location>>() {
-            @Override
-            public void onChanged(ArrayList<Location> locations) {
-                if (!locations.isEmpty()) {
-                    lastLocation = locations.get(0);
-                    ArrayList<LatLng> latLngs = new ArrayList<>();
-                    for (Location location : locations) {
-                       speedDistanceCalculator.handleLocationChange(location, lastLocation);
-                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        if (!userMovement.contains(latLng)) {
-                            latLngs.add(latLng);
-                        }
-                        lastLocation = location;
-                    }
-                    Log.i(TAG, "onChanged: list of locations size " + latLngs.size());
-                    userMovement.addAll(latLngs);
-                    lastLocation = null;
-                    currentLocation = null;
-                    latLngs.clear();
-                }
-            }
-        });
+                        Log.d(TAG, "onChanged: location updated");
 
+                    }
+                }
+            }
+        });
         locationViewModel.getLastKnownLocation().observe(this, new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
@@ -173,6 +149,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    private void setActivity(String type) {
+        MaterialButton button = view.findViewById(R.id.activity_type);
+        switch (type) {
+            case "Running":
+                button.setIcon(getActivity().getDrawable(R.drawable.ic_directions_run_black_24dp));
+                break;
+            case "Cycling":
+                button.setIcon(getActivity().getDrawable(R.drawable.ic_directions_bike_black_24dp));
+                break;
+            case "Walking":
+                button.setIcon(getActivity().getDrawable(R.drawable.ic_directions_walk_black_24dp));
+                break;
+            case "":
+                button.setIcon(getActivity().getDrawable(R.drawable.ic_priority_high_black_24dp));
+                break;
+        }
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -181,7 +175,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void initGlobalVariables() {
         speedDistanceCalculator = SpeedDistanceCalculator.getInstance();
         followerModeEnabled = true;
-       //saveSnackbar = Snackbar.make(view.findViewById(R.id.myCoordinatorLayout), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
+        saveSnackbar = Snackbar.make(view.findViewById(R.id.map_fragment), R.string.save_activity, Snackbar.LENGTH_INDEFINITE);
         route = null;
         distanceText = view.findViewById(R.id.distanceText);
         speedText = view.findViewById(R.id.speedText);
@@ -190,7 +184,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void initButtons() {
         FloatingActionButton startButton = view.findViewById(R.id.start_button);
         MaterialButton stopButton =  view.findViewById(R.id.stop_button);
-        MaterialButton activityButton = view.findViewById(R.id.activity_button);
+        MaterialButton activityButton = view.findViewById(R.id.activity_type);
         MaterialButton pauseButton =  view.findViewById(R.id.pause_button);
         MaterialButton resumeButton = view.findViewById(R.id.resume_button);
         pauseButton.setOnClickListener(pauseButtonClickListener);
@@ -205,7 +199,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.i(TAG, "onMapReady: map rdy");
-        ((MainActivity) getActivity()).changeActivityText();
         this.mMap = googleMap;
         if(checkPermissions()) mMap.setMyLocationEnabled(true);
         mMap.setPadding(0, 0, 0, 0);
@@ -218,7 +211,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
-    public void updateTextViews() {
+    private void updateTextViews() {
         TextView distanceText = view.findViewById(R.id.distanceText);
         TextView speedText = view.findViewById(R.id.speedText);
         double distance = speedDistanceCalculator.getDistanceInMetres();
@@ -262,7 +255,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationViewModel.getLocation().setValue(null);
     }
 
-    public void reDrawRoute(){
+    private void reDrawRoute(){
         if(route != null) {
             route.setPoints(userMovement);
         }
@@ -278,26 +271,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         reDrawRoute();
     }
 
-    private void startActivity() {
-        activityStopped = false;
-        ((MainActivity)getActivity()).requestLocationUpdates();
-        initActivityUI();
-        mMap.clear(); // clears the map of all polylines and markers
-        resetValues(); //resets all previous activity values to start recording a new one
-        Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
-        followerModeEnabled = true;
-        startTimer();
-    }
-
     private double totalCalories(String training, Location[] locations, Double[] elevations, int counter){
         if(counter < locations.length - 1)
-            return caloriesBurned.CalculateCalories((((MainActivity) getActivity()).getType()),
+            return caloriesBurned.CalculateCalories(training,
                     calcTime(locations[counter], locations[counter + 1]),
                     calcSpeed(locations[counter], locations[counter + 1]),
                     calcElevationAngel(locations[counter], locations[counter + 1],elevations[counter], elevations[counter + 1]))
                     + totalCalories(training, locations, elevations, counter + 1);
-        else
-        return 0;
+        else return 0;
     }
 
     private double calcTime(Location loc1, Location loc2){
@@ -318,22 +299,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return (Math.toDegrees(Math.atan2(height, base))/100);
     }
 
+    private void startActivity() {
+        activityStopped = false;
+        ((MainActivity)getActivity()).requestLocationUpdates();
+        initActivityUI();
+        Utils.setActivityStopped(getActivity(), false);
+        mMap.clear(); // clears the map of all polylines and markers
+        resetValues(); //resets all previous activity values to start recording a new one
+        Toast.makeText(getActivity(), "Activity started", Toast.LENGTH_SHORT).show();
+        followerModeEnabled = true;
+        startTimer();
+        saveSnackbar.dismiss();
+    }
+
+
     private void stopActivity() {
         activityStopped = true;
         ((MainActivity)getActivity()).removeLocationUpdates();
         initIdleUI();
+        Utils.setActivityStopped(getActivity(), true);
         Toast.makeText(getActivity(), "Activity stopped", Toast.LENGTH_SHORT).show();
         stopTimer();
-        saveActivity();
+        saveSnackbar.setAction(R.string.save_string, saveListener);
+        saveSnackbar.show();
         addMarkers();
-        plotGraph();
-        resetValues();
     }
 
     /** Pauses the current active activity */
     private void pauseActivity() {
         (view.findViewById(R.id.pause_button)).setVisibility(View.GONE);
         (view.findViewById(R.id.resume_button)).setVisibility(View.VISIBLE);
+        Utils.setActivityStopped(getActivity(), true);
         activityPaused = true;
         stopTimer();
     }
@@ -342,6 +338,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void resumeActivity() {
         (view.findViewById(R.id.pause_button)).setVisibility(View.VISIBLE);
         (view.findViewById(R.id.resume_button)).setVisibility(View.GONE);
+        Utils.setActivityStopped(getActivity(), false);
         activityPaused = false;
         addResumeMarkers();
         followerModeEnabled = true;
@@ -357,9 +354,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     userLocations.toArray(new Location[userLocations.size()]),
                     elevationUpdater.getElevationArray().toArray(new Double[elevationUpdater.getElevationArray().size()]),
                     0);
+            if(Double.isNaN(calories)) calories = 0.0;
             Log.d(TAG, "stopActivity: KALORIER " + calories);
-            LatLng firstLatLng = new LatLng(firstLocation.getLatitude(), firstLocation.getLongitude());
-            UserActivityEntity userActivityEntity = new UserActivityEntity(0,
+            UserActivityEntity userActivityEntity = new UserActivityEntity(
+                    0,
                     currentTime,
                     speedDistanceCalculator.getHighestSpeed(),
                     speedDistanceCalculator.getAveragePace(),
@@ -431,7 +429,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void initIdleUI() {
         //buttons
         view.findViewById(R.id.start_button).setVisibility(View.VISIBLE);
-        view.findViewById(R.id.activity_button).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.activity_type).setVisibility(View.VISIBLE);
         view.findViewById(R.id.pause_button).setVisibility(View.GONE);
         view.findViewById(R.id.stop_button).setVisibility(View.GONE);
         view.findViewById(R.id.resume_button).setVisibility(View.GONE);
@@ -446,7 +444,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void initActivityUI() {
         view.findViewById(R.id.start_button).setVisibility(View.GONE);
-        view.findViewById(R.id.activity_button).setVisibility(View.GONE);
+        view.findViewById(R.id.activity_type).setVisibility(View.GONE);
 
         view.findViewById(R.id.distanceText).setVisibility(View.VISIBLE);
         view.findViewById(R.id.speedText).setVisibility(View.VISIBLE);
@@ -508,8 +506,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     /** Sets the onClickListeners to all relevant buttons */
     private View.OnClickListener startButtonClickListener = new View.OnClickListener() {
         public void onClick(View v) {
-            if(((MainActivity) getActivity()).getType() == null)
+            if(((MainActivity)getActivity()).getType().isEmpty())
             {
+                Log.i(TAG, "onClick: type is " + ((MainActivity)getActivity()).getType());
                 Toast.makeText(getActivity(), "Please select Type of Activity", Toast.LENGTH_SHORT).show();
             }
             else {
@@ -563,7 +562,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private View.OnClickListener saveListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //saveActivity();
+            saveActivity();
         }
     };
 

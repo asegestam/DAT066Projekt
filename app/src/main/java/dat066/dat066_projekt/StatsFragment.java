@@ -91,7 +91,7 @@ public class StatsFragment extends Fragment  {
             dataPoints[i] = new DataPoint((double) time.get(i)/1000, (double) array.get(i));
         }
 
-        final LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
+        final LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints);
         final double maxX = series.getHighestValueX();
         final GraphView graphView = graph;
         final double minX = series.getLowestValueX();

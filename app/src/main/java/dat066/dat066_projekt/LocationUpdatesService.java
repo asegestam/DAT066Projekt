@@ -168,8 +168,11 @@ public class LocationUpdatesService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        ContextCompat.startForegroundService(this, new Intent(this, LocationUpdatesService.class));
-        startForeground(1, getNotification());
+        if(!Utils.activityStopped(this)) {
+            ContextCompat.startForegroundService(this, new Intent(this, LocationUpdatesService.class));
+            startForeground(1, getNotification());
+            Log.i(TAG, "onUnbind: foregorund starting");
+        }
         return true;
     }
 
